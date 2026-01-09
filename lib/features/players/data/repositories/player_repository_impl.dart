@@ -82,6 +82,58 @@ class PlayerRepositoryImpl implements PlayerRepository {
   }
 
   @override
+  Future<Either<Failure, List<Player>>> getPlayersByClubId(int clubId) async {
+    try {
+      final query = database.select(database.players)..where((tbl) => tbl.clubId.equals(clubId));
+      
+      // Default sort by CA descending for squad view
+      query.orderBy([(t) => OrderingTerm(expression: t.ca, mode: OrderingMode.desc)]);
+
+      final playerRows = await query.get();
+
+      final players = playerRows.map((row) => Player(
+        id: row.id,
+        name: row.name,
+        age: row.age,
+        clubId: row.clubId,
+        agentId: row.agentId,
+        position: row.position,
+        ca: row.ca,
+        pa: row.pa,
+        reputation: row.reputation,
+        currentContractId: row.currentContractId,
+      )).toList();
+
+      // Define position weights
+      final positionWeights = {
+        'GK': 0,
+        'DL': 1, 'DC': 1, 'DR': 1, 'DEF': 1, // Added DEF
+        'DMC': 2,
+        'ML': 3, 'MC': 3, 'MR': 3, 'MID': 3, // Added MID
+        'AML': 4, 'AMC': 4, 'AMR': 4,
+        'ST': 5, 'FWD': 5, // Added FWD
+      };
+
+      // Custom Sort: Position Weight (asc) -> CA (desc)
+      players.sort((a, b) {
+        final weightA = positionWeights[a.position] ?? 99;
+        final weightB = positionWeights[b.position] ?? 99;
+
+        if (weightA != weightB) {
+          return weightA.compareTo(weightB);
+        } else {
+          // Secondary sort by CA (Best players first within position group)
+          return b.ca.compareTo(a.ca);
+        }
+      });
+
+      return Right(players);
+    } catch (e) {
+      return Left(CacheFailure(e.toString()));
+    }
+  }
+
+  @override
   Future<Either<Failure, Player>> getPlayerById(int id) async {
     try {
       final query = database.select(database.players)..where((tbl) => tbl.id.equals(id));

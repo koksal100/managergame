@@ -30,3 +30,13 @@ final filteredPlayersProvider = FutureProvider<List<Player>>((ref) async {
     (players) => players,
   );
 });
+
+// Players by Club Provider (Family)
+final playersByClubProvider = FutureProvider.family<List<Player>, int>((ref, clubId) async {
+  final repository = ref.watch(playerRepositoryProvider);
+  final result = await repository.getPlayersByClubId(clubId);
+  return result.fold(
+    (failure) => throw Exception(failure.message),
+    (players) => players,
+  );
+});

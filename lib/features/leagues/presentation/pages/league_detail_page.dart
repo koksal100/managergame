@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../clubs/domain/entities/club.dart';
 import '../../../clubs/providers/club_provider.dart';
+import '../../../clubs/presentation/pages/club_squad_page.dart';
 import '../../domain/entities/league.dart';
 import '../widgets/league_colors.dart';
 
@@ -65,7 +67,7 @@ class LeagueDetailPage extends ConsumerWidget {
                       itemCount: clubs.length,
                       itemBuilder: (context, index) {
                         final club = clubs[index];
-                        return _buildTableRow(index + 1, club.name);
+                        return _buildTableRow(context, index + 1, club);
                       },
                     ),
                   ],
@@ -119,26 +121,36 @@ class LeagueDetailPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildTableRow(int pos, String teamName) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-      decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.white.withOpacity(0.05))),
-        color: pos % 2 == 0 ? Colors.white.withOpacity(0.02) : Colors.transparent, // Zebra striping
-      ),
-      child: Row(
-        children: [
-          _buildCell('$pos', width: 30),
-          Expanded(child: Text(teamName, style: const TextStyle(color: Colors.white, fontSize: 13))),
-          _buildCell('0', width: 25),
-          _buildCell('0', width: 25),
-          _buildCell('0', width: 25),
-          _buildCell('0', width: 25),
-          _buildCell('0', width: 25),
-          _buildCell('0', width: 25),
-          _buildCell('0', width: 25),
-          _buildCell('0', width: 30, bold: true, color: Colors.yellowAccent),
-        ],
+  Widget _buildTableRow(BuildContext context, int pos, Club club) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ClubSquadPage(clubId: club.id, clubName: club.name),
+          ),
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+        decoration: BoxDecoration(
+          border: Border(bottom: BorderSide(color: Colors.white.withOpacity(0.05))),
+          color: pos % 2 == 0 ? Colors.white.withOpacity(0.02) : Colors.transparent, // Zebra striping
+        ),
+        child: Row(
+          children: [
+            _buildCell('$pos', width: 30),
+            Expanded(child: Text(club.name, style: const TextStyle(color: Colors.white, fontSize: 13))),
+            _buildCell('0', width: 25),
+            _buildCell('0', width: 25),
+            _buildCell('0', width: 25),
+            _buildCell('0', width: 25),
+            _buildCell('0', width: 25),
+            _buildCell('0', width: 25),
+            _buildCell('0', width: 25),
+            _buildCell('0', width: 30, bold: true, color: Colors.yellowAccent),
+          ],
+        ),
       ),
     );
   }
