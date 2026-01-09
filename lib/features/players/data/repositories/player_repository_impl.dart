@@ -14,7 +14,9 @@ class PlayerRepositoryImpl implements PlayerRepository {
   @override
   Future<Either<Failure, List<Player>>> getPlayers() async {
     try {
-      final playerRows = await database.select(database.players).get();
+      final playerRows = await (database.select(database.players)
+            ..orderBy([(t) => OrderingTerm(expression: t.ca, mode: OrderingMode.desc)]))
+          .get();
       final players = playerRows.map((row) => Player(
         id: row.id,
         name: row.name,
@@ -119,7 +121,8 @@ class PlayerRepositoryImpl implements PlayerRepository {
   Future<Either<Failure, List<Player>>> searchPlayers(String query) async {
     try {
       final playerRows = await (database.select(database.players)
-            ..where((tbl) => tbl.name.like('%$query%'))) // Simple LIKE query
+            ..where((tbl) => tbl.name.like('%$query%'))
+            ..orderBy([(t) => OrderingTerm(expression: t.ca, mode: OrderingMode.desc)]))
           .get();
       
       final players = playerRows.map((row) => Player(

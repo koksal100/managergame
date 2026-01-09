@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/presentation/widgets/game_button.dart'; // Adjust path if needed
 import '../../../players/domain/entities/player.dart';
 import '../../../players/presentation/providers/player_provider.dart';
+import '../../../players/presentation/widgets/player_detail_dialog.dart';
 
 class ScoutingPage extends ConsumerWidget {
   const ScoutingPage({super.key});
@@ -88,7 +89,7 @@ class ScoutingPage extends ConsumerWidget {
                       itemCount: players.length,
                       itemBuilder: (context, index) {
                         final player = players[index];
-                        return _buildPlayerCard(player);
+                        return _buildPlayerCard(context, player);
                       },
                     );
                   },
@@ -105,51 +106,59 @@ class ScoutingPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildPlayerCard(Player player) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
-      ),
-      child: Row(
-        children: [
-          // Player Icon / Avatar
-          CircleAvatar(
-            backgroundColor: Colors.blueGrey.shade900,
-            child: Text(
-              player.position, 
-              style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+  Widget _buildPlayerCard(BuildContext context, Player player) {
+    return GestureDetector(
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (context) => PlayerDetailDialog(player: player),
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.08),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.white.withOpacity(0.1)),
+        ),
+        child: Row(
+          children: [
+            // Player Icon / Avatar
+            CircleAvatar(
+              backgroundColor: Colors.blueGrey.shade900,
+              child: Text(
+                player.position, 
+                style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+              ),
             ),
-          ),
-          const SizedBox(width: 16),
-          
-          // Player Info
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  player.name,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
+            const SizedBox(width: 16),
+            
+            // Player Info
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    player.name,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                   ),
-                ),
-                Text(
-                  'Age: ${player.age} • CA: ${player.ca} / PA: ${player.pa}', // Debug info enabled: CA/PA
-                  style: const TextStyle(color: Colors.white54, fontSize: 12),
-                ),
-              ],
+                  Text(
+                    'Age: ${player.age} • CA: ${player.ca} / PA: ${player.pa}', // Debug info enabled: CA/PA
+                    style: const TextStyle(color: Colors.white54, fontSize: 12),
+                  ),
+                ],
+              ),
             ),
-          ),
 
-          // Action / Status
-          const Icon(Icons.chevron_right, color: Colors.white54),
-        ],
+            // Action / Status
+            const Icon(Icons.chevron_right, color: Colors.white54),
+          ],
+        ),
       ),
     );
   }
