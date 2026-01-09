@@ -101,8 +101,8 @@ class ClubSquadPage extends ConsumerWidget {
                                   player.name,
                                   style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
                                 ),
-                                Text(
-                                  'Age: ${player.age} | Rating: ${player.ca}',
+                                  Text(
+                                  'Age: ${player.age} | Rat: ${player.ca} | Val: ${_formatCurrency(player.marketValue)}',
                                   style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 12),
                                 ),
                               ],
@@ -131,5 +131,16 @@ class ClubSquadPage extends ConsumerWidget {
     if (['DMC', 'MC', 'AMC', 'ML', 'MR', 'MID'].contains(position)) return Colors.amber; // Midfielders: Yellow/Amber
     if (['AML', 'AMR', 'ST', 'FWD'].contains(position)) return Colors.blue.shade900; // Forwards: Dark Blue
     return Colors.grey;
+  }
+
+  String _formatCurrency(int value) {
+    if (value >= 1000000) {
+      double millions = value / 1000000;
+      return '€${millions.toStringAsFixed(millions.truncateToDouble() == millions ? 0 : 1)}M';
+    } else if (value >= 1000) {
+      return '€${(value / 1000).toStringAsFixed(0)}K';
+    } else {
+      return '€$value';
+    }
   }
 }

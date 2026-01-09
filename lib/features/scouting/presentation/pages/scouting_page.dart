@@ -187,7 +187,7 @@ class ScoutingPage extends ConsumerWidget {
                     ),
                   ),
                   Text(
-                    'Age: ${player.age} • CA: ${player.ca} / PA: ${player.pa}', // Debug info enabled: CA/PA
+                    'Age: ${player.age} • CA: ${player.ca} • Val: ${_formatCurrency(player.marketValue)}',
                     style: const TextStyle(color: Colors.white54, fontSize: 12),
                   ),
                 ],
@@ -261,5 +261,16 @@ class ScoutingPage extends ConsumerWidget {
       },
       child: content,
     );
+  }
+
+  String _formatCurrency(int value) {
+    if (value >= 1000000) {
+      double millions = value / 1000000;
+      return '€${millions.toStringAsFixed(millions.truncateToDouble() == millions ? 0 : 1)}M';
+    } else if (value >= 1000) {
+      return '€${(value / 1000).toStringAsFixed(0)}K';
+    } else {
+      return '€$value';
+    }
   }
 }
