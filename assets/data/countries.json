@@ -1,0 +1,62 @@
+[
+    {
+        "name": "Turkey",
+        "code": "TR",
+        "reputation": 7000,
+        "nameSource": "Turkey"
+    },
+    {
+        "name": "England",
+        "code": "EN",
+        "reputation": 9500,
+        "nameSource": "England"
+    },
+    {
+        "name": "Spain",
+        "code": "ES",
+        "reputation": 9000,
+        "nameSource": "Spain"
+    },
+    {
+        "name": "Germany",
+        "code": "DE",
+        "reputation": 9200,
+        "nameSource": "Germany"
+    },
+    {
+        "name": "Italy",
+        "code": "IT",
+        "reputation": 8800,
+        "nameSource": "Italy"
+    },
+    {
+        "name": "France",
+        "code": "FR",
+        "reputation": 8500,
+        "nameSource": "France"
+    },
+    {
+        "name": "Brazil",
+        "code": "BR",
+        "reputation": 9400,
+        "nameSource": "Portugal"
+    },
+    {
+        "name": "Argentina",
+        "code": "AR",
+        "reputation": 9300,
+        "nameSource": "Spain"
+    },
+    {
+        "name": "Portugal",
+        "code": "PT",
+        "reputation": 8200,
+        "nameSource": "Portugal"
+    },
+    {
+        "name": "Netherlands",
+        "code": "NL",
+        "reputation": 8000,
+        "nameSource": "Netherlands"
+    }
+]

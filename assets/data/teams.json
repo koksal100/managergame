@@ -1,0 +1,1154 @@
+[
+    {
+        "name": "Galatasaray",
+        "reputation": 78,
+        "wageBudget": 45000000,
+        "transferBudget": 15000000
+    },
+    {
+        "name": "Fenerbahce",
+        "reputation": 77,
+        "wageBudget": 42000000,
+        "transferBudget": 14000000
+    },
+    {
+        "name": "Besiktas",
+        "reputation": 75,
+        "wageBudget": 35000000,
+        "transferBudget": 10000000
+    },
+    {
+        "name": "Trabzonspor",
+        "reputation": 72,
+        "wageBudget": 25000000,
+        "transferBudget": 8000000
+    },
+    {
+        "name": "Basaksehir",
+        "reputation": 70,
+        "wageBudget": 20000000,
+        "transferBudget": 5000000
+    },
+    {
+        "name": "Adana Demirspor",
+        "reputation": 68,
+        "wageBudget": 15000000,
+        "transferBudget": 3000000
+    },
+    {
+        "name": "Konyaspor",
+        "reputation": 65,
+        "wageBudget": 12000000,
+        "transferBudget": 2000000
+    },
+    {
+        "name": "Antalyaspor",
+        "reputation": 65,
+        "wageBudget": 12000000,
+        "transferBudget": 2000000
+    },
+    {
+        "name": "Kasimpasa",
+        "reputation": 64,
+        "wageBudget": 10000000,
+        "transferBudget": 1500000
+    },
+    {
+        "name": "Alanyaspor",
+        "reputation": 64,
+        "wageBudget": 10000000,
+        "transferBudget": 1500000
+    },
+    {
+        "name": "Kayserispor",
+        "reputation": 63,
+        "wageBudget": 9000000,
+        "transferBudget": 1000000
+    },
+    {
+        "name": "Rizespor",
+        "reputation": 62,
+        "wageBudget": 8000000,
+        "transferBudget": 1000000
+    },
+    {
+        "name": "Sivasspor",
+        "reputation": 63,
+        "wageBudget": 9000000,
+        "transferBudget": 1000000
+    },
+    {
+        "name": "Ankaragucu",
+        "reputation": 62,
+        "wageBudget": 8500000,
+        "transferBudget": 1000000
+    },
+    {
+        "name": "Hatayspor",
+        "reputation": 61,
+        "wageBudget": 7000000,
+        "transferBudget": 500000
+    },
+    {
+        "name": "Gaziantep FK",
+        "reputation": 60,
+        "wageBudget": 7000000,
+        "transferBudget": 500000
+    },
+    {
+        "name": "Karagumruk",
+        "reputation": 60,
+        "wageBudget": 6000000,
+        "transferBudget": 500000
+    },
+    {
+        "name": "Samsunspor",
+        "reputation": 60,
+        "wageBudget": 6500000,
+        "transferBudget": 1000000
+    },
+    {
+        "name": "Pendikspor",
+        "reputation": 58,
+        "wageBudget": 5000000,
+        "transferBudget": 500000
+    },
+    {
+        "name": "Istanbulspor",
+        "reputation": 57,
+        "wageBudget": 4000000,
+        "transferBudget": 200000
+    },
+    {
+        "name": "Manchester City",
+        "reputation": 95,
+        "wageBudget": 300000000,
+        "transferBudget": 150000000
+    },
+    {
+        "name": "Arsenal",
+        "reputation": 91,
+        "wageBudget": 220000000,
+        "transferBudget": 100000000
+    },
+    {
+        "name": "Liverpool",
+        "reputation": 92,
+        "wageBudget": 250000000,
+        "transferBudget": 110000000
+    },
+    {
+        "name": "Aston Villa",
+        "reputation": 82,
+        "wageBudget": 120000000,
+        "transferBudget": 60000000
+    },
+    {
+        "name": "Tottenham",
+        "reputation": 85,
+        "wageBudget": 160000000,
+        "transferBudget": 80000000
+    },
+    {
+        "name": "Manchester United",
+        "reputation": 86,
+        "wageBudget": 240000000,
+        "transferBudget": 100000000
+    },
+    {
+        "name": "Newcastle",
+        "reputation": 83,
+        "wageBudget": 150000000,
+        "transferBudget": 90000000
+    },
+    {
+        "name": "Brighton",
+        "reputation": 80,
+        "wageBudget": 80000000,
+        "transferBudget": 40000000
+    },
+    {
+        "name": "West Ham",
+        "reputation": 79,
+        "wageBudget": 90000000,
+        "transferBudget": 30000000
+    },
+    {
+        "name": "Chelsea",
+        "reputation": 84,
+        "wageBudget": 200000000,
+        "transferBudget": 100000000
+    },
+    {
+        "name": "Wolves",
+        "reputation": 76,
+        "wageBudget": 60000000,
+        "transferBudget": 20000000
+    },
+    {
+        "name": "Bournemouth",
+        "reputation": 74,
+        "wageBudget": 50000000,
+        "transferBudget": 15000000
+    },
+    {
+        "name": "Fulham",
+        "reputation": 75,
+        "wageBudget": 55000000,
+        "transferBudget": 20000000
+    },
+    {
+        "name": "Crystal Palace",
+        "reputation": 75,
+        "wageBudget": 60000000,
+        "transferBudget": 15000000
+    },
+    {
+        "name": "Brentford",
+        "reputation": 74,
+        "wageBudget": 50000000,
+        "transferBudget": 15000000
+    },
+    {
+        "name": "Everton",
+        "reputation": 74,
+        "wageBudget": 70000000,
+        "transferBudget": 10000000
+    },
+    {
+        "name": "Nottingham Forest",
+        "reputation": 73,
+        "wageBudget": 60000000,
+        "transferBudget": 15000000
+    },
+    {
+        "name": "Luton Town",
+        "reputation": 68,
+        "wageBudget": 20000000,
+        "transferBudget": 5000000
+    },
+    {
+        "name": "Burnley",
+        "reputation": 70,
+        "wageBudget": 30000000,
+        "transferBudget": 10000000
+    },
+    {
+        "name": "Sheffield United",
+        "reputation": 68,
+        "wageBudget": 25000000,
+        "transferBudget": 5000000
+    },
+    {
+        "name": "Real Madrid",
+        "reputation": 96,
+        "wageBudget": 350000000,
+        "transferBudget": 200000000
+    },
+    {
+        "name": "Barcelona",
+        "reputation": 93,
+        "wageBudget": 300000000,
+        "transferBudget": 50000000
+    },
+    {
+        "name": "Girona",
+        "reputation": 78,
+        "wageBudget": 40000000,
+        "transferBudget": 15000000
+    },
+    {
+        "name": "Atletico Madrid",
+        "reputation": 88,
+        "wageBudget": 180000000,
+        "transferBudget": 60000000
+    },
+    {
+        "name": "Athletic Club",
+        "reputation": 81,
+        "wageBudget": 80000000,
+        "transferBudget": 20000000
+    },
+    {
+        "name": "Real Sociedad",
+        "reputation": 82,
+        "wageBudget": 90000000,
+        "transferBudget": 25000000
+    },
+    {
+        "name": "Real Betis",
+        "reputation": 79,
+        "wageBudget": 70000000,
+        "transferBudget": 15000000
+    },
+    {
+        "name": "Valencia",
+        "reputation": 77,
+        "wageBudget": 60000000,
+        "transferBudget": 10000000
+    },
+    {
+        "name": "Las Palmas",
+        "reputation": 70,
+        "wageBudget": 20000000,
+        "transferBudget": 5000000
+    },
+    {
+        "name": "Getafe",
+        "reputation": 72,
+        "wageBudget": 30000000,
+        "transferBudget": 5000000
+    },
+    {
+        "name": "Osasuna",
+        "reputation": 73,
+        "wageBudget": 35000000,
+        "transferBudget": 8000000
+    },
+    {
+        "name": "Alaves",
+        "reputation": 69,
+        "wageBudget": 15000000,
+        "transferBudget": 3000000
+    },
+    {
+        "name": "Villarreal",
+        "reputation": 78,
+        "wageBudget": 75000000,
+        "transferBudget": 20000000
+    },
+    {
+        "name": "Rayo Vallecano",
+        "reputation": 71,
+        "wageBudget": 25000000,
+        "transferBudget": 5000000
+    },
+    {
+        "name": "Sevilla",
+        "reputation": 79,
+        "wageBudget": 80000000,
+        "transferBudget": 15000000
+    },
+    {
+        "name": "Mallorca",
+        "reputation": 70,
+        "wageBudget": 25000000,
+        "transferBudget": 5000000
+    },
+    {
+        "name": "Celta Vigo",
+        "reputation": 72,
+        "wageBudget": 40000000,
+        "transferBudget": 8000000
+    },
+    {
+        "name": "Cadiz",
+        "reputation": 68,
+        "wageBudget": 18000000,
+        "transferBudget": 2000000
+    },
+    {
+        "name": "Granada",
+        "reputation": 68,
+        "wageBudget": 20000000,
+        "transferBudget": 3000000
+    },
+    {
+        "name": "Almeria",
+        "reputation": 67,
+        "wageBudget": 22000000,
+        "transferBudget": 5000000
+    },
+    {
+        "name": "Bayern Munich",
+        "reputation": 94,
+        "wageBudget": 300000000,
+        "transferBudget": 120000000
+    },
+    {
+        "name": "Borussia Dortmund",
+        "reputation": 85,
+        "wageBudget": 150000000,
+        "transferBudget": 50000000
+    },
+    {
+        "name": "RB Leipzig",
+        "reputation": 84,
+        "wageBudget": 120000000,
+        "transferBudget": 45000000
+    },
+    {
+        "name": "Bayer Leverkusen",
+        "reputation": 83,
+        "wageBudget": 110000000,
+        "transferBudget": 40000000
+    },
+    {
+        "name": "VfB Stuttgart",
+        "reputation": 76,
+        "wageBudget": 50000000,
+        "transferBudget": 15000000
+    },
+    {
+        "name": "Eintracht Frankfurt",
+        "reputation": 78,
+        "wageBudget": 70000000,
+        "transferBudget": 20000000
+    },
+    {
+        "name": "SC Freiburg",
+        "reputation": 77,
+        "wageBudget": 55000000,
+        "transferBudget": 15000000
+    },
+    {
+        "name": "Hoffenheim",
+        "reputation": 75,
+        "wageBudget": 60000000,
+        "transferBudget": 10000000
+    },
+    {
+        "name": "Heidenheim",
+        "reputation": 66,
+        "wageBudget": 15000000,
+        "transferBudget": 3000000
+    },
+    {
+        "name": "Werder Bremen",
+        "reputation": 72,
+        "wageBudget": 40000000,
+        "transferBudget": 5000000
+    },
+    {
+        "name": "Augsburg",
+        "reputation": 70,
+        "wageBudget": 30000000,
+        "transferBudget": 5000000
+    },
+    {
+        "name": "Wolfsburg",
+        "reputation": 74,
+        "wageBudget": 65000000,
+        "transferBudget": 15000000
+    },
+    {
+        "name": "Monchengladbach",
+        "reputation": 74,
+        "wageBudget": 60000000,
+        "transferBudget": 10000000
+    },
+    {
+        "name": "Bochum",
+        "reputation": 67,
+        "wageBudget": 20000000,
+        "transferBudget": 2000000
+    },
+    {
+        "name": "Union Berlin",
+        "reputation": 75,
+        "wageBudget": 50000000,
+        "transferBudget": 10000000
+    },
+    {
+        "name": "Mainz 05",
+        "reputation": 71,
+        "wageBudget": 35000000,
+        "transferBudget": 5000000
+    },
+    {
+        "name": "FC Koln",
+        "reputation": 70,
+        "wageBudget": 40000000,
+        "transferBudget": 5000000
+    },
+    {
+        "name": "Darmstadt",
+        "reputation": 65,
+        "wageBudget": 15000000,
+        "transferBudget": 1000000
+    },
+    {
+        "name": "Inter Milan",
+        "reputation": 87,
+        "wageBudget": 140000000,
+        "transferBudget": 40000000
+    },
+    {
+        "name": "Juventus",
+        "reputation": 86,
+        "wageBudget": 150000000,
+        "transferBudget": 50000000
+    },
+    {
+        "name": "AC Milan",
+        "reputation": 86,
+        "wageBudget": 130000000,
+        "transferBudget": 45000000
+    },
+    {
+        "name": "Atalanta",
+        "reputation": 80,
+        "wageBudget": 70000000,
+        "transferBudget": 25000000
+    },
+    {
+        "name": "Roma",
+        "reputation": 82,
+        "wageBudget": 90000000,
+        "transferBudget": 20000000
+    },
+    {
+        "name": "Bologna",
+        "reputation": 75,
+        "wageBudget": 35000000,
+        "transferBudget": 10000000
+    },
+    {
+        "name": "Napoli",
+        "reputation": 84,
+        "wageBudget": 100000000,
+        "transferBudget": 30000000
+    },
+    {
+        "name": "Fiorentina",
+        "reputation": 78,
+        "wageBudget": 60000000,
+        "transferBudget": 15000000
+    },
+    {
+        "name": "Lazio",
+        "reputation": 80,
+        "wageBudget": 80000000,
+        "transferBudget": 20000000
+    },
+    {
+        "name": "Torino",
+        "reputation": 74,
+        "wageBudget": 40000000,
+        "transferBudget": 8000000
+    },
+    {
+        "name": "Monza",
+        "reputation": 71,
+        "wageBudget": 30000000,
+        "transferBudget": 5000000
+    },
+    {
+        "name": "Genoa",
+        "reputation": 70,
+        "wageBudget": 35000000,
+        "transferBudget": 5000000
+    },
+    {
+        "name": "Lecce",
+        "reputation": 68,
+        "wageBudget": 20000000,
+        "transferBudget": 3000000
+    },
+    {
+        "name": "Empoli",
+        "reputation": 68,
+        "wageBudget": 20000000,
+        "transferBudget": 3000000
+    },
+    {
+        "name": "Udinese",
+        "reputation": 70,
+        "wageBudget": 30000000,
+        "transferBudget": 5000000
+    },
+    {
+        "name": "Frosinone",
+        "reputation": 66,
+        "wageBudget": 15000000,
+        "transferBudget": 2000000
+    },
+    {
+        "name": "Verona",
+        "reputation": 68,
+        "wageBudget": 20000000,
+        "transferBudget": 2000000
+    },
+    {
+        "name": "Cagliari",
+        "reputation": 67,
+        "wageBudget": 18000000,
+        "transferBudget": 2000000
+    },
+    {
+        "name": "Sassuolo",
+        "reputation": 72,
+        "wageBudget": 40000000,
+        "transferBudget": 10000000
+    },
+    {
+        "name": "Salernitana",
+        "reputation": 66,
+        "wageBudget": 18000000,
+        "transferBudget": 2000000
+    },
+    {
+        "name": "PSG",
+        "reputation": 90,
+        "wageBudget": 350000000,
+        "transferBudget": 150000000
+    },
+    {
+        "name": "Monaco",
+        "reputation": 79,
+        "wageBudget": 70000000,
+        "transferBudget": 30000000
+    },
+    {
+        "name": "Brest",
+        "reputation": 70,
+        "wageBudget": 20000000,
+        "transferBudget": 5000000
+    },
+    {
+        "name": "Lille",
+        "reputation": 78,
+        "wageBudget": 50000000,
+        "transferBudget": 15000000
+    },
+    {
+        "name": "Nice",
+        "reputation": 76,
+        "wageBudget": 45000000,
+        "transferBudget": 20000000
+    },
+    {
+        "name": "Lens",
+        "reputation": 77,
+        "wageBudget": 40000000,
+        "transferBudget": 15000000
+    },
+    {
+        "name": "Marseille",
+        "reputation": 80,
+        "wageBudget": 80000000,
+        "transferBudget": 25000000
+    },
+    {
+        "name": "Rennes",
+        "reputation": 77,
+        "wageBudget": 50000000,
+        "transferBudget": 20000000
+    },
+    {
+        "name": "Reims",
+        "reputation": 72,
+        "wageBudget": 30000000,
+        "transferBudget": 10000000
+    },
+    {
+        "name": "Toulouse",
+        "reputation": 71,
+        "wageBudget": 25000000,
+        "transferBudget": 5000000
+    },
+    {
+        "name": "Lyon",
+        "reputation": 79,
+        "wageBudget": 70000000,
+        "transferBudget": 20000000
+    },
+    {
+        "name": "Strasbourg",
+        "reputation": 70,
+        "wageBudget": 30000000,
+        "transferBudget": 8000000
+    },
+    {
+        "name": "Le Havre",
+        "reputation": 66,
+        "wageBudget": 15000000,
+        "transferBudget": 2000000
+    },
+    {
+        "name": "Montpellier",
+        "reputation": 72,
+        "wageBudget": 30000000,
+        "transferBudget": 5000000
+    },
+    {
+        "name": "Nantes",
+        "reputation": 71,
+        "wageBudget": 28000000,
+        "transferBudget": 5000000
+    },
+    {
+        "name": "Lorient",
+        "reputation": 69,
+        "wageBudget": 20000000,
+        "transferBudget": 3000000
+    },
+    {
+        "name": "Metz",
+        "reputation": 66,
+        "wageBudget": 15000000,
+        "transferBudget": 1000000
+    },
+    {
+        "name": "Clermont Foot",
+        "reputation": 65,
+        "wageBudget": 12000000,
+        "transferBudget": 1000000
+    },
+    {
+        "name": "Palmeiras",
+        "reputation": 78,
+        "wageBudget": 40000000,
+        "transferBudget": 15000000
+    },
+    {
+        "name": "Flamengo",
+        "reputation": 79,
+        "wageBudget": 45000000,
+        "transferBudget": 18000000
+    },
+    {
+        "name": "Atletico Mineiro",
+        "reputation": 76,
+        "wageBudget": 35000000,
+        "transferBudget": 10000000
+    },
+    {
+        "name": "Gremio",
+        "reputation": 75,
+        "wageBudget": 30000000,
+        "transferBudget": 8000000
+    },
+    {
+        "name": "Botafogo",
+        "reputation": 74,
+        "wageBudget": 25000000,
+        "transferBudget": 7000000
+    },
+    {
+        "name": "Red Bull Bragantino",
+        "reputation": 73,
+        "wageBudget": 20000000,
+        "transferBudget": 8000000
+    },
+    {
+        "name": "Fluminense",
+        "reputation": 75,
+        "wageBudget": 30000000,
+        "transferBudget": 9000000
+    },
+    {
+        "name": "Athletico Paranaense",
+        "reputation": 74,
+        "wageBudget": 25000000,
+        "transferBudget": 7000000
+    },
+    {
+        "name": "Internacional",
+        "reputation": 74,
+        "wageBudget": 28000000,
+        "transferBudget": 8000000
+    },
+    {
+        "name": "Fortaleza",
+        "reputation": 71,
+        "wageBudget": 15000000,
+        "transferBudget": 4000000
+    },
+    {
+        "name": "Sao Paulo",
+        "reputation": 76,
+        "wageBudget": 35000000,
+        "transferBudget": 10000000
+    },
+    {
+        "name": "Cuiaba",
+        "reputation": 67,
+        "wageBudget": 10000000,
+        "transferBudget": 2000000
+    },
+    {
+        "name": "Corinthians",
+        "reputation": 76,
+        "wageBudget": 35000000,
+        "transferBudget": 10000000
+    },
+    {
+        "name": "Cruzeiro",
+        "reputation": 72,
+        "wageBudget": 20000000,
+        "transferBudget": 5000000
+    },
+    {
+        "name": "Vasco da Gama",
+        "reputation": 71,
+        "wageBudget": 22000000,
+        "transferBudget": 5000000
+    },
+    {
+        "name": "Bahia",
+        "reputation": 69,
+        "wageBudget": 15000000,
+        "transferBudget": 4000000
+    },
+    {
+        "name": "Santos",
+        "reputation": 73,
+        "wageBudget": 25000000,
+        "transferBudget": 6000000
+    },
+    {
+        "name": "Goias",
+        "reputation": 67,
+        "wageBudget": 10000000,
+        "transferBudget": 2000000
+    },
+    {
+        "name": "Coritiba",
+        "reputation": 66,
+        "wageBudget": 9000000,
+        "transferBudget": 1500000
+    },
+    {
+        "name": "America Mineiro",
+        "reputation": 65,
+        "wageBudget": 8000000,
+        "transferBudget": 1000000
+    },
+    {
+        "name": "River Plate",
+        "reputation": 76,
+        "wageBudget": 20000000,
+        "transferBudget": 8000000
+    },
+    {
+        "name": "Talleres",
+        "reputation": 70,
+        "wageBudget": 8000000,
+        "transferBudget": 3000000
+    },
+    {
+        "name": "San Lorenzo",
+        "reputation": 72,
+        "wageBudget": 9000000,
+        "transferBudget": 2000000
+    },
+    {
+        "name": "Lanus",
+        "reputation": 68,
+        "wageBudget": 6000000,
+        "transferBudget": 1500000
+    },
+    {
+        "name": "Estudiantes",
+        "reputation": 70,
+        "wageBudget": 8000000,
+        "transferBudget": 2000000
+    },
+    {
+        "name": "Defensa y Justicia",
+        "reputation": 69,
+        "wageBudget": 7000000,
+        "transferBudget": 1500000
+    },
+    {
+        "name": "Boca Juniors",
+        "reputation": 75,
+        "wageBudget": 18000000,
+        "transferBudget": 7000000
+    },
+    {
+        "name": "Rosario Central",
+        "reputation": 68,
+        "wageBudget": 6000000,
+        "transferBudget": 1500000
+    },
+    {
+        "name": "Godoy Cruz",
+        "reputation": 67,
+        "wageBudget": 5000000,
+        "transferBudget": 1000000
+    },
+    {
+        "name": "Argentinos Juniors",
+        "reputation": 68,
+        "wageBudget": 6000000,
+        "transferBudget": 1500000
+    },
+    {
+        "name": "Racing Club",
+        "reputation": 73,
+        "wageBudget": 12000000,
+        "transferBudget": 4000000
+    },
+    {
+        "name": "Atletico Tucuman",
+        "reputation": 65,
+        "wageBudget": 4000000,
+        "transferBudget": 500000
+    },
+    {
+        "name": "Belgrano",
+        "reputation": 66,
+        "wageBudget": 4500000,
+        "transferBudget": 800000
+    },
+    {
+        "name": "Newells Old Boys",
+        "reputation": 68,
+        "wageBudget": 6000000,
+        "transferBudget": 1200000
+    },
+    {
+        "name": "Barracas Central",
+        "reputation": 62,
+        "wageBudget": 2000000,
+        "transferBudget": 100000
+    },
+    {
+        "name": "Tigre",
+        "reputation": 65,
+        "wageBudget": 3500000,
+        "transferBudget": 500000
+    },
+    {
+        "name": "Platense",
+        "reputation": 63,
+        "wageBudget": 2500000,
+        "transferBudget": 300000
+    },
+    {
+        "name": "Instituto",
+        "reputation": 64,
+        "wageBudget": 3000000,
+        "transferBudget": 400000
+    },
+    {
+        "name": "Sarmiento",
+        "reputation": 62,
+        "wageBudget": 2000000,
+        "transferBudget": 150000
+    },
+    {
+        "name": "Union",
+        "reputation": 64,
+        "wageBudget": 3000000,
+        "transferBudget": 400000
+    },
+    {
+        "name": "Sporting CP",
+        "reputation": 78,
+        "wageBudget": 35000000,
+        "transferBudget": 15000000
+    },
+    {
+        "name": "Benfica",
+        "reputation": 79,
+        "wageBudget": 45000000,
+        "transferBudget": 25000000
+    },
+    {
+        "name": "Porto",
+        "reputation": 79,
+        "wageBudget": 40000000,
+        "transferBudget": 20000000
+    },
+    {
+        "name": "Braga",
+        "reputation": 75,
+        "wageBudget": 20000000,
+        "transferBudget": 8000000
+    },
+    {
+        "name": "Vitoria SC",
+        "reputation": 70,
+        "wageBudget": 10000000,
+        "transferBudget": 3000000
+    },
+    {
+        "name": "Moreirense",
+        "reputation": 66,
+        "wageBudget": 5000000,
+        "transferBudget": 1000000
+    },
+    {
+        "name": "Arouca",
+        "reputation": 68,
+        "wageBudget": 6000000,
+        "transferBudget": 1500000
+    },
+    {
+        "name": "Famalicao",
+        "reputation": 67,
+        "wageBudget": 5500000,
+        "transferBudget": 1200000
+    },
+    {
+        "name": "Casa Pia",
+        "reputation": 65,
+        "wageBudget": 4000000,
+        "transferBudget": 800000
+    },
+    {
+        "name": "Farense",
+        "reputation": 64,
+        "wageBudget": 3500000,
+        "transferBudget": 500000
+    },
+    {
+        "name": "Rio Ave",
+        "reputation": 66,
+        "wageBudget": 4500000,
+        "transferBudget": 900000
+    },
+    {
+        "name": "Gil Vicente",
+        "reputation": 66,
+        "wageBudget": 4500000,
+        "transferBudget": 900000
+    },
+    {
+        "name": "Estoril",
+        "reputation": 65,
+        "wageBudget": 4000000,
+        "transferBudget": 800000
+    },
+    {
+        "name": "Boavista",
+        "reputation": 67,
+        "wageBudget": 5000000,
+        "transferBudget": 1000000
+    },
+    {
+        "name": "Estrela",
+        "reputation": 62,
+        "wageBudget": 2500000,
+        "transferBudget": 300000
+    },
+    {
+        "name": "Portimonense",
+        "reputation": 64,
+        "wageBudget": 3500000,
+        "transferBudget": 500000
+    },
+    {
+        "name": "Vizela",
+        "reputation": 63,
+        "wageBudget": 3000000,
+        "transferBudget": 400000
+    },
+    {
+        "name": "Chaves",
+        "reputation": 63,
+        "wageBudget": 3000000,
+        "transferBudget": 400000
+    },
+    {
+        "name": "PSV Eindhoven",
+        "reputation": 76,
+        "wageBudget": 30000000,
+        "transferBudget": 12000000
+    },
+    {
+        "name": "Feyenoord",
+        "reputation": 76,
+        "wageBudget": 28000000,
+        "transferBudget": 10000000
+    },
+    {
+        "name": "Twente",
+        "reputation": 73,
+        "wageBudget": 15000000,
+        "transferBudget": 5000000
+    },
+    {
+        "name": "AZ Alkmaar",
+        "reputation": 74,
+        "wageBudget": 18000000,
+        "transferBudget": 60000000
+    },
+    {
+        "name": "Ajax",
+        "reputation": 77,
+        "wageBudget": 50000000,
+        "transferBudget": 20000000
+    },
+    {
+        "name": "NEC Nijmegen",
+        "reputation": 68,
+        "wageBudget": 8000000,
+        "transferBudget": 2000000
+    },
+    {
+        "name": "Go Ahead Eagles",
+        "reputation": 67,
+        "wageBudget": 7000000,
+        "transferBudget": 1500000
+    },
+    {
+        "name": "Utrecht",
+        "reputation": 70,
+        "wageBudget": 10000000,
+        "transferBudget": 3000000
+    },
+    {
+        "name": "Sparta Rotterdam",
+        "reputation": 68,
+        "wageBudget": 8000000,
+        "transferBudget": 2000000
+    },
+    {
+        "name": "Heerenveen",
+        "reputation": 69,
+        "wageBudget": 9000000,
+        "transferBudget": 2500000
+    },
+    {
+        "name": "Fortuna Sittard",
+        "reputation": 66,
+        "wageBudget": 6000000,
+        "transferBudget": 1000000
+    },
+    {
+        "name": "Almere City",
+        "reputation": 64,
+        "wageBudget": 4000000,
+        "transferBudget": 500000
+    },
+    {
+        "name": "PEC Zwolle",
+        "reputation": 65,
+        "wageBudget": 5000000,
+        "transferBudget": 800000
+    },
+    {
+        "name": "Heracles",
+        "reputation": 65,
+        "wageBudget": 5000000,
+        "transferBudget": 800000
+    },
+    {
+        "name": "Excelsior",
+        "reputation": 64,
+        "wageBudget": 4000000,
+        "transferBudget": 500000
+    },
+    {
+        "name": "Waalwijk",
+        "reputation": 65,
+        "wageBudget": 4500000,
+        "transferBudget": 600000
+    },
+    {
+        "name": "Vitesse",
+        "reputation": 68,
+        "wageBudget": 7000000,
+        "transferBudget": 1500000
+    },
+    {
+        "name": "Volendam",
+        "reputation": 63,
+        "wageBudget": 3000000,
+        "transferBudget": 300000
+    }
+]

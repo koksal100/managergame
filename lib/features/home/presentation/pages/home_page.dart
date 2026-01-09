@@ -4,14 +4,17 @@ import '../../../players/presentation/pages/players_page.dart';
 import '../../../scouting/presentation/pages/scouting_page.dart';
 import '../../../contracts/presentation/pages/contracts_page.dart';
 
-class HomePage extends StatefulWidget {
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/providers/seeder_provider.dart';
+
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  ConsumerState<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends ConsumerState<HomePage> {
   int _currentIndex = 0;
 
   final List<Widget> _pages = [
@@ -23,72 +26,106 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBody: true, // Allows body to extend behind the navigation bar
-      body: _pages[_currentIndex],
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.6), // Translucent dark background
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(30)), // Rounded top corners
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.3),
-              blurRadius: 10,
-              offset: const Offset(0, -5), // Shadow upwards
+    final initialization = ref.watch(initializationProvider);
+
+    return initialization.when(
+      data: (_) => Scaffold(
+        extendBody: true,
+        body: _pages[_currentIndex],
+        bottomNavigationBar: Container(
+          decoration: BoxDecoration(
+            color: Colors.black.withOpacity(0.6),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.3),
+                blurRadius: 10,
+                offset: const Offset(0, -5),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
+            child: NavigationBarTheme(
+              data: NavigationBarThemeData(
+                backgroundColor: Colors.transparent,
+                indicatorColor: Colors.blue.shade900.withOpacity(0.5),
+                labelTextStyle: WidgetStateProperty.all(
+                  const TextStyle(color: Colors.white70, fontSize: 12),
+                ),
+                iconTheme: WidgetStateProperty.resolveWith((states) {
+                   if (states.contains(WidgetState.selected)) {
+                     return const IconThemeData(color: Colors.white, size: 32);
+                   }
+                   return const IconThemeData(color: Colors.white54, size: 24);
+                }),
+              ),
+              child: NavigationBar(
+                selectedIndex: _currentIndex,
+                labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+                height: 70,
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                onDestinationSelected: (index) {
+                  setState(() {
+                    _currentIndex = index;
+                  });
+                },
+                destinations: const [
+                  NavigationDestination(
+                    icon: Icon(Icons.home_outlined),
+                    selectedIcon: Icon(Icons.home),
+                    label: 'Home',
+                  ),
+                  NavigationDestination(
+                    icon: Icon(Icons.people_outline),
+                    selectedIcon: Icon(Icons.people),
+                    label: 'Players',
+                  ),
+                  NavigationDestination(
+                    icon: Icon(Icons.search_outlined),
+                    selectedIcon: Icon(Icons.search),
+                    label: 'Scouting',
+                  ),
+                  NavigationDestination(
+                    icon: Icon(Icons.description_outlined),
+                    selectedIcon: Icon(Icons.description),
+                    label: 'Contracts',
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+      loading: () => Scaffold(
+        body: Stack(
+          fit: StackFit.expand,
+          children: [
+            Image.asset(
+              'assets/images/background.png',
+              fit: BoxFit.cover,
+            ),
+            Container(color: Colors.black54),
+            const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(color: Colors.teal),
+                  SizedBox(height: 20),
+                  Text(
+                    'Setting up Game World...',
+                    style: TextStyle(color: Colors.white, fontSize: 18),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
-        child: ClipRRect(
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
-          child: NavigationBarTheme(
-            data: NavigationBarThemeData(
-              backgroundColor: Colors.transparent,
-              indicatorColor: Colors.blue.shade900.withOpacity(0.5), // Dark blue and transparent
-              labelTextStyle: WidgetStateProperty.all(
-                const TextStyle(color: Colors.white70, fontSize: 12),
-              ),
-              iconTheme: WidgetStateProperty.resolveWith((states) {
-                 if (states.contains(WidgetState.selected)) {
-                   return const IconThemeData(color: Colors.white, size: 32); // Increased size for selected
-                 }
-                 return const IconThemeData(color: Colors.white54, size: 24); // Default size
-              }),
-            ),
-            child: NavigationBar(
-              selectedIndex: _currentIndex,
-              labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-              height: 70,
-              backgroundColor: Colors.transparent, // Important for the container color to show
-              elevation: 0,
-              onDestinationSelected: (index) {
-                setState(() {
-                  _currentIndex = index;
-                });
-              },
-              destinations: const [
-                NavigationDestination(
-                  icon: Icon(Icons.home_outlined),
-                  selectedIcon: Icon(Icons.home),
-                  label: 'Home',
-                ),
-                NavigationDestination(
-                  icon: Icon(Icons.people_outline),
-                  selectedIcon: Icon(Icons.people),
-                  label: 'Players',
-                ),
-                NavigationDestination(
-                  icon: Icon(Icons.search_outlined),
-                  selectedIcon: Icon(Icons.search),
-                  label: 'Scouting',
-                ),
-                NavigationDestination(
-                  icon: Icon(Icons.description_outlined),
-                  selectedIcon: Icon(Icons.description),
-                  label: 'Contracts',
-                ),
-              ],
-            ),
-          ),
+      ),
+      error: (err, stack) => Scaffold(
+        body: Center(
+          child: Text('Error initializing game: $err'),
         ),
       ),
     );

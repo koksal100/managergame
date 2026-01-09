@@ -12,6 +12,8 @@ import '../../features/contracts/data/datasources/tables/contracts_table.dart';
 import '../../features/transfers/data/datasources/tables/transfers_table.dart';
 import '../../features/players/data/datasources/tables/value_histories_table.dart';
 import '../../features/relationships/data/datasources/tables/relationships_table.dart';
+import '../../features/countries/data/datasources/tables/countries_table.dart';
+import '../../features/home/domain/entities/home_entity.dart';
 
 part 'app_database.g.dart';
 
@@ -23,7 +25,8 @@ part 'app_database.g.dart';
   Contracts,
   Transfers,
   ValueHistories,
-  Relationships
+  Relationships,
+  Countries
 ])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());

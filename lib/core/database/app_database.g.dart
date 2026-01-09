@@ -3425,6 +3425,300 @@ class RelationshipsCompanion extends UpdateCompanion<Relationship> {
   }
 }
 
+class $CountriesTable extends Countries
+    with TableInfo<$CountriesTable, Country> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CountriesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _codeMeta = const VerificationMeta('code');
+  @override
+  late final GeneratedColumn<String> code = GeneratedColumn<String>(
+    'code',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _reputationMeta = const VerificationMeta(
+    'reputation',
+  );
+  @override
+  late final GeneratedColumn<int> reputation = GeneratedColumn<int>(
+    'reputation',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, name, code, reputation];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'countries';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Country> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('code')) {
+      context.handle(
+        _codeMeta,
+        code.isAcceptableOrUnknown(data['code']!, _codeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_codeMeta);
+    }
+    if (data.containsKey('reputation')) {
+      context.handle(
+        _reputationMeta,
+        reputation.isAcceptableOrUnknown(data['reputation']!, _reputationMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_reputationMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Country map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Country(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      code: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}code'],
+      )!,
+      reputation: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}reputation'],
+      )!,
+    );
+  }
+
+  @override
+  $CountriesTable createAlias(String alias) {
+    return $CountriesTable(attachedDatabase, alias);
+  }
+}
+
+class Country extends DataClass implements Insertable<Country> {
+  final int id;
+  final String name;
+  final String code;
+  final int reputation;
+  const Country({
+    required this.id,
+    required this.name,
+    required this.code,
+    required this.reputation,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['name'] = Variable<String>(name);
+    map['code'] = Variable<String>(code);
+    map['reputation'] = Variable<int>(reputation);
+    return map;
+  }
+
+  CountriesCompanion toCompanion(bool nullToAbsent) {
+    return CountriesCompanion(
+      id: Value(id),
+      name: Value(name),
+      code: Value(code),
+      reputation: Value(reputation),
+    );
+  }
+
+  factory Country.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Country(
+      id: serializer.fromJson<int>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      code: serializer.fromJson<String>(json['code']),
+      reputation: serializer.fromJson<int>(json['reputation']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'name': serializer.toJson<String>(name),
+      'code': serializer.toJson<String>(code),
+      'reputation': serializer.toJson<int>(reputation),
+    };
+  }
+
+  Country copyWith({int? id, String? name, String? code, int? reputation}) =>
+      Country(
+        id: id ?? this.id,
+        name: name ?? this.name,
+        code: code ?? this.code,
+        reputation: reputation ?? this.reputation,
+      );
+  Country copyWithCompanion(CountriesCompanion data) {
+    return Country(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      code: data.code.present ? data.code.value : this.code,
+      reputation: data.reputation.present
+          ? data.reputation.value
+          : this.reputation,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Country(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('code: $code, ')
+          ..write('reputation: $reputation')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, name, code, reputation);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Country &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.code == this.code &&
+          other.reputation == this.reputation);
+}
+
+class CountriesCompanion extends UpdateCompanion<Country> {
+  final Value<int> id;
+  final Value<String> name;
+  final Value<String> code;
+  final Value<int> reputation;
+  const CountriesCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.code = const Value.absent(),
+    this.reputation = const Value.absent(),
+  });
+  CountriesCompanion.insert({
+    this.id = const Value.absent(),
+    required String name,
+    required String code,
+    required int reputation,
+  }) : name = Value(name),
+       code = Value(code),
+       reputation = Value(reputation);
+  static Insertable<Country> custom({
+    Expression<int>? id,
+    Expression<String>? name,
+    Expression<String>? code,
+    Expression<int>? reputation,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (code != null) 'code': code,
+      if (reputation != null) 'reputation': reputation,
+    });
+  }
+
+  CountriesCompanion copyWith({
+    Value<int>? id,
+    Value<String>? name,
+    Value<String>? code,
+    Value<int>? reputation,
+  }) {
+    return CountriesCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      code: code ?? this.code,
+      reputation: reputation ?? this.reputation,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (code.present) {
+      map['code'] = Variable<String>(code.value);
+    }
+    if (reputation.present) {
+      map['reputation'] = Variable<int>(reputation.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CountriesCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('code: $code, ')
+          ..write('reputation: $reputation')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -3436,6 +3730,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $TransfersTable transfers = $TransfersTable(this);
   late final $ValueHistoriesTable valueHistories = $ValueHistoriesTable(this);
   late final $RelationshipsTable relationships = $RelationshipsTable(this);
+  late final $CountriesTable countries = $CountriesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3449,6 +3744,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     transfers,
     valueHistories,
     relationships,
+    countries,
   ];
 }
 
@@ -6856,6 +7152,177 @@ typedef $$RelationshipsTableProcessedTableManager =
       Relationship,
       PrefetchHooks Function()
     >;
+typedef $$CountriesTableCreateCompanionBuilder =
+    CountriesCompanion Function({
+      Value<int> id,
+      required String name,
+      required String code,
+      required int reputation,
+    });
+typedef $$CountriesTableUpdateCompanionBuilder =
+    CountriesCompanion Function({
+      Value<int> id,
+      Value<String> name,
+      Value<String> code,
+      Value<int> reputation,
+    });
+
+class $$CountriesTableFilterComposer
+    extends Composer<_$AppDatabase, $CountriesTable> {
+  $$CountriesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get code => $composableBuilder(
+    column: $table.code,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get reputation => $composableBuilder(
+    column: $table.reputation,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$CountriesTableOrderingComposer
+    extends Composer<_$AppDatabase, $CountriesTable> {
+  $$CountriesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get code => $composableBuilder(
+    column: $table.code,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get reputation => $composableBuilder(
+    column: $table.reputation,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CountriesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CountriesTable> {
+  $$CountriesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get code =>
+      $composableBuilder(column: $table.code, builder: (column) => column);
+
+  GeneratedColumn<int> get reputation => $composableBuilder(
+    column: $table.reputation,
+    builder: (column) => column,
+  );
+}
+
+class $$CountriesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CountriesTable,
+          Country,
+          $$CountriesTableFilterComposer,
+          $$CountriesTableOrderingComposer,
+          $$CountriesTableAnnotationComposer,
+          $$CountriesTableCreateCompanionBuilder,
+          $$CountriesTableUpdateCompanionBuilder,
+          (Country, BaseReferences<_$AppDatabase, $CountriesTable, Country>),
+          Country,
+          PrefetchHooks Function()
+        > {
+  $$CountriesTableTableManager(_$AppDatabase db, $CountriesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CountriesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CountriesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CountriesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String> code = const Value.absent(),
+                Value<int> reputation = const Value.absent(),
+              }) => CountriesCompanion(
+                id: id,
+                name: name,
+                code: code,
+                reputation: reputation,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String name,
+                required String code,
+                required int reputation,
+              }) => CountriesCompanion.insert(
+                id: id,
+                name: name,
+                code: code,
+                reputation: reputation,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CountriesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CountriesTable,
+      Country,
+      $$CountriesTableFilterComposer,
+      $$CountriesTableOrderingComposer,
+      $$CountriesTableAnnotationComposer,
+      $$CountriesTableCreateCompanionBuilder,
+      $$CountriesTableUpdateCompanionBuilder,
+      (Country, BaseReferences<_$AppDatabase, $CountriesTable, Country>),
+      Country,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -6876,4 +7343,6 @@ class $AppDatabaseManager {
       $$ValueHistoriesTableTableManager(_db, _db.valueHistories);
   $$RelationshipsTableTableManager get relationships =>
       $$RelationshipsTableTableManager(_db, _db.relationships);
+  $$CountriesTableTableManager get countries =>
+      $$CountriesTableTableManager(_db, _db.countries);
 }
