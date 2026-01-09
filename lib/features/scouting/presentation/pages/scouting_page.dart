@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/presentation/widgets/game_button.dart'; // Adjust path if needed
 import '../../../players/domain/entities/player.dart';
+import '../../../players/domain/entities/player_filter.dart';
 import '../../../players/presentation/providers/player_provider.dart';
 import '../../../players/presentation/widgets/player_detail_dialog.dart';
 import '../../../players/presentation/widgets/player_filter_modal.dart';
@@ -70,6 +71,7 @@ class ScoutingPage extends ConsumerWidget {
                       ),
                     ),
                     const SizedBox(width: 8),
+                    // Filter Button
                     Container(
                       decoration: BoxDecoration(
                         color: Colors.teal.withOpacity(0.2),
@@ -92,7 +94,22 @@ class ScoutingPage extends ConsumerWidget {
                 ),
               ),
 
-              const SizedBox(height: 16),
+              // Sorting Headers Row
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10),
+                child: Row(
+                  children: [
+                    Expanded(child: _buildSortHeader(ref, 'Name', PlayerSortType.name)),
+                    const SizedBox(width: 8),
+                    _buildSortHeader(ref, 'Age', PlayerSortType.age, flex: 0, width: 40),
+                    const SizedBox(width: 8),
+                    _buildSortHeader(ref, 'CA', PlayerSortType.ca, flex: 0, width: 40),
+                    const SizedBox(width: 8),
+                    _buildSortHeader(ref, 'PA', PlayerSortType.pa, flex: 0, width: 40),
+                    const SizedBox(width: 32), // Space for arrow icon
+                  ],
+                ),
+              ),
 
               // Player List
               Expanded(
@@ -107,7 +124,7 @@ class ScoutingPage extends ConsumerWidget {
                       );
                     }
                     return ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                       itemCount: players.length,
                       itemBuilder: (context, index) {
                         final player = players[index];
@@ -182,6 +199,67 @@ class ScoutingPage extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildSortHeader(WidgetRef ref, String text, PlayerSortType type, {int flex = 1, double? width}) {
+    final currentFilter = ref.watch(playerFilterProvider);
+    final isSelected = currentFilter.sortType == type;
+    final isAscending = currentFilter.ascending;
+    
+    Widget content = Row(
+      mainAxisAlignment: MainAxisAlignment.center, // Center text in fixed width containers
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          text,
+          style: TextStyle(
+            color: isSelected ? Colors.tealAccent : Colors.white70,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            fontSize: 12
+          ),
+        ),
+        if (isSelected)
+          Icon(
+            isAscending ? Icons.arrow_drop_up : Icons.arrow_drop_down,
+            color: Colors.tealAccent,
+            size: 16,
+          )
+      ],
+    );
+
+    if (flex > 0) {
+      content = Expanded(child: content);
+    } else if (width != null) {
+      content = SizedBox(width: width, child: content);
+    }
+
+    return GestureDetector(
+      onTap: () {
+        PlayerSortType nextSortType = type;
+        bool nextAscending = false; // Default to Descending (High to Low)
+
+        if (isSelected) {
+          if (!isAscending) {
+            // State 1 (Desc) -> State 2 (Asc)
+            nextAscending = true;
+          } else {
+            // State 2 (Asc) -> State 3 (Reset / Default)
+            // Reset to CA Descending default
+            nextSortType = PlayerSortType.ca;
+            nextAscending = false;
+          }
+        } else {
+          // New Column -> State 1 (Desc)
+          nextAscending = false;
+        }
+
+        ref.read(playerFilterProvider.notifier).state = currentFilter.copyWith(
+          sortType: nextSortType,
+          ascending: nextAscending,
+        );
+      },
+      child: content,
     );
   }
 }

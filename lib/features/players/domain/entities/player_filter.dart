@@ -1,5 +1,14 @@
 import 'package:equatable/equatable.dart';
 
+
+enum PlayerSortType {
+  ca,
+  pa,
+  age,
+  name,
+  reputation
+}
+
 class PlayerFilter extends Equatable {
   final String? nameQuery;
   final List<String>? positions;
@@ -7,6 +16,8 @@ class PlayerFilter extends Equatable {
   final int? maxAge;
   final int? minCa;
   final int? minPa;
+  final PlayerSortType sortType;
+  final bool ascending;
 
   const PlayerFilter({
     this.nameQuery,
@@ -15,6 +26,8 @@ class PlayerFilter extends Equatable {
     this.maxAge,
     this.minCa,
     this.minPa,
+    this.sortType = PlayerSortType.ca,
+    this.ascending = false,
   });
 
   PlayerFilter copyWith({
@@ -24,6 +37,8 @@ class PlayerFilter extends Equatable {
     int? maxAge,
     int? minCa,
     int? minPa,
+    PlayerSortType? sortType,
+    bool? ascending,
   }) {
     return PlayerFilter(
       nameQuery: nameQuery ?? this.nameQuery,
@@ -32,6 +47,8 @@ class PlayerFilter extends Equatable {
       maxAge: maxAge ?? this.maxAge,
       minCa: minCa ?? this.minCa,
       minPa: minPa ?? this.minPa,
+      sortType: sortType ?? this.sortType,
+      ascending: ascending ?? this.ascending,
     );
   }
 
@@ -41,8 +58,10 @@ class PlayerFilter extends Equatable {
     minAge == null &&
     maxAge == null &&
     minCa == null &&
-    minPa == null;
+    minPa == null &&
+    sortType == PlayerSortType.ca && // Default sort
+    ascending == false;
 
   @override
-  List<Object?> get props => [nameQuery, positions, minAge, maxAge, minCa, minPa];
+  List<Object?> get props => [nameQuery, positions, minAge, maxAge, minCa, minPa, sortType, ascending];
 }

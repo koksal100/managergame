@@ -38,8 +38,28 @@ class PlayerRepositoryImpl implements PlayerRepository {
         }
       }
 
-      // Always sort by CA descending
-      query.orderBy([(t) => OrderingTerm(expression: t.ca, mode: OrderingMode.desc)]);
+      // Dynamic Sorting
+      final sortMode = (filter?.ascending ?? false) ? OrderingMode.asc : OrderingMode.desc;
+      final sortType = filter?.sortType ?? PlayerSortType.ca;
+
+      switch (sortType) {
+        case PlayerSortType.name:
+          query.orderBy([(t) => OrderingTerm(expression: t.name, mode: sortMode)]);
+          break;
+        case PlayerSortType.age:
+          query.orderBy([(t) => OrderingTerm(expression: t.age, mode: sortMode)]);
+          break;
+        case PlayerSortType.pa:
+          query.orderBy([(t) => OrderingTerm(expression: t.pa, mode: sortMode)]);
+          break;
+        case PlayerSortType.reputation:
+          query.orderBy([(t) => OrderingTerm(expression: t.reputation, mode: sortMode)]);
+          break;
+        case PlayerSortType.ca:
+        default:
+          query.orderBy([(t) => OrderingTerm(expression: t.ca, mode: sortMode)]);
+          break;
+      }
 
       final playerRows = await query.get();
 

@@ -6,6 +6,7 @@ import '../../../contracts/presentation/pages/contracts_page.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/providers/seeder_provider.dart';
+import '../../../../core/providers/game_date_provider.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -132,11 +133,13 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 }
 
-class HomeContent extends StatelessWidget {
+class HomeContent extends ConsumerWidget {
   const HomeContent({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentWeek = ref.watch(gameDateProvider);
+
     return Stack(
       fit: StackFit.expand,
       children: [
@@ -160,6 +163,62 @@ class HomeContent extends StatelessWidget {
           ),
         ),
 
+        // Calendar Widget (Top Left)
+        Positioned(
+          top: 60,
+          left: 20,
+          child: Container(
+            width: 70,
+            height: 80,
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.9),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.3),
+                  blurRadius: 10,
+                  offset: const Offset(0, 5),
+                )
+              ],
+            ),
+            child: Column(
+              children: [
+                // Red Header
+                Container(
+                  height: 25,
+                  decoration: const BoxDecoration(
+                    color: Colors.redAccent,
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+                  ),
+                  alignment: Alignment.center,
+                  child: const Text(
+                    'WEEK',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                ),
+                // Number
+                Expanded(
+                  child: Center(
+                    child: Text(
+                      '$currentWeek',
+                      style: const TextStyle(
+                        color: Colors.black87,
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+
         // Main Content
         Center(
           child: Column(
@@ -171,7 +230,7 @@ class HomeContent extends StatelessWidget {
               GameButton(
                 text: 'NEXT WEEK',
                 onPressed: () {
-                  // TODO: Implement Next Week Logic
+                   ref.read(gameDateProvider.notifier).advanceWeek();
                 },
               ),
 
