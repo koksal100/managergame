@@ -35,70 +35,76 @@ class _HomePageState extends ConsumerState<HomePage> {
       data: (_) => Scaffold(
         extendBody: true,
         body: _pages[_currentIndex],
-        bottomNavigationBar: Container(
-          decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.6),
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.3),
-                blurRadius: 10,
-                offset: const Offset(0, -5),
-              ),
-            ],
-          ),
-          child: ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
-            child: NavigationBarTheme(
-              data: NavigationBarThemeData(
-                backgroundColor: Colors.transparent,
-                indicatorColor: Colors.blue.shade900.withOpacity(0.5),
-                labelTextStyle: WidgetStateProperty.all(
-                  const TextStyle(color: Colors.white70, fontSize: 12),
-                ),
-                iconTheme: WidgetStateProperty.resolveWith((states) {
-                   if (states.contains(WidgetState.selected)) {
-                     return const IconThemeData(color: Colors.white, size: 32);
-                   }
-                   return const IconThemeData(color: Colors.white54, size: 24);
-                }),
-              ),
-              child: NavigationBar(
-                selectedIndex: _currentIndex,
-                labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-                height: 70,
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-                onDestinationSelected: (index) {
-                  setState(() {
-                    _currentIndex = index;
-                  });
-                },
-                destinations: const [
-                  NavigationDestination(
-                    icon: Icon(Icons.home_outlined),
-                    selectedIcon: Icon(Icons.home),
-                    label: 'Home',
-                  ),
-                  NavigationDestination(
-                    icon: Icon(Icons.people_outline),
-                    selectedIcon: Icon(Icons.people),
-                    label: 'Players',
-                  ),
-                  NavigationDestination(
-                    icon: Icon(Icons.search_outlined),
-                    selectedIcon: Icon(Icons.search),
-                    label: 'Scouting',
-                  ),
-                  NavigationDestination(
-                    icon: Icon(Icons.description_outlined),
-                    selectedIcon: Icon(Icons.description),
-                    label: 'Contracts',
+        bottomNavigationBar: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const _TickerWidget(),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.6),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.3),
+                    blurRadius: 10,
+                    offset: const Offset(0, -5),
                   ),
                 ],
               ),
+              child: ClipRRect(
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
+                child: NavigationBarTheme(
+                  data: NavigationBarThemeData(
+                    backgroundColor: Colors.transparent,
+                    indicatorColor: Colors.blue.shade900.withOpacity(0.5),
+                    labelTextStyle: WidgetStateProperty.all(
+                      const TextStyle(color: Colors.white70, fontSize: 12),
+                    ),
+                    iconTheme: WidgetStateProperty.resolveWith((states) {
+                       if (states.contains(WidgetState.selected)) {
+                         return const IconThemeData(color: Colors.white, size: 32);
+                       }
+                       return const IconThemeData(color: Colors.white54, size: 24);
+                    }),
+                  ),
+                  child: NavigationBar(
+                    selectedIndex: _currentIndex,
+                    labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+                    height: 70,
+                    backgroundColor: Colors.transparent,
+                    elevation: 0,
+                    onDestinationSelected: (index) {
+                      setState(() {
+                        _currentIndex = index;
+                      });
+                    },
+                    destinations: const [
+                      NavigationDestination(
+                        icon: Icon(Icons.home_outlined),
+                        selectedIcon: Icon(Icons.home),
+                        label: 'Home',
+                      ),
+                      NavigationDestination(
+                        icon: Icon(Icons.people_outline),
+                        selectedIcon: Icon(Icons.people),
+                        label: 'Players',
+                      ),
+                      NavigationDestination(
+                        icon: Icon(Icons.search_outlined),
+                        selectedIcon: Icon(Icons.search),
+                        label: 'Scouting',
+                      ),
+                      NavigationDestination(
+                        icon: Icon(Icons.description_outlined),
+                        selectedIcon: Icon(Icons.description),
+                        label: 'Contracts',
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
-          ),
+          ],
         ),
       ),
       loading: () => Scaffold(
@@ -204,17 +210,16 @@ class HomeContent extends ConsumerWidget {
                 // Number
                 Text(
                   '$currentWeek',
-                  style: const TextStyle(
-                    color: Color(0xFF2979FF), // Cool vibrant Blue
+                  style: TextStyle(
+                    color: Colors.white,
                     fontSize: 36,
                     fontWeight: FontWeight.w900,
                     height: 1.0,
                     shadows: [
-                      Shadow(
-                        color: Color(0xFF0D47A1), // Dark Blue depth shadow
-                        offset: Offset(0, 2),
-                        blurRadius: 10,
-                      ),
+                      Shadow(offset: Offset(-1, -1), color: Colors.black),
+                      Shadow(offset: Offset(1, -1), color: Colors.black),
+                      Shadow(offset: Offset(1, 1), color: Colors.black),
+                      Shadow(offset: Offset(-1, 1), color: Colors.black),
                     ],
                   ),
                 ),
@@ -225,8 +230,8 @@ class HomeContent extends ConsumerWidget {
 
         // Trophy / Leagues Button
         Positioned(
-          top: 150, // 60 (top) + 80 (height) + 10 (spacing)
-          left: 20,
+          top: 60,
+          right: 20,
           child: GestureDetector(
             onTap: () {
               Navigator.push(
@@ -308,6 +313,86 @@ class HomeContent extends ConsumerWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+
+class _TickerWidget extends StatefulWidget {
+  const _TickerWidget();
+
+  @override
+  State<_TickerWidget> createState() => _TickerWidgetState();
+}
+
+class _TickerWidgetState extends State<_TickerWidget> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  // Added more dummy Super Lig matches
+  final String _text = "GALATASARAY 3-0 FENERBAHÇE   •   BEŞİKTAŞ 2-1 TRABZONSPOR   •   BAŞAKŞEHİR 1-0 KASIMPAŞA   •   ADANA DEMİR 2-2 SİVASSPOR   •   GÖZTEPE 3-2 RİZESPOR   •   ANTALYASPOR 0-1 ALANYASPOR";
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 20), // Slower duration for longer text
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      height: 26, // Increased slightly for border
+      decoration: const BoxDecoration(
+        color: Colors.black,
+        border: Border.symmetric(
+          horizontal: BorderSide(color: Colors.white, width: 1.0),
+        ),
+      ),
+      child: ClipRect(
+        child: AnimatedBuilder(
+          animation: _controller,
+          builder: (context, child) {
+            return LayoutBuilder(
+              builder: (context, constraints) {
+                final screenWidth = constraints.maxWidth;
+                // Calculate estimated text width (Char count * approx width per char)
+                // Courier 14px is approx 9-10px wide per char.
+                final textWidth = _text.length * 10.0; 
+                
+                // Scroll from [Screen Right] to [Pass Full Text]
+                final offset = screenWidth - (screenWidth + textWidth) * _controller.value;
+                
+                return Stack(
+                  children: [
+                    Positioned(
+                      left: offset,
+                      top: 4,
+                      child: Text(
+                        _text,
+                        style: const TextStyle(
+                          color: Color(0xFF89CFF0), // Baby Blue
+                          fontFamily: 'Courier', 
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          letterSpacing: 2.0,
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            );
+          },
+        ),
+      ),
     );
   }
 }

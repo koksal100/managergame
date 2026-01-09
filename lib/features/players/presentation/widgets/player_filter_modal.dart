@@ -40,7 +40,7 @@ class _PlayerFilterModalState extends ConsumerState<PlayerFilterModal> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.80, // Slightly more compact
+      height: MediaQuery.of(context).size.height * 0.65, // Slightly more compact
       padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
       decoration: BoxDecoration(
         color: _glassBackground, // Transparent elegant background
