@@ -15,6 +15,9 @@ import '../../features/relationships/data/datasources/tables/relationships_table
 import '../../features/countries/data/datasources/tables/countries_table.dart';
 import '../../features/home/domain/entities/home_entity.dart';
 
+import '../../features/matches/data/datasources/tables/matches_table.dart';
+import '../../features/performances/data/datasources/tables/performances_table.dart';
+
 part 'app_database.g.dart';
 
 @DriftDatabase(tables: [
@@ -26,7 +29,9 @@ part 'app_database.g.dart';
   Transfers,
   ValueHistories,
   Relationships,
-  Countries
+  Countries,
+  Matches,
+  Performances,
 ])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
