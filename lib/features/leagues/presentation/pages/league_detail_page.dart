@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../clubs/providers/club_provider.dart';
 import '../../domain/entities/league.dart';
+import '../widgets/league_colors.dart';
 
 class LeagueDetailPage extends ConsumerWidget {
   final League league;
@@ -80,24 +81,39 @@ class LeagueDetailPage extends ConsumerWidget {
   }
 
   Widget _buildTableHeader() {
+    const shadow = [
+      Shadow(offset: Offset(-1, -1), color: Colors.black),
+      Shadow(offset: Offset(1, -1), color: Colors.black),
+      Shadow(offset: Offset(1, 1), color: Colors.black),
+      Shadow(offset: Offset(-1, 1), color: Colors.black),
+      Shadow(blurRadius: 2, color: Colors.black, offset: Offset(0, 1))
+    ];
+
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
       decoration: BoxDecoration(
-        color: Colors.blueGrey.shade900,
+        gradient: LeagueColors.getGradient(league.name),
         borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.4),
+            blurRadius: 6,
+            offset: const Offset(0, 3)
+          )
+        ]
       ),
       child: Row(
         children: [
-          _buildCell('Pos', width: 30, bold: true),
-          Expanded(child: Text('Team', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
-          _buildCell('P', width: 25, bold: true),
-          _buildCell('W', width: 25, bold: true),
-          _buildCell('D', width: 25, bold: true),
-          _buildCell('L', width: 25, bold: true),
-          _buildCell('GF', width: 25, bold: true),
-          _buildCell('GA', width: 25, bold: true),
-          _buildCell('GD', width: 25, bold: true),
-          _buildCell('Pts', width: 30, bold: true),
+          _buildCell('Pos', width: 30, bold: true, hasShadow: true),
+          Expanded(child: Text('Team', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, shadows: shadow))),
+          _buildCell('P', width: 25, bold: true, hasShadow: true),
+          _buildCell('W', width: 25, bold: true, hasShadow: true),
+          _buildCell('D', width: 25, bold: true, hasShadow: true),
+          _buildCell('L', width: 25, bold: true, hasShadow: true),
+          _buildCell('GF', width: 25, bold: true, hasShadow: true),
+          _buildCell('GA', width: 25, bold: true, hasShadow: true),
+          _buildCell('GD', width: 25, bold: true, hasShadow: true),
+          _buildCell('Pts', width: 30, bold: true, hasShadow: true),
         ],
       ),
     );
@@ -127,16 +143,23 @@ class LeagueDetailPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildCell(String text, {double? width, bool bold = false, Color? color}) {
+  Widget _buildCell(String text, {double? width, bool bold = false, Color? color, bool hasShadow = false}) {
     return SizedBox(
       width: width,
       child: Text(
         text,
         textAlign: TextAlign.center,
         style: TextStyle(
-          color: color ?? (bold ? Colors.white70 : Colors.white54),
+          color: color ?? (bold ? Colors.white : Colors.white54), // Header text usually white if shadow present
           fontWeight: bold ? FontWeight.bold : FontWeight.normal,
           fontSize: 12,
+          shadows: hasShadow ? [
+            const Shadow(offset: Offset(-1, -1), color: Colors.black),
+            const Shadow(offset: Offset(1, -1), color: Colors.black),
+            const Shadow(offset: Offset(1, 1), color: Colors.black),
+            const Shadow(offset: Offset(-1, 1), color: Colors.black),
+            const Shadow(blurRadius: 2, color: Colors.black, offset: Offset(0, 1))
+          ] : null,
         ),
       ),
     );

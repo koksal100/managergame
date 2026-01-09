@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/presentation/widgets/game_button.dart';
 import '../../providers/league_provider.dart';
+import '../widgets/league_colors.dart';
 import 'league_detail_page.dart';
 
 class LeaguesPage extends ConsumerWidget {
@@ -16,7 +17,7 @@ class LeaguesPage extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text('Competitions', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        title: const Text('Competitions', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),textAlign: TextAlign.center),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
@@ -75,20 +76,22 @@ class LeaguesPage extends ConsumerWidget {
                          children: [
                            // League Icon / Color
                            Container(
-                             width: 50,
-                             height: 50,
+                             width: 60,
+                             height: 60,
                              decoration: BoxDecoration(
-                               color: _getLeagueColor(league.countryId),
-                               borderRadius: BorderRadius.circular(12),
+                               gradient: LeagueColors.getGradient(league.name),
+                               borderRadius: BorderRadius.circular(15),
                                boxShadow: [
                                  BoxShadow(
-                                   color: _getLeagueColor(league.countryId).withOpacity(0.4),
-                                   blurRadius: 10,
+                                   color: Colors.black.withOpacity(0.3),
+                                   blurRadius: 8,
                                    offset: const Offset(0, 4),
                                  )
-                               ]
+                               ],
+                               border: Border.all(color: Colors.white24, width: 1),
                              ),
-                             child: const Icon(Icons.emoji_events, color: Colors.white, size: 28),
+                             child: const Icon(Icons.emoji_events, color: Color(
+                                 0x80000000), size: 50),
                            ),
                            const SizedBox(width: 16),
                            // Name
@@ -130,18 +133,5 @@ class LeaguesPage extends ConsumerWidget {
     );
   }
 
-  Color _getLeagueColor(int countryId) {
-    // Determine color based on ID seed or map
-    // Simple hashing for MVP
-    final List<Color> colors = [
-      Colors.redAccent,
-      Colors.blueAccent,
-      Colors.greenAccent,
-      Colors.orangeAccent,
-      Colors.purpleAccent,
-      Colors.tealAccent,
-      Colors.amberAccent,
-    ];
-    return colors[countryId % colors.length];
-  }
+  // Removed local _getLeagueGradient
 }
