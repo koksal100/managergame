@@ -1,76 +1,168 @@
 import 'package:flutter/material.dart';
 import '../../../../core/presentation/widgets/game_button.dart';
+import '../../../players/presentation/pages/players_page.dart';
+import '../../../scouting/presentation/pages/scouting_page.dart';
+import '../../../contracts/presentation/pages/contracts_page.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  int _currentIndex = 0;
+
+  final List<Widget> _pages = [
+    const HomeContent(),
+    const PlayersPage(),
+    const ScoutingPage(),
+    const ContractsPage(),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          // Background Image
-          Image.asset(
-            'assets/images/background.png',
-            fit: BoxFit.cover,
-          ),
-          
-          // Overlay Gradient for better visibility (optional but good for premium feel)
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.black.withOpacity(0.3),
-                  Colors.black.withOpacity(0.7),
-                ],
-              ),
+      extendBody: true, // Allows body to extend behind the navigation bar
+      body: _pages[_currentIndex],
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Colors.black.withOpacity(0.6), // Translucent dark background
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(30)), // Rounded top corners
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.3),
+              blurRadius: 10,
+              offset: const Offset(0, -5), // Shadow upwards
             ),
-          ),
-
-          // Main Content
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Spacer(),
-                
-                // Next Week Button
-                GameButton(
-                  text: 'NEXT WEEK',
-                  onPressed: () {
-                    // TODO: Implement Next Week Logic
-                  },
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
+          child: NavigationBarTheme(
+            data: NavigationBarThemeData(
+              backgroundColor: Colors.transparent,
+              indicatorColor: Colors.blue.shade900.withOpacity(0.5), // Dark blue and transparent
+              labelTextStyle: WidgetStateProperty.all(
+                const TextStyle(color: Colors.white70, fontSize: 12),
+              ),
+              iconTheme: WidgetStateProperty.resolveWith((states) {
+                 if (states.contains(WidgetState.selected)) {
+                   return const IconThemeData(color: Colors.white, size: 32); // Increased size for selected
+                 }
+                 return const IconThemeData(color: Colors.white54, size: 24); // Default size
+              }),
+            ),
+            child: NavigationBar(
+              selectedIndex: _currentIndex,
+              labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+              height: 70,
+              backgroundColor: Colors.transparent, // Important for the container color to show
+              elevation: 0,
+              onDestinationSelected: (index) {
+                setState(() {
+                  _currentIndex = index;
+                });
+              },
+              destinations: const [
+                NavigationDestination(
+                  icon: Icon(Icons.home_outlined),
+                  selectedIcon: Icon(Icons.home),
+                  label: 'Home',
                 ),
-
-                const SizedBox(height: 20),
-
-                // Settings Button
-                GameButton(
-                  text: 'SETTINGS',
-                  onPressed: () {
-                    // TODO: Navigate to Settings
-                  },
+                NavigationDestination(
+                  icon: Icon(Icons.people_outline),
+                  selectedIcon: Icon(Icons.people),
+                  label: 'Players',
                 ),
-
-                const Spacer(),
-                
-                // Version or Branding
-                const Text(
-                  'Manager Game v1.0',
-                  style: TextStyle(
-                    color: Colors.white38,
-                    fontSize: 12,
-                  ),
+                NavigationDestination(
+                  icon: Icon(Icons.search_outlined),
+                  selectedIcon: Icon(Icons.search),
+                  label: 'Scouting',
                 ),
-                const SizedBox(height: 20),
+                NavigationDestination(
+                  icon: Icon(Icons.description_outlined),
+                  selectedIcon: Icon(Icons.description),
+                  label: 'Contracts',
+                ),
               ],
             ),
           ),
-        ],
+        ),
       ),
+    );
+  }
+}
+
+class HomeContent extends StatelessWidget {
+  const HomeContent({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        // Background Image
+        Image.asset(
+          'assets/images/background.png',
+          fit: BoxFit.cover,
+        ),
+        
+        // Overlay Gradient
+        Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Colors.black.withOpacity(0.3),
+                Colors.black.withOpacity(0.7),
+              ],
+            ),
+          ),
+        ),
+
+        // Main Content
+        Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Spacer(),
+              
+              // Next Week Button
+              GameButton(
+                text: 'NEXT WEEK',
+                onPressed: () {
+                  // TODO: Implement Next Week Logic
+                },
+              ),
+
+              const SizedBox(height: 20),
+
+              // Settings Button
+              GameButton(
+                text: 'SETTINGS',
+                onPressed: () {
+                  // TODO: Navigate to Settings
+                },
+              ),
+
+              const Spacer(),
+              
+              // Version or Branding
+              const Text(
+                'Manager Game v1.0',
+                style: TextStyle(
+                  color: Colors.white38,
+                  fontSize: 12,
+                ),
+              ),
+              const SizedBox(height: 20),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
