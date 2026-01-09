@@ -10,6 +10,7 @@ class Player extends Equatable {
   final int ca; // Current Ability
   final int pa; // Potential Ability
   final int reputation;
+  final int marketValue;
   final int? currentContractId;
 
   const Player({
@@ -22,11 +23,12 @@ class Player extends Equatable {
     required this.ca,
     required this.pa,
     required this.reputation,
+    required this.marketValue,
     this.currentContractId,
   });
 
   @override
   List<Object?> get props => [
-    id, name, age, clubId, agentId, position, ca, pa, reputation, currentContractId
+    id, name, age, clubId, agentId, position, ca, pa, reputation, marketValue, currentContractId
   ];
 }

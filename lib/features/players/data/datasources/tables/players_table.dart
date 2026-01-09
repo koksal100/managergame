@@ -14,6 +14,7 @@ class Players extends Table {
   IntColumn get ca => integer()(); // Current Ability
   IntColumn get pa => integer()(); // Potential Ability
   IntColumn get reputation => integer()();
+  IntColumn get marketValue => integer()();
   // Using nullable references for circular dependencies might be needed, 
   // but drift handles simple references.
   IntColumn get currentContractId => integer().nullable().references(Contracts, #id)();

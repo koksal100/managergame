@@ -1778,6 +1778,17 @@ class $PlayersTable extends Players with TableInfo<$PlayersTable, Player> {
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _marketValueMeta = const VerificationMeta(
+    'marketValue',
+  );
+  @override
+  late final GeneratedColumn<int> marketValue = GeneratedColumn<int>(
+    'market_value',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _currentContractIdMeta = const VerificationMeta(
     'currentContractId',
   );
@@ -1803,6 +1814,7 @@ class $PlayersTable extends Players with TableInfo<$PlayersTable, Player> {
     ca,
     pa,
     reputation,
+    marketValue,
     currentContractId,
   ];
   @override
@@ -1874,6 +1886,17 @@ class $PlayersTable extends Players with TableInfo<$PlayersTable, Player> {
     } else if (isInserting) {
       context.missing(_reputationMeta);
     }
+    if (data.containsKey('market_value')) {
+      context.handle(
+        _marketValueMeta,
+        marketValue.isAcceptableOrUnknown(
+          data['market_value']!,
+          _marketValueMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_marketValueMeta);
+    }
     if (data.containsKey('current_contract_id')) {
       context.handle(
         _currentContractIdMeta,
@@ -1928,6 +1951,10 @@ class $PlayersTable extends Players with TableInfo<$PlayersTable, Player> {
         DriftSqlType.int,
         data['${effectivePrefix}reputation'],
       )!,
+      marketValue: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}market_value'],
+      )!,
       currentContractId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}current_contract_id'],
@@ -1951,6 +1978,7 @@ class Player extends DataClass implements Insertable<Player> {
   final int ca;
   final int pa;
   final int reputation;
+  final int marketValue;
   final int? currentContractId;
   const Player({
     required this.id,
@@ -1962,6 +1990,7 @@ class Player extends DataClass implements Insertable<Player> {
     required this.ca,
     required this.pa,
     required this.reputation,
+    required this.marketValue,
     this.currentContractId,
   });
   @override
@@ -1980,6 +2009,7 @@ class Player extends DataClass implements Insertable<Player> {
     map['ca'] = Variable<int>(ca);
     map['pa'] = Variable<int>(pa);
     map['reputation'] = Variable<int>(reputation);
+    map['market_value'] = Variable<int>(marketValue);
     if (!nullToAbsent || currentContractId != null) {
       map['current_contract_id'] = Variable<int>(currentContractId);
     }
@@ -2001,6 +2031,7 @@ class Player extends DataClass implements Insertable<Player> {
       ca: Value(ca),
       pa: Value(pa),
       reputation: Value(reputation),
+      marketValue: Value(marketValue),
       currentContractId: currentContractId == null && nullToAbsent
           ? const Value.absent()
           : Value(currentContractId),
@@ -2022,6 +2053,7 @@ class Player extends DataClass implements Insertable<Player> {
       ca: serializer.fromJson<int>(json['ca']),
       pa: serializer.fromJson<int>(json['pa']),
       reputation: serializer.fromJson<int>(json['reputation']),
+      marketValue: serializer.fromJson<int>(json['marketValue']),
       currentContractId: serializer.fromJson<int?>(json['currentContractId']),
     );
   }
@@ -2038,6 +2070,7 @@ class Player extends DataClass implements Insertable<Player> {
       'ca': serializer.toJson<int>(ca),
       'pa': serializer.toJson<int>(pa),
       'reputation': serializer.toJson<int>(reputation),
+      'marketValue': serializer.toJson<int>(marketValue),
       'currentContractId': serializer.toJson<int?>(currentContractId),
     };
   }
@@ -2052,6 +2085,7 @@ class Player extends DataClass implements Insertable<Player> {
     int? ca,
     int? pa,
     int? reputation,
+    int? marketValue,
     Value<int?> currentContractId = const Value.absent(),
   }) => Player(
     id: id ?? this.id,
@@ -2063,6 +2097,7 @@ class Player extends DataClass implements Insertable<Player> {
     ca: ca ?? this.ca,
     pa: pa ?? this.pa,
     reputation: reputation ?? this.reputation,
+    marketValue: marketValue ?? this.marketValue,
     currentContractId: currentContractId.present
         ? currentContractId.value
         : this.currentContractId,
@@ -2080,6 +2115,9 @@ class Player extends DataClass implements Insertable<Player> {
       reputation: data.reputation.present
           ? data.reputation.value
           : this.reputation,
+      marketValue: data.marketValue.present
+          ? data.marketValue.value
+          : this.marketValue,
       currentContractId: data.currentContractId.present
           ? data.currentContractId.value
           : this.currentContractId,
@@ -2098,6 +2136,7 @@ class Player extends DataClass implements Insertable<Player> {
           ..write('ca: $ca, ')
           ..write('pa: $pa, ')
           ..write('reputation: $reputation, ')
+          ..write('marketValue: $marketValue, ')
           ..write('currentContractId: $currentContractId')
           ..write(')'))
         .toString();
@@ -2114,6 +2153,7 @@ class Player extends DataClass implements Insertable<Player> {
     ca,
     pa,
     reputation,
+    marketValue,
     currentContractId,
   );
   @override
@@ -2129,6 +2169,7 @@ class Player extends DataClass implements Insertable<Player> {
           other.ca == this.ca &&
           other.pa == this.pa &&
           other.reputation == this.reputation &&
+          other.marketValue == this.marketValue &&
           other.currentContractId == this.currentContractId);
 }
 
@@ -2142,6 +2183,7 @@ class PlayersCompanion extends UpdateCompanion<Player> {
   final Value<int> ca;
   final Value<int> pa;
   final Value<int> reputation;
+  final Value<int> marketValue;
   final Value<int?> currentContractId;
   const PlayersCompanion({
     this.id = const Value.absent(),
@@ -2153,6 +2195,7 @@ class PlayersCompanion extends UpdateCompanion<Player> {
     this.ca = const Value.absent(),
     this.pa = const Value.absent(),
     this.reputation = const Value.absent(),
+    this.marketValue = const Value.absent(),
     this.currentContractId = const Value.absent(),
   });
   PlayersCompanion.insert({
@@ -2165,13 +2208,15 @@ class PlayersCompanion extends UpdateCompanion<Player> {
     required int ca,
     required int pa,
     required int reputation,
+    required int marketValue,
     this.currentContractId = const Value.absent(),
   }) : name = Value(name),
        age = Value(age),
        position = Value(position),
        ca = Value(ca),
        pa = Value(pa),
-       reputation = Value(reputation);
+       reputation = Value(reputation),
+       marketValue = Value(marketValue);
   static Insertable<Player> custom({
     Expression<int>? id,
     Expression<String>? name,
@@ -2182,6 +2227,7 @@ class PlayersCompanion extends UpdateCompanion<Player> {
     Expression<int>? ca,
     Expression<int>? pa,
     Expression<int>? reputation,
+    Expression<int>? marketValue,
     Expression<int>? currentContractId,
   }) {
     return RawValuesInsertable({
@@ -2194,6 +2240,7 @@ class PlayersCompanion extends UpdateCompanion<Player> {
       if (ca != null) 'ca': ca,
       if (pa != null) 'pa': pa,
       if (reputation != null) 'reputation': reputation,
+      if (marketValue != null) 'market_value': marketValue,
       if (currentContractId != null) 'current_contract_id': currentContractId,
     });
   }
@@ -2208,6 +2255,7 @@ class PlayersCompanion extends UpdateCompanion<Player> {
     Value<int>? ca,
     Value<int>? pa,
     Value<int>? reputation,
+    Value<int>? marketValue,
     Value<int?>? currentContractId,
   }) {
     return PlayersCompanion(
@@ -2220,6 +2268,7 @@ class PlayersCompanion extends UpdateCompanion<Player> {
       ca: ca ?? this.ca,
       pa: pa ?? this.pa,
       reputation: reputation ?? this.reputation,
+      marketValue: marketValue ?? this.marketValue,
       currentContractId: currentContractId ?? this.currentContractId,
     );
   }
@@ -2254,6 +2303,9 @@ class PlayersCompanion extends UpdateCompanion<Player> {
     if (reputation.present) {
       map['reputation'] = Variable<int>(reputation.value);
     }
+    if (marketValue.present) {
+      map['market_value'] = Variable<int>(marketValue.value);
+    }
     if (currentContractId.present) {
       map['current_contract_id'] = Variable<int>(currentContractId.value);
     }
@@ -2272,6 +2324,7 @@ class PlayersCompanion extends UpdateCompanion<Player> {
           ..write('ca: $ca, ')
           ..write('pa: $pa, ')
           ..write('reputation: $reputation, ')
+          ..write('marketValue: $marketValue, ')
           ..write('currentContractId: $currentContractId')
           ..write(')'))
         .toString();
@@ -5336,6 +5389,7 @@ typedef $$PlayersTableCreateCompanionBuilder =
       required int ca,
       required int pa,
       required int reputation,
+      required int marketValue,
       Value<int?> currentContractId,
     });
 typedef $$PlayersTableUpdateCompanionBuilder =
@@ -5349,6 +5403,7 @@ typedef $$PlayersTableUpdateCompanionBuilder =
       Value<int> ca,
       Value<int> pa,
       Value<int> reputation,
+      Value<int> marketValue,
       Value<int?> currentContractId,
     });
 
@@ -5489,6 +5544,11 @@ class $$PlayersTableFilterComposer
 
   ColumnFilters<int> get reputation => $composableBuilder(
     column: $table.reputation,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get marketValue => $composableBuilder(
+    column: $table.marketValue,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -5656,6 +5716,11 @@ class $$PlayersTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get marketValue => $composableBuilder(
+    column: $table.marketValue,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$ClubsTableOrderingComposer get clubId {
     final $$ClubsTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -5755,6 +5820,11 @@ class $$PlayersTableAnnotationComposer
 
   GeneratedColumn<int> get reputation => $composableBuilder(
     column: $table.reputation,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get marketValue => $composableBuilder(
+    column: $table.marketValue,
     builder: (column) => column,
   );
 
@@ -5921,6 +5991,7 @@ class $$PlayersTableTableManager
                 Value<int> ca = const Value.absent(),
                 Value<int> pa = const Value.absent(),
                 Value<int> reputation = const Value.absent(),
+                Value<int> marketValue = const Value.absent(),
                 Value<int?> currentContractId = const Value.absent(),
               }) => PlayersCompanion(
                 id: id,
@@ -5932,6 +6003,7 @@ class $$PlayersTableTableManager
                 ca: ca,
                 pa: pa,
                 reputation: reputation,
+                marketValue: marketValue,
                 currentContractId: currentContractId,
               ),
           createCompanionCallback:
@@ -5945,6 +6017,7 @@ class $$PlayersTableTableManager
                 required int ca,
                 required int pa,
                 required int reputation,
+                required int marketValue,
                 Value<int?> currentContractId = const Value.absent(),
               }) => PlayersCompanion.insert(
                 id: id,
@@ -5956,6 +6029,7 @@ class $$PlayersTableTableManager
                 ca: ca,
                 pa: pa,
                 reputation: reputation,
+                marketValue: marketValue,
                 currentContractId: currentContractId,
               ),
           withReferenceMapper: (p0) => p0

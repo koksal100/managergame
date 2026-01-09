@@ -54,6 +54,7 @@ class PlayerDetailDialog extends ConsumerWidget {
                     const SizedBox(height: 20),
                     _buildSectionTitle('Contract / Value'),
                     const SizedBox(height: 10),
+                    _buildStatRow('Market Value', _formatCurrency(player.marketValue)), // Added Market Value
                     _buildStatRow('Reputation', '${player.reputation} / 100'),
                     
                     // Club Name Fetcher
@@ -198,6 +199,18 @@ class PlayerDetailDialog extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  String _formatCurrency(int value) {
+    if (value >= 1000000) {
+      double millions = value / 1000000;
+      // Show decimal only if needed (e.g. 1.5M, but 10M)
+      return '€${millions.toStringAsFixed(millions.truncateToDouble() == millions ? 0 : 1)}M';
+    } else if (value >= 1000) {
+      return '€${(value / 1000).toStringAsFixed(0)}K';
+    } else {
+      return '€$value';
+    }
   }
 
   Widget _buildStarRating(String label, int value) {

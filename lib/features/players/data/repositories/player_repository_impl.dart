@@ -73,6 +73,7 @@ class PlayerRepositoryImpl implements PlayerRepository {
         ca: row.ca,
         pa: row.pa,
         reputation: row.reputation,
+        marketValue: row.marketValue,
         currentContractId: row.currentContractId,
       )).toList();
       return Right(players);
@@ -101,6 +102,7 @@ class PlayerRepositoryImpl implements PlayerRepository {
         ca: row.ca,
         pa: row.pa,
         reputation: row.reputation,
+        marketValue: row.marketValue,
         currentContractId: row.currentContractId,
       )).toList();
 
@@ -153,6 +155,7 @@ class PlayerRepositoryImpl implements PlayerRepository {
         ca: row.ca,
         pa: row.pa,
         reputation: row.reputation,
+        marketValue: row.marketValue,
         currentContractId: row.currentContractId,
       ));
     } catch (e) {
@@ -172,6 +175,7 @@ class PlayerRepositoryImpl implements PlayerRepository {
         ca: Value(player.ca),
         pa: Value(player.pa),
         reputation: Value(player.reputation),
+        marketValue: Value(player.marketValue),
         currentContractId: Value(player.currentContractId),
       );
       final id = await database.into(database.players).insert(companion);
@@ -194,6 +198,7 @@ class PlayerRepositoryImpl implements PlayerRepository {
         ca: Value(player.ca),
         pa: Value(player.pa),
         reputation: Value(player.reputation),
+        marketValue: Value(player.marketValue),
         currentContractId: Value(player.currentContractId),
       );
       await database.update(database.players).replace(companion);
