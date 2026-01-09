@@ -1,9 +1,10 @@
 import 'package:dartz/dartz.dart';
 import 'package:drift/drift.dart';
-import '../../../../core/database/app_database.dart';
+import '../../../../core/database/app_database.dart' hide Contract;
 import '../../../../core/error/failures.dart';
-import '../entities/contract.dart';
-import '../repositories/contract_repository.dart';
+import '../../domain/repositories/contract_repository.dart';
+import '../../domain/entities/contract.dart';
+
 
 class ContractRepositoryImpl implements ContractRepository {
   final AppDatabase database;

@@ -1,9 +1,10 @@
 import 'package:dartz/dartz.dart';
 import 'package:drift/drift.dart';
-import '../../../../core/database/app_database.dart';
+import '../../../../core/database/app_database.dart' hide Club;
 import '../../../../core/error/failures.dart';
-import '../entities/club.dart';
-import '../repositories/club_repository.dart';
+import '../../domain/repositories/club_repository.dart';
+import '../../domain/entities/club.dart';
+
 
 class ClubRepositoryImpl implements ClubRepository {
   final AppDatabase database;

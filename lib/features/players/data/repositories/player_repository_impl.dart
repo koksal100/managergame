@@ -1,9 +1,10 @@
 import 'package:dartz/dartz.dart';
 import 'package:drift/drift.dart';
-import '../../../../core/database/app_database.dart';
+import '../../../../core/database/app_database.dart' hide Player;
 import '../../../../core/error/failures.dart';
-import '../entities/player.dart';
-import '../repositories/player_repository.dart';
+import '../../domain/repositories/player_repository.dart';
+import '../../domain/entities/player.dart';
+
 
 class PlayerRepositoryImpl implements PlayerRepository {
   final AppDatabase database;
@@ -109,6 +110,32 @@ class PlayerRepositoryImpl implements PlayerRepository {
     try {
       await (database.delete(database.players)..where((tbl) => tbl.id.equals(id))).go();
       return const Right(null);
+    } catch (e) {
+      return Left(CacheFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<Player>>> searchPlayers(String query) async {
+    try {
+      final playerRows = await (database.select(database.players)
+            ..where((tbl) => tbl.name.like('%$query%'))) // Simple LIKE query
+          .get();
+      
+      final players = playerRows.map((row) => Player(
+        id: row.id,
+        name: row.name,
+        age: row.age,
+        clubId: row.clubId,
+        agentId: row.agentId,
+        position: row.position,
+        ca: row.ca,
+        pa: row.pa,
+        reputation: row.reputation,
+        currentContractId: row.currentContractId,
+      )).toList();
+      
+      return Right(players);
     } catch (e) {
       return Left(CacheFailure(e.toString()));
     }

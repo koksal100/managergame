@@ -1,9 +1,9 @@
 import 'package:dartz/dartz.dart';
 import 'package:drift/drift.dart';
-import '../../../../core/database/app_database.dart';
+import '../../../../core/database/app_database.dart' hide Agent;
 import '../../../../core/error/failures.dart';
-import '../entities/agent.dart';
-import '../repositories/agent_repository.dart';
+import '../../domain/repositories/agent_repository.dart';
+import '../../domain/entities/agent.dart';
 
 class AgentRepositoryImpl implements AgentRepository {
   final AppDatabase database;

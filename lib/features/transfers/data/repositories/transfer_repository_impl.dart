@@ -1,9 +1,10 @@
 import 'package:dartz/dartz.dart';
 import 'package:drift/drift.dart';
-import '../../../../core/database/app_database.dart';
+import '../../../../core/database/app_database.dart' hide Transfer;
 import '../../../../core/error/failures.dart';
-import '../entities/transfer.dart';
-import '../repositories/transfer_repository.dart';
+import '../../domain/repositories/transfer_repository.dart';
+import '../../domain/entities/transfer.dart';
+
 
 class TransferRepositoryImpl implements TransferRepository {
   final AppDatabase database;

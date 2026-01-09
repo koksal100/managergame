@@ -1,9 +1,10 @@
 import 'package:dartz/dartz.dart';
 import 'package:drift/drift.dart';
-import '../../../../core/database/app_database.dart';
+import '../../../../core/database/app_database.dart' hide Relationship;
 import '../../../../core/error/failures.dart';
-import '../entities/relationship.dart';
-import '../repositories/relationship_repository.dart';
+import '../../domain/repositories/relationship_repository.dart';
+import '../../domain/entities/relationship.dart';
+
 
 class RelationshipRepositoryImpl implements RelationshipRepository {
   final AppDatabase database;

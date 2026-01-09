@@ -8,4 +8,5 @@ abstract class PlayerRepository {
   Future<Either<Failure, int>> createPlayer(Player player);
   Future<Either<Failure, void>> updatePlayer(Player player);
   Future<Either<Failure, void>> deletePlayer(int id);
+  Future<Either<Failure, List<Player>>> searchPlayers(String query);
 }
