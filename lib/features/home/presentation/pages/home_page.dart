@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import '../../../../core/presentation/widgets/game_button.dart';
 import '../../../players/presentation/pages/players_page.dart';
 import '../../../scouting/presentation/pages/scouting_page.dart';
+import '../../../scouting/presentation/pages/scouting_page.dart';
 import '../../../contracts/presentation/pages/contracts_page.dart';
+import '../../../leagues/presentation/pages/leagues_page.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/providers/seeder_provider.dart';
@@ -168,53 +170,100 @@ class HomeContent extends ConsumerWidget {
           top: 60,
           left: 20,
           child: Container(
-            width: 70,
+            width: 80,
             height: 80,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.9),
-              borderRadius: BorderRadius.circular(12),
+              color: Colors.black.withOpacity(0.3), // Dark transparent background
+              borderRadius: BorderRadius.circular(5), // More rounded
+              border: Border.all(
+                color: Colors.white.withAlpha(70), // Subtle border
+                width: 1,
+              ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.3),
-                  blurRadius: 10,
+                  color: Colors.black.withOpacity(0.5),
+                  blurRadius: 15,
                   offset: const Offset(0, 5),
                 )
               ],
             ),
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Red Header
-                Container(
-                  height: 25,
-                  decoration: const BoxDecoration(
-                    color: Colors.redAccent,
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
-                  ),
-                  alignment: Alignment.center,
-                  child: const Text(
-                    'WEEK',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1.2,
-                    ),
+                // Label
+                Text(
+                  'WEEK',
+                  style: TextStyle(
+                    color: Colors.blueGrey.shade100,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 2.0,
                   ),
                 ),
+                const SizedBox(height: 4),
                 // Number
-                Expanded(
-                  child: Center(
-                    child: Text(
-                      '$currentWeek',
-                      style: const TextStyle(
-                        color: Colors.black87,
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
+                Text(
+                  '$currentWeek',
+                  style: const TextStyle(
+                    color: Color(0xFF2979FF), // Cool vibrant Blue
+                    fontSize: 36,
+                    fontWeight: FontWeight.w900,
+                    height: 1.0,
+                    shadows: [
+                      Shadow(
+                        color: Color(0xFF0D47A1), // Dark Blue depth shadow
+                        offset: Offset(0, 2),
+                        blurRadius: 10,
                       ),
-                    ),
+                    ],
                   ),
                 ),
               ],
+            ),
+          ),
+        ),
+
+        // Trophy / Leagues Button
+        Positioned(
+          top: 150, // 60 (top) + 80 (height) + 10 (spacing)
+          left: 20,
+          child: GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context, 
+                MaterialPageRoute(builder: (context) => const LeaguesPage()),
+              );
+            },
+            child: Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.3), // Matching Calendar BG
+                borderRadius: BorderRadius.circular(5),
+                border: Border.all(
+                  color: Colors.white.withAlpha(70), 
+                  width: 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.5),
+                    blurRadius: 15,
+                    offset: const Offset(0, 5),
+                  )
+                ],
+              ),
+              child: const Icon(
+                Icons.emoji_events, 
+                color: Colors.amberAccent, 
+                size: 40,
+                shadows: [
+                  Shadow(
+                    color: Colors.orangeAccent,
+                    blurRadius: 10,
+                    offset: Offset(0, 2),
+                  )
+                ],
+              ),
             ),
           ),
         ),

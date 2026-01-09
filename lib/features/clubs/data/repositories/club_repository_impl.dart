@@ -15,6 +15,26 @@ class ClubRepositoryImpl implements ClubRepository {
   Future<Either<Failure, List<Club>>> getClubs() async {
     try {
       final rows = await database.select(database.clubs).get();
+      final list = rows.map((row) =>
+          Club(
+            id: row.id,
+            name: row.name,
+            leagueId: row.leagueId,
+            reputation: row.reputation,
+            transferBudget: row.transferBudget,
+            wageBudget: row.wageBudget,
+          )).toList();
+      return Right(list);
+    } catch (e) {
+      return Left(CacheFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<Club>>> getClubsByLeagueId(int leagueId) async {
+    try {
+      final query = database.select(database.clubs)..where((tbl) => tbl.leagueId.equals(leagueId));
+      final rows = await query.get();
       final list = rows.map((row) => Club(
         id: row.id,
         name: row.name,
@@ -23,6 +43,8 @@ class ClubRepositoryImpl implements ClubRepository {
         transferBudget: row.transferBudget,
         wageBudget: row.wageBudget,
       )).toList();
+      // Alphabetical Sort by default for now
+      list.sort((a, b) => a.name.compareTo(b.name));
       return Right(list);
     } catch (e) {
       return Left(CacheFailure(e.toString()));

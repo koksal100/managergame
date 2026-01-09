@@ -4,6 +4,7 @@ import '../entities/club.dart';
 
 abstract class ClubRepository {
   Future<Either<Failure, List<Club>>> getClubs();
+  Future<Either<Failure, List<Club>>> getClubsByLeagueId(int leagueId);
   Future<Either<Failure, Club>> getClubById(int id);
   Future<Either<Failure, int>> createClub(Club club);
   Future<Either<Failure, void>> updateClub(Club club);

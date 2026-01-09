@@ -43,3 +43,12 @@ class ClubsNotifier extends AsyncNotifier<List<Club>> {
   
   // Implement update/delete similarly if needed
 }
+
+final clubsByLeagueProvider = FutureProvider.family<List<Club>, int>((ref, leagueId) async {
+  final repository = ref.watch(clubRepositoryProvider);
+  final result = await repository.getClubsByLeagueId(leagueId);
+  return result.fold(
+    (failure) => throw Exception(failure.message),
+    (clubs) => clubs,
+  );
+});
