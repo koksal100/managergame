@@ -115,50 +115,75 @@ class GameSeeder {
   }
 
   Future<void> _createPlayers(
-    int clubId, 
-    TeamDTO club, 
-    PlayerPosition position, 
-    int count, 
-    NamesDTO names,
-    String clubCountryName,
-    List<CountryDTO> allCountries
-  ) async {
-    final availableCountries = names.countries.keys.toList();
+      int clubId,
+      TeamDTO club,
+      PlayerPosition position,
+      int count,
+      NamesDTO names,
+      String clubCountryName,
+      List<CountryDTO> allCountries
+      ) async {
 
     for (int i = 0; i < count; i++) {
-      // 1. Determine Nationality
-      // 80% chance -> Club's Country
-      // 20% chance -> Random Country from all seeded countries
+      // 1. Nationality Logic
       String playerNationality = clubCountryName;
       if (_random.nextInt(100) >= 80) {
-        // Pick a random country from the list of ALL countries we know about
         playerNationality = allCountries[_random.nextInt(allCountries.length)].name;
       }
 
-      // 2. Resolve Name Source (Metadata Lookyp)
-      // Find the CountryDTO for the chosen nationality to get its nameSource
+      // 2. Name Logic
       final countryDto = allCountries.firstWhere(
-        (c) => c.name == playerNationality, 
-        orElse: () => CountryDTO(name: playerNationality, code: 'XX', reputation: 0, nameSource: playerNationality)
+              (c) => c.name == playerNationality,
+          orElse: () => CountryDTO(name: playerNationality, code: 'XX', reputation: 0, nameSource: playerNationality)
       );
-      
-      String nameSource = countryDto.nameSource;
 
-      // Fallback: If the resolved source isn't in our names.json, default to England
+      String nameSource = countryDto.nameSource;
       if (!names.countries.containsKey(nameSource)) {
-         nameSource = 'England'; 
+        nameSource = 'England';
       }
 
       final nameSet = names.countries[nameSource]!;
-
-      // 3. Generate Attributes
-      final baseAttribute = club.reputation;
-      final ca = (baseAttribute + _random.nextInt(15) - 7).clamp(1, 100);
-      final pa = (ca + _random.nextInt(20)).clamp(1, 100);
-      final age = 16 + _random.nextInt(20); 
-
       final firstName = nameSet.names[_random.nextInt(nameSet.names.length)];
       final lastName = nameSet.surnames[_random.nextInt(nameSet.surnames.length)];
+
+      // --- 3. GÜNCELLENMİŞ MATEMATİKSEL MODEL ---
+
+      // A. YAŞ (16 - 38)
+      final age = 16 + _random.nextInt(23);
+
+      // B. YENİ DİNAMİK ORTALAMA (Dynamic Mean)
+      // Kulüp Gücü 57 ise -> Ortalama 60 olsun.
+      // Kulüp Gücü 96 ise -> Ortalama 85 olsun.
+      // Aradaki fark: 39 puanlık kulüp gücü farkı, 25 puanlık ortalama farkına denk geliyor.
+      double clubPower = club.reputation.toDouble().clamp(57.0, 96.0);
+
+      // FORMÜL: Başlangıç (60) + (KulüpGücüFarkı * (HedefAralık / KaynakAralık))
+      double dynamicMean = 60.0 + (clubPower - 57.0) * (25.0 / 55.0);
+
+      // C. GAUSS DAĞILIMI
+      // Standart sapmayı 6.5'te tutuyoruz.
+      double baseOvr = _nextGaussian(dynamicMean, 6.5);
+
+      // D. YAŞ PENALTISI
+      // (Yaş - 27)^2 / 22
+      double distFromPrime = (age - 27).abs().toDouble();
+      double agePenalty = (distFromPrime * distFromPrime) / 22.0;
+
+      // E. CA HESAPLAMA
+      int rawCa = (baseOvr - agePenalty).round();
+
+      // Alt limiti 57, üst limiti 96 ile sınırlıyoruz.
+      int ca = rawCa.clamp(57, 96);
+
+      // F. PA HESAPLAMA
+      int potentialBonus = 0;
+      if (age < 29) {
+        // Genç oyunculara bonus potansiyel
+        potentialBonus = _random.nextInt(30 - (age - 16));
+      }
+      int pa = (ca + potentialBonus).clamp(ca, 99);
+
+      // --- MODEL SONU ---
 
       await database.into(database.players).insert(
         PlayersCompanion(
@@ -168,10 +193,18 @@ class GameSeeder {
           clubId: Value(clubId),
           ca: Value(ca),
           pa: Value(pa),
-          reputation: Value(ca), 
+          reputation: Value(ca),
         ),
       );
     }
+  }
+
+// Yardımcı Fonksiyon (Aynı kalacak)
+  double _nextGaussian(double mean, double stdDev) {
+    var u1 = 1.0 - _random.nextDouble();
+    var u2 = 1.0 - _random.nextDouble();
+    var randStdNormal = sqrt(-2.0 * log(u1)) * sin(2.0 * pi * u2);
+    return mean + stdDev * randStdNormal;
   }
 
 }
