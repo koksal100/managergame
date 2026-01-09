@@ -6,7 +6,8 @@ enum PlayerSortType {
   pa,
   age,
   name,
-  reputation
+  reputation,
+  marketValue
 }
 
 class PlayerFilter extends Equatable {
@@ -16,6 +17,8 @@ class PlayerFilter extends Equatable {
   final int? maxAge;
   final int? minCa;
   final int? minPa;
+  final int? minMarketValue;
+  final int? maxMarketValue;
   final PlayerSortType sortType;
   final bool ascending;
 
@@ -26,6 +29,8 @@ class PlayerFilter extends Equatable {
     this.maxAge,
     this.minCa,
     this.minPa,
+    this.minMarketValue,
+    this.maxMarketValue,
     this.sortType = PlayerSortType.ca,
     this.ascending = false,
   });
@@ -37,6 +42,8 @@ class PlayerFilter extends Equatable {
     int? maxAge,
     int? minCa,
     int? minPa,
+    int? minMarketValue,
+    int? maxMarketValue,
     PlayerSortType? sortType,
     bool? ascending,
   }) {
@@ -47,6 +54,8 @@ class PlayerFilter extends Equatable {
       maxAge: maxAge ?? this.maxAge,
       minCa: minCa ?? this.minCa,
       minPa: minPa ?? this.minPa,
+      minMarketValue: minMarketValue ?? this.minMarketValue,
+      maxMarketValue: maxMarketValue ?? this.maxMarketValue,
       sortType: sortType ?? this.sortType,
       ascending: ascending ?? this.ascending,
     );
@@ -59,9 +68,11 @@ class PlayerFilter extends Equatable {
     maxAge == null &&
     minCa == null &&
     minPa == null &&
+    minMarketValue == null &&
+    maxMarketValue == null &&
     sortType == PlayerSortType.ca && // Default sort
     ascending == false;
 
   @override
-  List<Object?> get props => [nameQuery, positions, minAge, maxAge, minCa, minPa, sortType, ascending];
+  List<Object?> get props => [nameQuery, positions, minAge, maxAge, minCa, minPa, minMarketValue, maxMarketValue, sortType, ascending];
 }

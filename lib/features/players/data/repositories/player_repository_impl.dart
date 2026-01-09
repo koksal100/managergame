@@ -36,6 +36,12 @@ class PlayerRepositoryImpl implements PlayerRepository {
         if (filter.minPa != null) {
           query.where((tbl) => tbl.pa.isBiggerOrEqualValue(filter.minPa!));
         }
+        if (filter.minMarketValue != null) {
+          query.where((tbl) => tbl.marketValue.isBiggerOrEqualValue(filter.minMarketValue!));
+        }
+        if (filter.maxMarketValue != null) {
+          query.where((tbl) => tbl.marketValue.isSmallerOrEqualValue(filter.maxMarketValue!));
+        }
       }
 
       // Dynamic Sorting
@@ -54,6 +60,9 @@ class PlayerRepositoryImpl implements PlayerRepository {
           break;
         case PlayerSortType.reputation:
           query.orderBy([(t) => OrderingTerm(expression: t.reputation, mode: sortMode)]);
+          break;
+        case PlayerSortType.marketValue:
+          query.orderBy([(t) => OrderingTerm(expression: t.marketValue, mode: sortMode)]);
           break;
         case PlayerSortType.ca:
         default:

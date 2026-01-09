@@ -106,6 +106,8 @@ class ScoutingPage extends ConsumerWidget {
                     _buildSortHeader(ref, 'CA', PlayerSortType.ca, flex: 0, width: 40),
                     const SizedBox(width: 8),
                     _buildSortHeader(ref, 'PA', PlayerSortType.pa, flex: 0, width: 40),
+                    const SizedBox(width: 8),
+                    _buildSortHeader(ref, 'Value', PlayerSortType.marketValue, flex: 0, width: 60), // Added Value Sort
                     const SizedBox(width: 32), // Space for arrow icon
                   ],
                 ),
@@ -228,13 +230,8 @@ class ScoutingPage extends ConsumerWidget {
       ],
     );
 
-    if (flex > 0) {
-      content = Expanded(child: content);
-    } else if (width != null) {
-      content = SizedBox(width: width, child: content);
-    }
-
-    return GestureDetector(
+    // Apply GestureDetector First
+    Widget clickableContent = GestureDetector(
       onTap: () {
         PlayerSortType nextSortType = type;
         bool nextAscending = false; // Default to Descending (High to Low)
@@ -261,6 +258,15 @@ class ScoutingPage extends ConsumerWidget {
       },
       child: content,
     );
+    
+    // Apply Size Constraints Last
+    if (flex > 0) {
+      return Expanded(flex: flex, child: clickableContent);
+    } else if (width != null) {
+      return SizedBox(width: width, child: clickableContent);
+    }
+
+    return clickableContent;
   }
 
   String _formatCurrency(int value) {

@@ -17,6 +17,8 @@ class _PlayerFilterModalState extends ConsumerState<PlayerFilterModal> {
   double _maxAge = 40;
   double _minCa = 0;
   double _minPa = 0;
+  double _minMarketValue = 0;
+  double _maxMarketValue = 150000000; // 150M
 
   // Design Constants - Elegant & Thin
   final Color _accentColor = const Color(0xFF3B82F6);
@@ -31,12 +33,14 @@ class _PlayerFilterModalState extends ConsumerState<PlayerFilterModal> {
     _maxAge = currentFilter.maxAge?.toDouble() ?? 40;
     _minCa = currentFilter.minCa?.toDouble() ?? 0;
     _minPa = currentFilter.minPa?.toDouble() ?? 0;
+    _minMarketValue = currentFilter.minMarketValue?.toDouble() ?? 0;
+    _maxMarketValue = currentFilter.maxMarketValue?.toDouble() ?? 150000000;
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.60, // Slightly more compact
+      height: MediaQuery.of(context).size.height * 0.80, // Slightly more compact
       padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
       decoration: BoxDecoration(
         color: _glassBackground, // Transparent elegant background
@@ -151,6 +155,25 @@ class _PlayerFilterModalState extends ConsumerState<PlayerFilterModal> {
                   ),
                   const SizedBox(height: 20), // Reduced spacing
 
+                  // Market Value Range
+                  _buildSliderHeader('Market Value', '${_formatCompactCurrency(_minMarketValue)} - ${_formatCompactCurrency(_maxMarketValue)}'),
+                  SliderTheme(
+                    data: _customSliderTheme(context),
+                    child: RangeSlider(
+                      values: RangeValues(_minMarketValue, _maxMarketValue),
+                      min: 0,
+                      max: 150000000, // 150M Max
+                      divisions: 150,
+                      onChanged: (values) {
+                        setState(() {
+                          _minMarketValue = values.start;
+                          _maxMarketValue = values.end;
+                        });
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
                   // Age Range
                   _buildSliderHeader('Age Range', '${_minAge.round()} - ${_maxAge.round()}'),
                   SliderTheme(
@@ -246,7 +269,20 @@ class _PlayerFilterModalState extends ConsumerState<PlayerFilterModal> {
       _maxAge = 40;
       _minCa = 0;
       _minPa = 0;
+      _minMarketValue = 0;
+      _maxMarketValue = 150000000;
     });
+  }
+
+  String _formatCompactCurrency(double value) {
+    if (value >= 1000000) {
+      double millions = value / 1000000;
+      return '€${millions.toStringAsFixed(millions.truncateToDouble() == millions ? 0 : 1)}M';
+    } else if (value >= 1000) {
+      return '€${(value / 1000).toStringAsFixed(0)}K';
+    } else {
+      return '€${value.toInt()}';
+    }
   }
 
   void _applyFilters() {
@@ -259,6 +295,8 @@ class _PlayerFilterModalState extends ConsumerState<PlayerFilterModal> {
       maxAge: _maxAge.round(),
       minCa: _minCa.round() > 0 ? _minCa.round() : null,
       minPa: _minPa.round() > 0 ? _minPa.round() : null,
+      minMarketValue: _minMarketValue.round(),
+      maxMarketValue: _maxMarketValue.round(),
     );
 
     ref.read(playerFilterProvider.notifier).state = newFilter;
