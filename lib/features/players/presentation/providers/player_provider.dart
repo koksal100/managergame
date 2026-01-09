@@ -6,6 +6,7 @@ import '../../domain/repositories/player_repository.dart';
 import '../../data/repositories/player_repository_impl.dart';
 import '../../../../core/database/app_database.dart' hide Player;
 import '../../../../core/providers/database_provider.dart';
+import '../../domain/entities/player_filter.dart';
 
 // Repository Provider
 final playerRepositoryProvider = Provider<PlayerRepository>((ref) {
@@ -13,28 +14,19 @@ final playerRepositoryProvider = Provider<PlayerRepository>((ref) {
   return PlayerRepositoryImpl(database);
 });
 
-// Search Query Provider (State)
-final playerSearchQueryProvider = StateProvider<String>((ref) => '');
+
+// Filter State Provider
+final playerFilterProvider = StateProvider<PlayerFilter>((ref) => const PlayerFilter());
 
 // Filtered Players Provider (Future)
 final filteredPlayersProvider = FutureProvider<List<Player>>((ref) async {
   final repository = ref.watch(playerRepositoryProvider);
-  final query = ref.watch(playerSearchQueryProvider);
+  final filter = ref.watch(playerFilterProvider);
 
-  Either<Failure, List<Player>> result;
-  
-  if (query.isEmpty) {
-    // Optionally return top 50 players or empty if we don't want to show all immediately
-    // For now let's return all (might be heavy if 5000+) or maybe limit?
-    // Let's rely on repository.getPlayers() but maybe we should limit init load.
-    // Let's start with just searching.
-    result = await repository.getPlayers();
-  } else {
-    result = await repository.searchPlayers(query);
-  }
+  final result = await repository.getPlayers(filter: filter);
 
   return result.fold(
-    (failure) => [],
+    (failure) => <Player>[], // Return empty list on failure or handle error differently
     (players) => players,
   );
 });

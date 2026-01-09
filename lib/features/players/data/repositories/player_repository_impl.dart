@@ -4,6 +4,7 @@ import '../../../../core/database/app_database.dart' hide Player;
 import '../../../../core/error/failures.dart';
 import '../../domain/repositories/player_repository.dart';
 import '../../domain/entities/player.dart';
+import '../../domain/entities/player_filter.dart';
 
 
 class PlayerRepositoryImpl implements PlayerRepository {
@@ -12,11 +13,36 @@ class PlayerRepositoryImpl implements PlayerRepository {
   PlayerRepositoryImpl(this.database);
 
   @override
-  Future<Either<Failure, List<Player>>> getPlayers() async {
+  Future<Either<Failure, List<Player>>> getPlayers({PlayerFilter? filter}) async {
     try {
-      final playerRows = await (database.select(database.players)
-            ..orderBy([(t) => OrderingTerm(expression: t.ca, mode: OrderingMode.desc)]))
-          .get();
+      final query = database.select(database.players);
+
+      if (filter != null) {
+        if (filter.nameQuery != null && filter.nameQuery!.isNotEmpty) {
+          query.where((tbl) => tbl.name.like('%${filter.nameQuery}%'));
+        }
+        if (filter.positions != null && filter.positions!.isNotEmpty) {
+          query.where((tbl) => tbl.position.isIn(filter.positions!));
+        }
+        if (filter.minAge != null) {
+          query.where((tbl) => tbl.age.isBiggerOrEqualValue(filter.minAge!));
+        }
+        if (filter.maxAge != null) {
+          query.where((tbl) => tbl.age.isSmallerOrEqualValue(filter.maxAge!));
+        }
+        if (filter.minCa != null) {
+          query.where((tbl) => tbl.ca.isBiggerOrEqualValue(filter.minCa!));
+        }
+        if (filter.minPa != null) {
+          query.where((tbl) => tbl.pa.isBiggerOrEqualValue(filter.minPa!));
+        }
+      }
+
+      // Always sort by CA descending
+      query.orderBy([(t) => OrderingTerm(expression: t.ca, mode: OrderingMode.desc)]);
+
+      final playerRows = await query.get();
+
       final players = playerRows.map((row) => Player(
         id: row.id,
         name: row.name,
@@ -86,8 +112,6 @@ class PlayerRepositoryImpl implements PlayerRepository {
   @override
   Future<Either<Failure, void>> updatePlayer(Player player) async {
     try {
-       // Drift update requires explicit Value wrappers if we want to be safe or just replace object
-       // But the Repository takes an Entity which has full data, so we can replace.
        final companion = PlayersCompanion(
         id: Value(player.id),
         name: Value(player.name),
@@ -112,33 +136,6 @@ class PlayerRepositoryImpl implements PlayerRepository {
     try {
       await (database.delete(database.players)..where((tbl) => tbl.id.equals(id))).go();
       return const Right(null);
-    } catch (e) {
-      return Left(CacheFailure(e.toString()));
-    }
-  }
-
-  @override
-  Future<Either<Failure, List<Player>>> searchPlayers(String query) async {
-    try {
-      final playerRows = await (database.select(database.players)
-            ..where((tbl) => tbl.name.like('%$query%'))
-            ..orderBy([(t) => OrderingTerm(expression: t.ca, mode: OrderingMode.desc)]))
-          .get();
-      
-      final players = playerRows.map((row) => Player(
-        id: row.id,
-        name: row.name,
-        age: row.age,
-        clubId: row.clubId,
-        agentId: row.agentId,
-        position: row.position,
-        ca: row.ca,
-        pa: row.pa,
-        reputation: row.reputation,
-        currentContractId: row.currentContractId,
-      )).toList();
-      
-      return Right(players);
     } catch (e) {
       return Left(CacheFailure(e.toString()));
     }

@@ -4,6 +4,7 @@ import '../../../../core/presentation/widgets/game_button.dart'; // Adjust path 
 import '../../../players/domain/entities/player.dart';
 import '../../../players/presentation/providers/player_provider.dart';
 import '../../../players/presentation/widgets/player_detail_dialog.dart';
+import '../../../players/presentation/widgets/player_filter_modal.dart';
 
 class ScoutingPage extends ConsumerWidget {
   const ScoutingPage({super.key});
@@ -11,15 +12,9 @@ class ScoutingPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final playersAsyncValue = ref.watch(filteredPlayersProvider);
-    final query = ref.watch(playerSearchQueryProvider);
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        title: const Text('Scouting Network', style: TextStyle(color: Colors.white)),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
       body: Stack(
         fit: StackFit.expand,
         children: [
@@ -46,27 +41,54 @@ class ScoutingPage extends ConsumerWidget {
           // Content
           Column(
             children: [
-              const SizedBox(height: 100), // Spacing for AppBar
-              
-              // Search Bar
+              const SizedBox(height: 50), // Spacing for AppBar
+
+              // Search Bar & Filter
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: TextField(
-                  onChanged: (value) {
-                    ref.read(playerSearchQueryProvider.notifier).state = value;
-                  },
-                  style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    hintText: 'Search Player Name...',
-                    hintStyle: const TextStyle(color: Colors.white54),
-                    filled: true,
-                    fillColor: Colors.white.withOpacity(0.1),
-                    prefixIcon: const Icon(Icons.search, color: Colors.white54),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        onChanged: (value) {
+                          // Update only name part of filter
+                          final currentFilter = ref.read(playerFilterProvider);
+                          ref.read(playerFilterProvider.notifier).state = currentFilter.copyWith(nameQuery: value);
+                        },
+                        style: const TextStyle(color: Colors.white),
+                        decoration: InputDecoration(
+                          hintText: 'Search Player Name...',
+                          hintStyle: const TextStyle(color: Colors.white54),
+                          filled: true,
+                          fillColor: Colors.white.withOpacity(0.1),
+                          prefixIcon: const Icon(Icons.search, color: Colors.white54),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
+                    const SizedBox(width: 8),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.teal.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.teal.withOpacity(0.5)),
+                      ),
+                      child: IconButton(
+                        icon: const Icon(Icons.filter_list, color: Colors.tealAccent),
+                        onPressed: () {
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            backgroundColor: Colors.transparent,
+                            builder: (context) => const PlayerFilterModal(),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ),
 
