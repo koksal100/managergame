@@ -12,6 +12,9 @@ class GameSeeder {
 
   GameSeeder(this.database);
 
+  // Cache for agents to assign to players
+  List<AgentsCompanion> _cachedAgents = [];
+
   Future<void> seed() async {
     // 1. Load JSONs
     final countriesJson = await _loadJson('assets/data/countries.json');
@@ -27,11 +30,64 @@ class GameSeeder {
     // 2. Seed Countries
     await _seedCountries(countryDTOs);
 
-    // 3. Seed Leagues and Clubs
-    await _seedLeaguesAndClubs(leagueDTOs, teamDTOs, namesDTO, countryDTOs);
-
-    // 4. Seed User Agent
+    // 3. Seed Agents (Rivals) & User - BEFORE Players
+    await _seedAgents(); // Populates _cachedAgents
     await seedUserAgent();
+
+    // 4. Seed Leagues and Clubs (and Players)
+    await _seedLeaguesAndClubs(leagueDTOs, teamDTOs, namesDTO, countryDTOs);
+  }
+
+  Future<void> _seedAgents() async {
+    // Check if we already seeded rivals (check ID 2)
+    final existingRival = await (database.select(database.agents)..where((tbl) => tbl.id.equals(2))).getSingleOrNull();
+    
+    if (existingRival != null) {
+        // If already seeded, load into cache for player assignment
+        final allAgents = await database.select(database.agents).get();
+        _cachedAgents = allAgents.map((a) => AgentsCompanion(
+            id: Value(a.id),
+            name: Value(a.name),
+            reputation: Value(a.reputation),
+        )).toList();
+        return;
+    }
+
+    final agentsJson = await _loadJson('assets/data/agents.json');
+    final List<dynamic> agentsList = agentsJson as List;
+    final List<AgentsCompanion> newAgents = [];
+
+    int currentId = 2; // Start from ID 2 (ID 1 is User)
+    
+    for (var agentData in agentsList) {
+      final name = agentData['name'];
+      final reputation = agentData['reputation'] as int;
+      
+      final level = (reputation / 5).clamp(1, 60).toInt();
+      final balance = (reputation * 100000.0) + (_random.nextInt(5000000));
+      final negotiation = (reputation / 10).round() + _random.nextInt(5);
+      final scouting = (reputation / 10).round() + _random.nextInt(5);
+
+      final companion = AgentsCompanion(
+          id: Value(currentId),
+          name: Value(name),
+          balance: Value(balance),
+          reputation: Value(reputation),
+          negotiationSkill: Value(negotiation.clamp(1, 20)),
+          scoutingSkill: Value(scouting.clamp(1, 20)),
+          level: Value(level),
+      );
+      
+      newAgents.add(companion);
+      currentId++;
+    }
+
+    // Batch Insert
+    await database.batch((batch) {
+      batch.insertAll(database.agents, newAgents);
+    });
+
+    _cachedAgents = newAgents;
   }
 
   Future<void> seedUserAgent() async {
@@ -208,7 +264,52 @@ class GameSeeder {
       // G. PİYASA DEĞERİ HESAPLAMA
       int marketValue = _calculateMarketValue(ca, age, position.shortName);
 
-      // --- MODEL SONU ---
+      // --- NEW AGENT ASSIGNMENT LOGIC (Weighted Random) ---
+      int? assignedAgentId;
+
+      if (_cachedAgents.isNotEmpty) {
+        // 1. Calculate Weights
+        // Weight = 1 / (Distance + 1)^2
+        // Distance = |AgentRep - PlayerCA|
+        
+        Map<int, double> agentWeights = {};
+        double totalWeight = 0;
+
+        for (var agent in _cachedAgents) {
+          int agentRep = agent.reputation.value;
+          
+          // Players prefer agents slightly better than themselves, but not too high
+          // Ideal target is AgentRep = PlayerCA + 5
+          double distance = (agentRep - (ca + 5)).abs().toDouble();
+          
+          // Formula: Higher weight for lower distance
+          // RELAXED FORMULA: Power of 2.0 and base offset of 20.0 
+          // This creates a much flatter curve, allowing more "reach" for agents
+          double weight = 100000.0 / pow(distance + 20.0, 2.0);
+          
+          agentWeights[agent.id.value] = weight;
+          totalWeight += weight;
+        }
+
+        // 2. Roulette Wheel Selection
+        double randomPoint = _random.nextDouble() * totalWeight;
+        double currentSum = 0;
+
+        for (var entry in agentWeights.entries) {
+          currentSum += entry.value;
+          if (currentSum >= randomPoint) {
+            assignedAgentId = entry.key;
+            break;
+          }
+        }
+        
+        // Fallback (Precision errors)
+        assignedAgentId ??= _cachedAgents.first.id.value;
+      }
+      
+      // FALLBACK: If no cached agents (shouldn't happen), use random
+      // Or leave null if you want free agents. But for now we assign.
+
 
       final playerId = await database.into(database.players).insert(
         PlayersCompanion(
@@ -220,6 +321,7 @@ class GameSeeder {
           pa: Value(pa),
           reputation: Value(ca),
           marketValue: Value(marketValue),
+          agentId: Value(assignedAgentId),
         ),
       );
 

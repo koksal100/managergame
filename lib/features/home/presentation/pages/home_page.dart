@@ -10,7 +10,9 @@ import '../../../../core/providers/seeder_provider.dart';
 import '../../../../core/providers/game_date_provider.dart';
 import '../../../simulation/presentation/providers/simulation_provider.dart';
 import '../../../leagues/presentation/providers/standings_provider.dart';
+import '../../../leagues/presentation/providers/standings_provider.dart';
 import '../../../../core/presentation/widgets/glass_container.dart';
+import '../../../agents/presentation/pages/agents_page.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -27,6 +29,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     const PlayersPage(),
     const ScoutingPage(),
     const ContractsPage(),
+    const AgentsPage(), // Index 4: World/Agents
   ];
 
   @override
@@ -107,7 +110,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           Expanded(
             child: Container(
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   _NavBarItem(
                     icon: Icons.home_rounded,
@@ -132,6 +135,12 @@ class _HomePageState extends ConsumerState<HomePage> {
                     label: "Office",
                     isSelected: _currentIndex == 3,
                     onTap: () => setState(() => _currentIndex = 3),
+                  ),
+                  _NavBarItem(
+                    icon: Icons.public,
+                    label: "World",
+                    isSelected: _currentIndex == 4,
+                    onTap: () => setState(() => _currentIndex = 4),
                   ),
                 ],
               ),
@@ -226,51 +235,67 @@ class HomeContent extends ConsumerWidget {
             child: Column(
               children: [
                 // Top Header Row
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // Manager Profile & Week Info
-                    const _ManagerProfileHeader(),
+                    Row(
+                      children: [
+                        // Manager Profile
+                        const Expanded(child: _ManagerProfileHeader()),
 
-                    // İlerle Butonu (Glass Effect + Glow)
-                    GestureDetector(
-                      onTap: () async {
-                        _handleSimulation(context, ref, currentWeek);
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(30),
-                          border: Border.all(color: Colors.white.withOpacity(0.2)),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.blueAccent.withOpacity(0.1),
-                              blurRadius: 20,
-                              spreadRadius: 5,
-                            )
-                          ],
-                        ),
-                        child: const Row(
-                          children: [
-                            Text(
-                              "NEXT WEEK",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 1.0,
-                              ),
+                        // World / Agents Button
+                        /* REMOVED: World Icon - Moved to Bottom Nav
+                        GestureDetector(
+                          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AgentsPage())),
+                          child: Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.purple.withOpacity(0.2),
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.purpleAccent.withOpacity(0.5)),
                             ),
-                            SizedBox(width: 8),
-                            Icon(Icons.arrow_forward_ios_rounded, color: Colors.white, size: 14),
-                            Icon(Icons.arrow_forward_ios_rounded, color: Colors.white, size: 14),
-                          ],
+                            child: const Icon(Icons.public, color: Colors.white, size: 20),
+                          ),
                         ),
-                      ),
+                        const SizedBox(width: 15),
+                        */
+
+                        // Next Week Button
+                        GestureDetector(
+                          onTap: () async {
+                            _handleSimulation(context, ref, currentWeek);
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(30),
+                              border: Border.all(color: Colors.white.withOpacity(0.2)),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.blueAccent.withOpacity(0.1),
+                                  blurRadius: 20,
+                                  spreadRadius: 5,
+                                )
+                              ],
+                            ),
+                            child: const Row(
+                              children: [
+                                Text(
+                                  "NEXT WEEK",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 1.0,
+                                  ),
+                                ),
+                                SizedBox(width: 8),
+                                Icon(Icons.arrow_forward_ios_rounded, color: Colors.white, size: 14),
+                                Icon(Icons.arrow_forward_ios_rounded, color: Colors.white, size: 14),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
               ],
             ),
           ),
@@ -389,6 +414,8 @@ class _ManagerProfileHeader extends ConsumerWidget {
     final controller = TextEditingController(text: currentName);
     showDialog(
       context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black.withOpacity(0.8),
       builder: (context) => Dialog(
         backgroundColor: const Color(0xFF1E1E1E),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
@@ -521,7 +548,7 @@ class _NavBarItem extends StatelessWidget {
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 4), // Reduced from 10 to 4
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

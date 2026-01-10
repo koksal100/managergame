@@ -1,0 +1,402 @@
+[
+    {
+        "name": "Mino Raiola Clone",
+        "reputation": 95
+    },
+    {
+        "name": "Jorge Mendes Ref",
+        "reputation": 98
+    },
+    {
+        "name": "Jonathan Barnett",
+        "reputation": 92
+    },
+    {
+        "name": "Volker Struth",
+        "reputation": 88
+    },
+    {
+        "name": "Pini Zahavi",
+        "reputation": 85
+    },
+    {
+        "name": "Giuliano Bertolucci",
+        "reputation": 82
+    },
+    {
+        "name": "Fali Ramadani",
+        "reputation": 80
+    },
+    {
+        "name": "Kia Joorabchian",
+        "reputation": 78
+    },
+    {
+        "name": "Alessandro Lucci",
+        "reputation": 75
+    },
+    {
+        "name": "Federico Pastorello",
+        "reputation": 74
+    },
+    {
+        "name": "Christian Bragarnik",
+        "reputation": 72
+    },
+    {
+        "name": "Fernando Felicevich",
+        "reputation": 70
+    },
+    {
+        "name": "Ulisse Savini",
+        "reputation": 65
+    },
+    {
+        "name": "Meissa Ndiaye",
+        "reputation": 68
+    },
+    {
+        "name": "Frank Trimboli",
+        "reputation": 66
+    },
+    {
+        "name": "Leon Angel",
+        "reputation": 64
+    },
+    {
+        "name": "Pere Guardiola",
+        "reputation": 69
+    },
+    {
+        "name": "Wagner Ribeiro",
+        "reputation": 62
+    },
+    {
+        "name": "Sven Mislintat",
+        "reputation": 60
+    },
+    {
+        "name": "Michael Zorc",
+        "reputation": 58
+    },
+    {
+        "name": "Hans-Joachim Watzke",
+        "reputation": 55
+    },
+    {
+        "name": "Txiki Begiristain",
+        "reputation": 85
+    },
+    {
+        "name": "Edu Gaspar",
+        "reputation": 75
+    },
+    {
+        "name": "Monchi",
+        "reputation": 82
+    },
+    {
+        "name": "Fabio Paratici",
+        "reputation": 78
+    },
+    {
+        "name": "Beppe Marotta",
+        "reputation": 88
+    },
+    {
+        "name": "Adriano Galliani",
+        "reputation": 70
+    },
+    {
+        "name": "Aurelio De Laurentiis",
+        "reputation": 65
+    },
+    {
+        "name": "Claudio Lotito",
+        "reputation": 60
+    },
+    {
+        "name": "Erik Vandermeer",
+        "reputation": 72
+    },
+    {
+        "name": "Jurgen Hassen",
+        "reputation": 90
+    },
+    {
+        "name": "Pep Rivera",
+        "reputation": 95
+    },
+    {
+        "name": "Jose Santos",
+        "reputation": 92
+    },
+    {
+        "name": "Carlo Rossi",
+        "reputation": 94
+    },
+    {
+        "name": "Zinedine Blanc",
+        "reputation": 91
+    },
+    {
+        "name": "Antonio Bruno",
+        "reputation": 85
+    },
+    {
+        "name": "Max Allegro",
+        "reputation": 80
+    },
+    {
+        "name": "Thomas Schneider",
+        "reputation": 82
+    },
+    {
+        "name": "Julian Young",
+        "reputation": 78
+    },
+    {
+        "name": "Diego Costa",
+        "reputation": 86
+    },
+    {
+        "name": "Mikel Arrieta",
+        "reputation": 80
+    },
+    {
+        "name": "Unai Basque",
+        "reputation": 76
+    },
+    {
+        "name": "Xabi Tolosa",
+        "reputation": 79
+    },
+    {
+        "name": "Roberto Brescia",
+        "reputation": 74
+    },
+    {
+        "name": "Ruben Lisboa",
+        "reputation": 72
+    },
+    {
+        "name": "Arne Rotterdam",
+        "reputation": 70
+    },
+    {
+        "name": "Ange Athens",
+        "reputation": 73
+    },
+    {
+        "name": "Eddie Tyne",
+        "reputation": 71
+    },
+    {
+        "name": "Sean Gravel",
+        "reputation": 60
+    },
+    {
+        "name": "David Scot",
+        "reputation": 65
+    },
+    {
+        "name": "Roy Crystal",
+        "reputation": 62
+    },
+    {
+        "name": "Sam Bolton",
+        "reputation": 58
+    },
+    {
+        "name": "Harry Pointer",
+        "reputation": 55
+    },
+    {
+        "name": "Neil Sheffield",
+        "reputation": 50
+    },
+    {
+        "name": "Alan Castle",
+        "reputation": 45
+    },
+    {
+        "name": "Steve Tyne",
+        "reputation": 48
+    },
+    {
+        "name": "Mark Spark",
+        "reputation": 42
+    },
+    {
+        "name": "Tony Stoke",
+        "reputation": 40
+    },
+    {
+        "name": "Gary Berm",
+        "reputation": 35
+    },
+    {
+        "name": "Chris Blade",
+        "reputation": 38
+    },
+    {
+        "name": "Slaven Croat",
+        "reputation": 55
+    },
+    {
+        "name": "Ralph Leipzig",
+        "reputation": 52
+    },
+    {
+        "name": "Jesse York",
+        "reputation": 48
+    },
+    {
+        "name": "Brendan Fox",
+        "reputation": 65
+    },
+    {
+        "name": "Graham Bright",
+        "reputation": 60
+    },
+    {
+        "name": "Frank Bridge",
+        "reputation": 58
+    },
+    {
+        "name": "Steven Kopp",
+        "reputation": 62
+    },
+    {
+        "name": "Wayne Scouse",
+        "reputation": 55
+    },
+    {
+        "name": "Patrick Eagle",
+        "reputation": 60
+    },
+    {
+        "name": "Thierry Gunner",
+        "reputation": 65
+    },
+    {
+        "name": "Dennis Ice",
+        "reputation": 62
+    },
+    {
+        "name": "Robert French",
+        "reputation": 58
+    },
+    {
+        "name": "Freddie Swede",
+        "reputation": 55
+    },
+    {
+        "name": "Sol Center",
+        "reputation": 50
+    },
+    {
+        "name": "Ashley Left",
+        "reputation": 52
+    },
+    {
+        "name": "Petr Helmet",
+        "reputation": 60
+    },
+    {
+        "name": "Didier King",
+        "reputation": 70
+    },
+    {
+        "name": "John Captain",
+        "reputation": 65
+    },
+    {
+        "name": "Rio Back",
+        "reputation": 68
+    },
+    {
+        "name": "Nemanja Wall",
+        "reputation": 62
+    },
+    {
+        "name": "Paul Ginger",
+        "reputation": 65
+    },
+    {
+        "name": "Ryan Wing",
+        "reputation": 60
+    },
+    {
+        "name": "Gary Right",
+        "reputation": 55
+    },
+    {
+        "name": "Phil Utility",
+        "reputation": 50
+    },
+    {
+        "name": "David Spec",
+        "reputation": 99
+    },
+    {
+        "name": "Zlatan God",
+        "reputation": 95
+    },
+    {
+        "name": "Cristiano Goat",
+        "reputation": 98
+    },
+    {
+        "name": "Lionel Alien",
+        "reputation": 99
+    },
+    {
+        "name": "Neymdar Jr",
+        "reputation": 90
+    },
+    {
+        "name": "Kylian Flash",
+        "reputation": 95
+    },
+    {
+        "name": "Erling Robot",
+        "reputation": 92
+    },
+    {
+        "name": "Jude Hey",
+        "reputation": 88
+    },
+    {
+        "name": "Vini Dance",
+        "reputation": 85
+    },
+    {
+        "name": "Rodri Piv",
+        "reputation": 82
+    },
+    {
+        "name": "Kevin Assist",
+        "reputation": 90
+    },
+    {
+        "name": "Mo Pharaoh",
+        "reputation": 88
+    },
+    {
+        "name": "Virgil Wall",
+        "reputation": 85
+    },
+    {
+        "name": "Alisson Safe",
+        "reputation": 80
+    },
+    {
+        "name": "Ederson Kick",
+        "reputation": 78
+    },
+    {
+        "name": "Ruben Block",
+        "reputation": 75
+    }
+]
