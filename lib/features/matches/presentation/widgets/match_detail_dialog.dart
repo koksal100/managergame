@@ -88,30 +88,32 @@ class MatchDetailDialog extends ConsumerWidget {
                 padding: const EdgeInsets.all(16),
                 child: statsAsync.when(
                   data: (stats) {
-                    final homeScorers = stats.where((s) => s.clubId == match.homeClubId && s.goals > 0).toList();
-                    final awayScorers = stats.where((s) => s.clubId == match.awayClubId && s.goals > 0).toList();
-                    
-                    if (homeScorers.isEmpty && awayScorers.isEmpty) {
-                       return const Text('No goals', style: TextStyle(color: Colors.white54, fontStyle: FontStyle.italic));
+                    final homeEvents = _reconstructMatchEvents(stats, match.homeClubId);
+                    final awayEvents = _reconstructMatchEvents(stats, match.awayClubId);
+
+                    if (homeEvents.isEmpty && awayEvents.isEmpty) {
+                       return const Text('No stats available', style: TextStyle(color: Colors.white54, fontStyle: FontStyle.italic));
                     }
 
                     return Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Home Scorers
+                        // Home Events
                         Expanded(
                           child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start, // Align left for home? Or center? usually simpler
-                            children: homeScorers.map((s) => _buildScorerItem(s, TextAlign.left)).toList(),
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: homeEvents.map((e) => _buildEventItem(e, TextAlign.left)).toList(),
                           ),
                         ),
+                        
                         // Divider
-                        Container(width: 1, height: 40, color: Colors.white10),
-                        // Away Scorers
+                        Container(width: 1, height: 80, color: Colors.white10),
+                        
+                        // Away Events
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
-                            children: awayScorers.map((s) => _buildScorerItem(s, TextAlign.right)).toList(),
+                            children: awayEvents.map((e) => _buildEventItem(e, TextAlign.right)).toList(),
                           ),
                         ),
                       ],
@@ -141,14 +143,83 @@ class MatchDetailDialog extends ConsumerWidget {
     );
   }
 
-  Widget _buildScorerItem(MatchDetailStat stat, TextAlign align) {
+  Widget _buildEventItem(_MatchEvent event, TextAlign align) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Text(
-        '${stat.playerName} (${stat.goals})',
-        textAlign: align,
-        style: const TextStyle(color: Colors.white70, fontSize: 14),
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Column(
+        crossAxisAlignment: align == TextAlign.left ? CrossAxisAlignment.start : CrossAxisAlignment.end,
+        children: [
+           // Scorer
+           Text(
+             event.scorerName,
+             textAlign: align,
+             style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
+           ),
+           // Assister (if any)
+           if (event.assisterName != null)
+             Text(
+               '(A. ${event.assisterName})',
+               textAlign: align,
+               style: const TextStyle(color: Colors.white54, fontSize: 11),
+             ),
+        ],
       ),
     );
   }
+
+  List<_MatchEvent> _reconstructMatchEvents(List<MatchDetailStat> stats, int clubId) {
+    // Filter stats for this club
+    final clubStats = stats.where((s) => s.clubId == clubId).toList();
+    
+    // Expand Goals
+    List<String> scorers = [];
+    for (var s in clubStats) {
+      for (int i = 0; i < s.goals; i++) {
+        scorers.add(s.playerName);
+      }
+    }
+    
+    // Expand Assists
+    List<String> assisters = [];
+    for (var s in clubStats) {
+      for (int i = 0; i < s.assists; i++) {
+        assisters.add(s.playerName);
+      }
+    }
+
+    // Pair them (Simple approach: Queue based)
+    // To respect "Self-Assist" constraint roughly:
+    // We can just shuffle and hope, or do a simple check.
+    // Given it's a visual approximation:
+    assisters.shuffle(); 
+    
+    List<_MatchEvent> events = [];
+    
+    for (var scorer in scorers) {
+       String? assister;
+       if (assisters.isNotEmpty) {
+           // Try to find an assister who is NOT the scorer
+           try {
+              assister = assisters.firstWhere((a) => a != scorer);
+              assisters.remove(assister); // Remove specific instance
+           } catch (e) {
+              // If only self remains (rare but possible in loose reconstruction), just take it or none?
+              // Simulation prevents generation, but reconstruction might corner itself.
+              // Just take first if forced, or leave null.
+              if (assisters.isNotEmpty) {
+                 assister = assisters.removeAt(0);
+              }
+           }
+       }
+       events.add(_MatchEvent(scorer, assister));
+    }
+    
+    return events;
+  }
+}
+
+class _MatchEvent {
+  final String scorerName;
+  final String? assisterName;
+  _MatchEvent(this.scorerName, this.assisterName);
 }

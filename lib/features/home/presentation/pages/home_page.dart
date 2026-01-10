@@ -40,6 +40,50 @@ class _HomePageState extends ConsumerState<HomePage> {
         bottomNavigationBar: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Leads: Leagues / Trophy (Bottom Left)
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context, 
+                        MaterialPageRoute(builder: (context) => const LeaguesPage()),
+                      );
+                    },
+                    child: Container(
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.5),
+                        borderRadius: BorderRadius.circular(5),
+                        border: Border.all(color: Colors.white.withAlpha(70), width: 1),
+                      ),
+                      child: const Icon(Icons.emoji_events, color: Colors.amberAccent, size: 28),
+                    ),
+                  ),
+
+                  // Trailing: Settings (Bottom Right)
+                  GestureDetector(
+                    onTap: () {
+                       // TODO: Settings
+                    },
+                    child: Container(
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.5),
+                        borderRadius: BorderRadius.circular(5),
+                        border: Border.all(color: Colors.white.withAlpha(70), width: 1),
+                      ),
+                      child: const Icon(Icons.settings, color: Colors.white70, size: 28),
+                    ),
+                  ),
+                ],
+              ),
+            ),
             const _TickerWidget(),
             Container(
               decoration: BoxDecoration(
@@ -230,25 +274,55 @@ class HomeContent extends ConsumerWidget {
           ),
         ),
 
-        // Trophy / Leagues Button
+        // Next Week Button (Top Right)
         Positioned(
           top: 60,
           right: 20,
           child: GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context, 
-                MaterialPageRoute(builder: (context) => const LeaguesPage()),
+            onTap: () async {
+              // Show loading dialog
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (context) => const Center(
+                  child: CircularProgressIndicator(color: Colors.white),
+                ),
               );
+
+              try {
+                // Simulate the CURRENT week's matches before moving to next
+                // Assuming Season 1 for now
+                final simulationService = ref.read(simulationServiceProvider); 
+                await simulationService.simulateWeek(1, currentWeek);
+
+                // Advance date
+                await ref.read(gameDateProvider.notifier).advanceWeek();
+                
+                // Force refresh of Standings and Stats
+                ref.invalidate(standingsProvider);
+                ref.invalidate(topScorersProvider);
+                ref.invalidate(topAssistersProvider);
+                ref.invalidate(topRatedProvider);
+                ref.invalidate(tickerMatchesProvider); // Update ticker
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Simulation Error: $e')),
+                  );
+                }
+              } finally {
+                // Close dialog
+                if (context.mounted) Navigator.pop(context);
+              }
             },
             child: Container(
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.3), // Matching Calendar BG
-                borderRadius: BorderRadius.circular(5),
+                color: Colors.black.withOpacity(0.3), // Match other buttons
+                borderRadius: BorderRadius.circular(5), 
                 border: Border.all(
-                  color: Colors.white.withAlpha(70), 
+                  color: Colors.white.withAlpha(70),
                   width: 1,
                 ),
                 boxShadow: [
@@ -259,93 +333,22 @@ class HomeContent extends ConsumerWidget {
                   )
                 ],
               ),
-              child: const Icon(
-                Icons.emoji_events, 
-                color: Colors.amberAccent, 
-                size: 40,
-                shadows: [
-                  Shadow(
-                    color: Colors.orangeAccent,
-                    blurRadius: 10,
-                    offset: Offset(0, 2),
-                  )
-                ],
+              alignment: Alignment.center,
+              child: const Text(
+                '>>',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 32,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: -2,
+                ),
               ),
             ),
           ),
         ),
-
-        // Main Content
-        Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Spacer(),
-              
-                GameButton(
-                text: 'NEXT WEEK',
-                onPressed: () async {
-                  // Show loading dialog
-                  showDialog(
-                    context: context,
-                    barrierDismissible: false,
-                    builder: (context) => const Center(
-                      child: CircularProgressIndicator(color: Colors.white),
-                    ),
-                  );
-
-                  try {
-                    // Simulate the CURRENT week's matches before moving to next
-                    // Assuming Season 1 for now
-                    // Import the provider at top of file
-                    final simulationService = ref.read(simulationServiceProvider); 
-                    await simulationService.simulateWeek(1, currentWeek);
-
-                    // Advance date
-                    await ref.read(gameDateProvider.notifier).advanceWeek();
-                    
-                    // Force refresh of Standings and Stats
-                    ref.invalidate(standingsProvider);
-                    ref.invalidate(topScorersProvider);
-                    ref.invalidate(topAssistersProvider);
-                    ref.invalidate(topRatedProvider);
-                  } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Simulation Error: $e')),
-                    );
-                  } finally {
-                    // Close dialog
-                    if (context.mounted) Navigator.pop(context);
-                  }
-                },
-              ),
-
-              const SizedBox(height: 20),
-
-              // Settings Button
-              GameButton(
-                text: 'SETTINGS',
-                onPressed: () {
-                  // TODO: Navigate to Settings
-                },
-              ),
-
-              const Spacer(),
-              
-              // Version or Branding
-              const Text(
-                'Manager Game v1.0',
-                style: TextStyle(
-                  color: Colors.white38,
-                  fontSize: 12,
-                ),
-              ),
-              const SizedBox(height: 20),
-            ],
-          ),
-        ),
-      ],
+       ]
     );
+
   }
 }
 
