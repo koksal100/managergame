@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../clubs/domain/entities/club.dart';
-import '../../../clubs/providers/club_provider.dart';
+// import '../../../clubs/providers/club_provider.dart'; // Unused now
 import '../../../clubs/presentation/pages/club_squad_page.dart';
 import '../../domain/entities/league.dart';
 import '../widgets/league_colors.dart';
+import '../providers/standings_provider.dart';
+import '../../domain/services/standings_service.dart';
 
 class LeagueDetailPage extends ConsumerWidget {
   final League league;
@@ -13,7 +15,7 @@ class LeagueDetailPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final clubsAsync = ref.watch(clubsByLeagueProvider(league.id));
+    final standingsAsync = ref.watch(standingsProvider(league.id));
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -49,9 +51,9 @@ class LeagueDetailPage extends ConsumerWidget {
           ),
 
           // Content
-          clubsAsync.when(
-            data: (clubs) {
-              if (clubs.isEmpty) {
+          standingsAsync.when(
+            data: (standings) {
+              if (standings.isEmpty) {
                 return const Center(child: Text('No clubs found', style: TextStyle(color: Colors.white)));
               }
               return SingleChildScrollView(
@@ -64,10 +66,10 @@ class LeagueDetailPage extends ConsumerWidget {
                       padding: EdgeInsets.zero,
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      itemCount: clubs.length,
+                      itemCount: standings.length,
                       itemBuilder: (context, index) {
-                        final club = clubs[index];
-                        return _buildTableRow(context, index + 1, club);
+                        final standing = standings[index];
+                        return _buildTableRow(context, index + 1, standing);
                       },
                     ),
                   ],
@@ -121,13 +123,13 @@ class LeagueDetailPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildTableRow(BuildContext context, int pos, Club club) {
+  Widget _buildTableRow(BuildContext context, int pos, LeagueStanding standing) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ClubSquadPage(clubId: club.id, clubName: club.name),
+            builder: (context) => ClubSquadPage(clubId: standing.club.id, clubName: standing.club.name),
           ),
         );
       },
@@ -140,15 +142,15 @@ class LeagueDetailPage extends ConsumerWidget {
         child: Row(
           children: [
             _buildCell('$pos', width: 30),
-            Expanded(child: Text(club.name, style: const TextStyle(color: Colors.white, fontSize: 13))),
-            _buildCell('0', width: 25),
-            _buildCell('0', width: 25),
-            _buildCell('0', width: 25),
-            _buildCell('0', width: 25),
-            _buildCell('0', width: 25),
-            _buildCell('0', width: 25),
-            _buildCell('0', width: 25),
-            _buildCell('0', width: 30, bold: true, color: Colors.yellowAccent),
+            Expanded(child: Text(standing.club.name, style: const TextStyle(color: Colors.white, fontSize: 13))),
+            _buildCell('${standing.played}', width: 25),
+            _buildCell('${standing.won}', width: 25),
+            _buildCell('${standing.drawn}', width: 25),
+            _buildCell('${standing.lost}', width: 25),
+            _buildCell('${standing.goalsFor}', width: 25),
+            _buildCell('${standing.goalsAgainst}', width: 25),
+            _buildCell('${standing.goalDifference}', width: 25),
+            _buildCell('${standing.points}', width: 30, bold: true, color: Colors.yellowAccent),
           ],
         ),
       ),

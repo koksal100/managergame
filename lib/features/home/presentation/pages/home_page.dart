@@ -9,6 +9,8 @@ import '../../../leagues/presentation/pages/leagues_page.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/providers/seeder_provider.dart';
 import '../../../../core/providers/game_date_provider.dart';
+import '../../../simulation/presentation/providers/simulation_provider.dart';
+import '../../../leagues/presentation/providers/standings_provider.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -280,11 +282,38 @@ class HomeContent extends ConsumerWidget {
             children: [
               const Spacer(),
               
-              // Next Week Button
-              GameButton(
+                GameButton(
                 text: 'NEXT WEEK',
-                onPressed: () {
-                   ref.read(gameDateProvider.notifier).advanceWeek();
+                onPressed: () async {
+                  // Show loading dialog
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (context) => const Center(
+                      child: CircularProgressIndicator(color: Colors.white),
+                    ),
+                  );
+
+                  try {
+                    // Simulate the CURRENT week's matches before moving to next
+                    // Assuming Season 1 for now
+                    // Import the provider at top of file
+                    final simulationService = ref.read(simulationServiceProvider); 
+                    await simulationService.simulateWeek(1, currentWeek);
+
+                    // Advance date
+                    await ref.read(gameDateProvider.notifier).advanceWeek();
+                    
+                    // Force refresh of Standings
+                    ref.invalidate(standingsProvider);
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Simulation Error: $e')),
+                    );
+                  } finally {
+                    // Close dialog
+                    if (context.mounted) Navigator.pop(context);
+                  }
                 },
               ),
 

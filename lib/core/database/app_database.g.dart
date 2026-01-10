@@ -3772,6 +3772,1072 @@ class CountriesCompanion extends UpdateCompanion<Country> {
   }
 }
 
+class $MatchesTable extends Matches with TableInfo<$MatchesTable, Matche> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $MatchesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _homeClubIdMeta = const VerificationMeta(
+    'homeClubId',
+  );
+  @override
+  late final GeneratedColumn<int> homeClubId = GeneratedColumn<int>(
+    'home_club_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES clubs (id)',
+    ),
+  );
+  static const VerificationMeta _awayClubIdMeta = const VerificationMeta(
+    'awayClubId',
+  );
+  @override
+  late final GeneratedColumn<int> awayClubId = GeneratedColumn<int>(
+    'away_club_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES clubs (id)',
+    ),
+  );
+  static const VerificationMeta _homeScoreMeta = const VerificationMeta(
+    'homeScore',
+  );
+  @override
+  late final GeneratedColumn<int> homeScore = GeneratedColumn<int>(
+    'home_score',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _awayScoreMeta = const VerificationMeta(
+    'awayScore',
+  );
+  @override
+  late final GeneratedColumn<int> awayScore = GeneratedColumn<int>(
+    'away_score',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _seasonMeta = const VerificationMeta('season');
+  @override
+  late final GeneratedColumn<int> season = GeneratedColumn<int>(
+    'season',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _weekMeta = const VerificationMeta('week');
+  @override
+  late final GeneratedColumn<int> week = GeneratedColumn<int>(
+    'week',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _isPlayedMeta = const VerificationMeta(
+    'isPlayed',
+  );
+  @override
+  late final GeneratedColumn<bool> isPlayed = GeneratedColumn<bool>(
+    'is_played',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_played" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    homeClubId,
+    awayClubId,
+    homeScore,
+    awayScore,
+    season,
+    week,
+    isPlayed,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'matches';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Matche> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('home_club_id')) {
+      context.handle(
+        _homeClubIdMeta,
+        homeClubId.isAcceptableOrUnknown(
+          data['home_club_id']!,
+          _homeClubIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_homeClubIdMeta);
+    }
+    if (data.containsKey('away_club_id')) {
+      context.handle(
+        _awayClubIdMeta,
+        awayClubId.isAcceptableOrUnknown(
+          data['away_club_id']!,
+          _awayClubIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_awayClubIdMeta);
+    }
+    if (data.containsKey('home_score')) {
+      context.handle(
+        _homeScoreMeta,
+        homeScore.isAcceptableOrUnknown(data['home_score']!, _homeScoreMeta),
+      );
+    }
+    if (data.containsKey('away_score')) {
+      context.handle(
+        _awayScoreMeta,
+        awayScore.isAcceptableOrUnknown(data['away_score']!, _awayScoreMeta),
+      );
+    }
+    if (data.containsKey('season')) {
+      context.handle(
+        _seasonMeta,
+        season.isAcceptableOrUnknown(data['season']!, _seasonMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_seasonMeta);
+    }
+    if (data.containsKey('week')) {
+      context.handle(
+        _weekMeta,
+        week.isAcceptableOrUnknown(data['week']!, _weekMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_weekMeta);
+    }
+    if (data.containsKey('is_played')) {
+      context.handle(
+        _isPlayedMeta,
+        isPlayed.isAcceptableOrUnknown(data['is_played']!, _isPlayedMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Matche map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Matche(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      homeClubId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}home_club_id'],
+      )!,
+      awayClubId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}away_club_id'],
+      )!,
+      homeScore: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}home_score'],
+      ),
+      awayScore: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}away_score'],
+      ),
+      season: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}season'],
+      )!,
+      week: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}week'],
+      )!,
+      isPlayed: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_played'],
+      )!,
+    );
+  }
+
+  @override
+  $MatchesTable createAlias(String alias) {
+    return $MatchesTable(attachedDatabase, alias);
+  }
+}
+
+class Matche extends DataClass implements Insertable<Matche> {
+  final int id;
+  final int homeClubId;
+  final int awayClubId;
+  final int? homeScore;
+  final int? awayScore;
+  final int season;
+  final int week;
+  final bool isPlayed;
+  const Matche({
+    required this.id,
+    required this.homeClubId,
+    required this.awayClubId,
+    this.homeScore,
+    this.awayScore,
+    required this.season,
+    required this.week,
+    required this.isPlayed,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['home_club_id'] = Variable<int>(homeClubId);
+    map['away_club_id'] = Variable<int>(awayClubId);
+    if (!nullToAbsent || homeScore != null) {
+      map['home_score'] = Variable<int>(homeScore);
+    }
+    if (!nullToAbsent || awayScore != null) {
+      map['away_score'] = Variable<int>(awayScore);
+    }
+    map['season'] = Variable<int>(season);
+    map['week'] = Variable<int>(week);
+    map['is_played'] = Variable<bool>(isPlayed);
+    return map;
+  }
+
+  MatchesCompanion toCompanion(bool nullToAbsent) {
+    return MatchesCompanion(
+      id: Value(id),
+      homeClubId: Value(homeClubId),
+      awayClubId: Value(awayClubId),
+      homeScore: homeScore == null && nullToAbsent
+          ? const Value.absent()
+          : Value(homeScore),
+      awayScore: awayScore == null && nullToAbsent
+          ? const Value.absent()
+          : Value(awayScore),
+      season: Value(season),
+      week: Value(week),
+      isPlayed: Value(isPlayed),
+    );
+  }
+
+  factory Matche.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Matche(
+      id: serializer.fromJson<int>(json['id']),
+      homeClubId: serializer.fromJson<int>(json['homeClubId']),
+      awayClubId: serializer.fromJson<int>(json['awayClubId']),
+      homeScore: serializer.fromJson<int?>(json['homeScore']),
+      awayScore: serializer.fromJson<int?>(json['awayScore']),
+      season: serializer.fromJson<int>(json['season']),
+      week: serializer.fromJson<int>(json['week']),
+      isPlayed: serializer.fromJson<bool>(json['isPlayed']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'homeClubId': serializer.toJson<int>(homeClubId),
+      'awayClubId': serializer.toJson<int>(awayClubId),
+      'homeScore': serializer.toJson<int?>(homeScore),
+      'awayScore': serializer.toJson<int?>(awayScore),
+      'season': serializer.toJson<int>(season),
+      'week': serializer.toJson<int>(week),
+      'isPlayed': serializer.toJson<bool>(isPlayed),
+    };
+  }
+
+  Matche copyWith({
+    int? id,
+    int? homeClubId,
+    int? awayClubId,
+    Value<int?> homeScore = const Value.absent(),
+    Value<int?> awayScore = const Value.absent(),
+    int? season,
+    int? week,
+    bool? isPlayed,
+  }) => Matche(
+    id: id ?? this.id,
+    homeClubId: homeClubId ?? this.homeClubId,
+    awayClubId: awayClubId ?? this.awayClubId,
+    homeScore: homeScore.present ? homeScore.value : this.homeScore,
+    awayScore: awayScore.present ? awayScore.value : this.awayScore,
+    season: season ?? this.season,
+    week: week ?? this.week,
+    isPlayed: isPlayed ?? this.isPlayed,
+  );
+  Matche copyWithCompanion(MatchesCompanion data) {
+    return Matche(
+      id: data.id.present ? data.id.value : this.id,
+      homeClubId: data.homeClubId.present
+          ? data.homeClubId.value
+          : this.homeClubId,
+      awayClubId: data.awayClubId.present
+          ? data.awayClubId.value
+          : this.awayClubId,
+      homeScore: data.homeScore.present ? data.homeScore.value : this.homeScore,
+      awayScore: data.awayScore.present ? data.awayScore.value : this.awayScore,
+      season: data.season.present ? data.season.value : this.season,
+      week: data.week.present ? data.week.value : this.week,
+      isPlayed: data.isPlayed.present ? data.isPlayed.value : this.isPlayed,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Matche(')
+          ..write('id: $id, ')
+          ..write('homeClubId: $homeClubId, ')
+          ..write('awayClubId: $awayClubId, ')
+          ..write('homeScore: $homeScore, ')
+          ..write('awayScore: $awayScore, ')
+          ..write('season: $season, ')
+          ..write('week: $week, ')
+          ..write('isPlayed: $isPlayed')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    homeClubId,
+    awayClubId,
+    homeScore,
+    awayScore,
+    season,
+    week,
+    isPlayed,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Matche &&
+          other.id == this.id &&
+          other.homeClubId == this.homeClubId &&
+          other.awayClubId == this.awayClubId &&
+          other.homeScore == this.homeScore &&
+          other.awayScore == this.awayScore &&
+          other.season == this.season &&
+          other.week == this.week &&
+          other.isPlayed == this.isPlayed);
+}
+
+class MatchesCompanion extends UpdateCompanion<Matche> {
+  final Value<int> id;
+  final Value<int> homeClubId;
+  final Value<int> awayClubId;
+  final Value<int?> homeScore;
+  final Value<int?> awayScore;
+  final Value<int> season;
+  final Value<int> week;
+  final Value<bool> isPlayed;
+  const MatchesCompanion({
+    this.id = const Value.absent(),
+    this.homeClubId = const Value.absent(),
+    this.awayClubId = const Value.absent(),
+    this.homeScore = const Value.absent(),
+    this.awayScore = const Value.absent(),
+    this.season = const Value.absent(),
+    this.week = const Value.absent(),
+    this.isPlayed = const Value.absent(),
+  });
+  MatchesCompanion.insert({
+    this.id = const Value.absent(),
+    required int homeClubId,
+    required int awayClubId,
+    this.homeScore = const Value.absent(),
+    this.awayScore = const Value.absent(),
+    required int season,
+    required int week,
+    this.isPlayed = const Value.absent(),
+  }) : homeClubId = Value(homeClubId),
+       awayClubId = Value(awayClubId),
+       season = Value(season),
+       week = Value(week);
+  static Insertable<Matche> custom({
+    Expression<int>? id,
+    Expression<int>? homeClubId,
+    Expression<int>? awayClubId,
+    Expression<int>? homeScore,
+    Expression<int>? awayScore,
+    Expression<int>? season,
+    Expression<int>? week,
+    Expression<bool>? isPlayed,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (homeClubId != null) 'home_club_id': homeClubId,
+      if (awayClubId != null) 'away_club_id': awayClubId,
+      if (homeScore != null) 'home_score': homeScore,
+      if (awayScore != null) 'away_score': awayScore,
+      if (season != null) 'season': season,
+      if (week != null) 'week': week,
+      if (isPlayed != null) 'is_played': isPlayed,
+    });
+  }
+
+  MatchesCompanion copyWith({
+    Value<int>? id,
+    Value<int>? homeClubId,
+    Value<int>? awayClubId,
+    Value<int?>? homeScore,
+    Value<int?>? awayScore,
+    Value<int>? season,
+    Value<int>? week,
+    Value<bool>? isPlayed,
+  }) {
+    return MatchesCompanion(
+      id: id ?? this.id,
+      homeClubId: homeClubId ?? this.homeClubId,
+      awayClubId: awayClubId ?? this.awayClubId,
+      homeScore: homeScore ?? this.homeScore,
+      awayScore: awayScore ?? this.awayScore,
+      season: season ?? this.season,
+      week: week ?? this.week,
+      isPlayed: isPlayed ?? this.isPlayed,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (homeClubId.present) {
+      map['home_club_id'] = Variable<int>(homeClubId.value);
+    }
+    if (awayClubId.present) {
+      map['away_club_id'] = Variable<int>(awayClubId.value);
+    }
+    if (homeScore.present) {
+      map['home_score'] = Variable<int>(homeScore.value);
+    }
+    if (awayScore.present) {
+      map['away_score'] = Variable<int>(awayScore.value);
+    }
+    if (season.present) {
+      map['season'] = Variable<int>(season.value);
+    }
+    if (week.present) {
+      map['week'] = Variable<int>(week.value);
+    }
+    if (isPlayed.present) {
+      map['is_played'] = Variable<bool>(isPlayed.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MatchesCompanion(')
+          ..write('id: $id, ')
+          ..write('homeClubId: $homeClubId, ')
+          ..write('awayClubId: $awayClubId, ')
+          ..write('homeScore: $homeScore, ')
+          ..write('awayScore: $awayScore, ')
+          ..write('season: $season, ')
+          ..write('week: $week, ')
+          ..write('isPlayed: $isPlayed')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $PerformancesTable extends Performances
+    with TableInfo<$PerformancesTable, Performance> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PerformancesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _matchIdMeta = const VerificationMeta(
+    'matchId',
+  );
+  @override
+  late final GeneratedColumn<int> matchId = GeneratedColumn<int>(
+    'match_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES matches (id)',
+    ),
+  );
+  static const VerificationMeta _playerIdMeta = const VerificationMeta(
+    'playerId',
+  );
+  @override
+  late final GeneratedColumn<int> playerId = GeneratedColumn<int>(
+    'player_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES players (id)',
+    ),
+  );
+  static const VerificationMeta _minutesPlayedMeta = const VerificationMeta(
+    'minutesPlayed',
+  );
+  @override
+  late final GeneratedColumn<int> minutesPlayed = GeneratedColumn<int>(
+    'minutes_played',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _goalsMeta = const VerificationMeta('goals');
+  @override
+  late final GeneratedColumn<int> goals = GeneratedColumn<int>(
+    'goals',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _assistsMeta = const VerificationMeta(
+    'assists',
+  );
+  @override
+  late final GeneratedColumn<int> assists = GeneratedColumn<int>(
+    'assists',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _yellowCardsMeta = const VerificationMeta(
+    'yellowCards',
+  );
+  @override
+  late final GeneratedColumn<int> yellowCards = GeneratedColumn<int>(
+    'yellow_cards',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _redCardsMeta = const VerificationMeta(
+    'redCards',
+  );
+  @override
+  late final GeneratedColumn<int> redCards = GeneratedColumn<int>(
+    'red_cards',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _ratingMeta = const VerificationMeta('rating');
+  @override
+  late final GeneratedColumn<double> rating = GeneratedColumn<double>(
+    'rating',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0.0),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    matchId,
+    playerId,
+    minutesPlayed,
+    goals,
+    assists,
+    yellowCards,
+    redCards,
+    rating,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'performances';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Performance> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('match_id')) {
+      context.handle(
+        _matchIdMeta,
+        matchId.isAcceptableOrUnknown(data['match_id']!, _matchIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_matchIdMeta);
+    }
+    if (data.containsKey('player_id')) {
+      context.handle(
+        _playerIdMeta,
+        playerId.isAcceptableOrUnknown(data['player_id']!, _playerIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_playerIdMeta);
+    }
+    if (data.containsKey('minutes_played')) {
+      context.handle(
+        _minutesPlayedMeta,
+        minutesPlayed.isAcceptableOrUnknown(
+          data['minutes_played']!,
+          _minutesPlayedMeta,
+        ),
+      );
+    }
+    if (data.containsKey('goals')) {
+      context.handle(
+        _goalsMeta,
+        goals.isAcceptableOrUnknown(data['goals']!, _goalsMeta),
+      );
+    }
+    if (data.containsKey('assists')) {
+      context.handle(
+        _assistsMeta,
+        assists.isAcceptableOrUnknown(data['assists']!, _assistsMeta),
+      );
+    }
+    if (data.containsKey('yellow_cards')) {
+      context.handle(
+        _yellowCardsMeta,
+        yellowCards.isAcceptableOrUnknown(
+          data['yellow_cards']!,
+          _yellowCardsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('red_cards')) {
+      context.handle(
+        _redCardsMeta,
+        redCards.isAcceptableOrUnknown(data['red_cards']!, _redCardsMeta),
+      );
+    }
+    if (data.containsKey('rating')) {
+      context.handle(
+        _ratingMeta,
+        rating.isAcceptableOrUnknown(data['rating']!, _ratingMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Performance map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Performance(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      matchId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}match_id'],
+      )!,
+      playerId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}player_id'],
+      )!,
+      minutesPlayed: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}minutes_played'],
+      )!,
+      goals: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}goals'],
+      )!,
+      assists: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}assists'],
+      )!,
+      yellowCards: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}yellow_cards'],
+      )!,
+      redCards: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}red_cards'],
+      )!,
+      rating: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}rating'],
+      )!,
+    );
+  }
+
+  @override
+  $PerformancesTable createAlias(String alias) {
+    return $PerformancesTable(attachedDatabase, alias);
+  }
+}
+
+class Performance extends DataClass implements Insertable<Performance> {
+  final int id;
+  final int matchId;
+  final int playerId;
+  final int minutesPlayed;
+  final int goals;
+  final int assists;
+  final int yellowCards;
+  final int redCards;
+  final double rating;
+  const Performance({
+    required this.id,
+    required this.matchId,
+    required this.playerId,
+    required this.minutesPlayed,
+    required this.goals,
+    required this.assists,
+    required this.yellowCards,
+    required this.redCards,
+    required this.rating,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['match_id'] = Variable<int>(matchId);
+    map['player_id'] = Variable<int>(playerId);
+    map['minutes_played'] = Variable<int>(minutesPlayed);
+    map['goals'] = Variable<int>(goals);
+    map['assists'] = Variable<int>(assists);
+    map['yellow_cards'] = Variable<int>(yellowCards);
+    map['red_cards'] = Variable<int>(redCards);
+    map['rating'] = Variable<double>(rating);
+    return map;
+  }
+
+  PerformancesCompanion toCompanion(bool nullToAbsent) {
+    return PerformancesCompanion(
+      id: Value(id),
+      matchId: Value(matchId),
+      playerId: Value(playerId),
+      minutesPlayed: Value(minutesPlayed),
+      goals: Value(goals),
+      assists: Value(assists),
+      yellowCards: Value(yellowCards),
+      redCards: Value(redCards),
+      rating: Value(rating),
+    );
+  }
+
+  factory Performance.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Performance(
+      id: serializer.fromJson<int>(json['id']),
+      matchId: serializer.fromJson<int>(json['matchId']),
+      playerId: serializer.fromJson<int>(json['playerId']),
+      minutesPlayed: serializer.fromJson<int>(json['minutesPlayed']),
+      goals: serializer.fromJson<int>(json['goals']),
+      assists: serializer.fromJson<int>(json['assists']),
+      yellowCards: serializer.fromJson<int>(json['yellowCards']),
+      redCards: serializer.fromJson<int>(json['redCards']),
+      rating: serializer.fromJson<double>(json['rating']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'matchId': serializer.toJson<int>(matchId),
+      'playerId': serializer.toJson<int>(playerId),
+      'minutesPlayed': serializer.toJson<int>(minutesPlayed),
+      'goals': serializer.toJson<int>(goals),
+      'assists': serializer.toJson<int>(assists),
+      'yellowCards': serializer.toJson<int>(yellowCards),
+      'redCards': serializer.toJson<int>(redCards),
+      'rating': serializer.toJson<double>(rating),
+    };
+  }
+
+  Performance copyWith({
+    int? id,
+    int? matchId,
+    int? playerId,
+    int? minutesPlayed,
+    int? goals,
+    int? assists,
+    int? yellowCards,
+    int? redCards,
+    double? rating,
+  }) => Performance(
+    id: id ?? this.id,
+    matchId: matchId ?? this.matchId,
+    playerId: playerId ?? this.playerId,
+    minutesPlayed: minutesPlayed ?? this.minutesPlayed,
+    goals: goals ?? this.goals,
+    assists: assists ?? this.assists,
+    yellowCards: yellowCards ?? this.yellowCards,
+    redCards: redCards ?? this.redCards,
+    rating: rating ?? this.rating,
+  );
+  Performance copyWithCompanion(PerformancesCompanion data) {
+    return Performance(
+      id: data.id.present ? data.id.value : this.id,
+      matchId: data.matchId.present ? data.matchId.value : this.matchId,
+      playerId: data.playerId.present ? data.playerId.value : this.playerId,
+      minutesPlayed: data.minutesPlayed.present
+          ? data.minutesPlayed.value
+          : this.minutesPlayed,
+      goals: data.goals.present ? data.goals.value : this.goals,
+      assists: data.assists.present ? data.assists.value : this.assists,
+      yellowCards: data.yellowCards.present
+          ? data.yellowCards.value
+          : this.yellowCards,
+      redCards: data.redCards.present ? data.redCards.value : this.redCards,
+      rating: data.rating.present ? data.rating.value : this.rating,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Performance(')
+          ..write('id: $id, ')
+          ..write('matchId: $matchId, ')
+          ..write('playerId: $playerId, ')
+          ..write('minutesPlayed: $minutesPlayed, ')
+          ..write('goals: $goals, ')
+          ..write('assists: $assists, ')
+          ..write('yellowCards: $yellowCards, ')
+          ..write('redCards: $redCards, ')
+          ..write('rating: $rating')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    matchId,
+    playerId,
+    minutesPlayed,
+    goals,
+    assists,
+    yellowCards,
+    redCards,
+    rating,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Performance &&
+          other.id == this.id &&
+          other.matchId == this.matchId &&
+          other.playerId == this.playerId &&
+          other.minutesPlayed == this.minutesPlayed &&
+          other.goals == this.goals &&
+          other.assists == this.assists &&
+          other.yellowCards == this.yellowCards &&
+          other.redCards == this.redCards &&
+          other.rating == this.rating);
+}
+
+class PerformancesCompanion extends UpdateCompanion<Performance> {
+  final Value<int> id;
+  final Value<int> matchId;
+  final Value<int> playerId;
+  final Value<int> minutesPlayed;
+  final Value<int> goals;
+  final Value<int> assists;
+  final Value<int> yellowCards;
+  final Value<int> redCards;
+  final Value<double> rating;
+  const PerformancesCompanion({
+    this.id = const Value.absent(),
+    this.matchId = const Value.absent(),
+    this.playerId = const Value.absent(),
+    this.minutesPlayed = const Value.absent(),
+    this.goals = const Value.absent(),
+    this.assists = const Value.absent(),
+    this.yellowCards = const Value.absent(),
+    this.redCards = const Value.absent(),
+    this.rating = const Value.absent(),
+  });
+  PerformancesCompanion.insert({
+    this.id = const Value.absent(),
+    required int matchId,
+    required int playerId,
+    this.minutesPlayed = const Value.absent(),
+    this.goals = const Value.absent(),
+    this.assists = const Value.absent(),
+    this.yellowCards = const Value.absent(),
+    this.redCards = const Value.absent(),
+    this.rating = const Value.absent(),
+  }) : matchId = Value(matchId),
+       playerId = Value(playerId);
+  static Insertable<Performance> custom({
+    Expression<int>? id,
+    Expression<int>? matchId,
+    Expression<int>? playerId,
+    Expression<int>? minutesPlayed,
+    Expression<int>? goals,
+    Expression<int>? assists,
+    Expression<int>? yellowCards,
+    Expression<int>? redCards,
+    Expression<double>? rating,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (matchId != null) 'match_id': matchId,
+      if (playerId != null) 'player_id': playerId,
+      if (minutesPlayed != null) 'minutes_played': minutesPlayed,
+      if (goals != null) 'goals': goals,
+      if (assists != null) 'assists': assists,
+      if (yellowCards != null) 'yellow_cards': yellowCards,
+      if (redCards != null) 'red_cards': redCards,
+      if (rating != null) 'rating': rating,
+    });
+  }
+
+  PerformancesCompanion copyWith({
+    Value<int>? id,
+    Value<int>? matchId,
+    Value<int>? playerId,
+    Value<int>? minutesPlayed,
+    Value<int>? goals,
+    Value<int>? assists,
+    Value<int>? yellowCards,
+    Value<int>? redCards,
+    Value<double>? rating,
+  }) {
+    return PerformancesCompanion(
+      id: id ?? this.id,
+      matchId: matchId ?? this.matchId,
+      playerId: playerId ?? this.playerId,
+      minutesPlayed: minutesPlayed ?? this.minutesPlayed,
+      goals: goals ?? this.goals,
+      assists: assists ?? this.assists,
+      yellowCards: yellowCards ?? this.yellowCards,
+      redCards: redCards ?? this.redCards,
+      rating: rating ?? this.rating,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (matchId.present) {
+      map['match_id'] = Variable<int>(matchId.value);
+    }
+    if (playerId.present) {
+      map['player_id'] = Variable<int>(playerId.value);
+    }
+    if (minutesPlayed.present) {
+      map['minutes_played'] = Variable<int>(minutesPlayed.value);
+    }
+    if (goals.present) {
+      map['goals'] = Variable<int>(goals.value);
+    }
+    if (assists.present) {
+      map['assists'] = Variable<int>(assists.value);
+    }
+    if (yellowCards.present) {
+      map['yellow_cards'] = Variable<int>(yellowCards.value);
+    }
+    if (redCards.present) {
+      map['red_cards'] = Variable<int>(redCards.value);
+    }
+    if (rating.present) {
+      map['rating'] = Variable<double>(rating.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PerformancesCompanion(')
+          ..write('id: $id, ')
+          ..write('matchId: $matchId, ')
+          ..write('playerId: $playerId, ')
+          ..write('minutesPlayed: $minutesPlayed, ')
+          ..write('goals: $goals, ')
+          ..write('assists: $assists, ')
+          ..write('yellowCards: $yellowCards, ')
+          ..write('redCards: $redCards, ')
+          ..write('rating: $rating')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -3784,6 +4850,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $ValueHistoriesTable valueHistories = $ValueHistoriesTable(this);
   late final $RelationshipsTable relationships = $RelationshipsTable(this);
   late final $CountriesTable countries = $CountriesTable(this);
+  late final $MatchesTable matches = $MatchesTable(this);
+  late final $PerformancesTable performances = $PerformancesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3798,6 +4866,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     valueHistories,
     relationships,
     countries,
+    matches,
+    performances,
   ];
 }
 
@@ -5501,6 +6571,24 @@ final class $$PlayersTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<$PerformancesTable, List<Performance>>
+  _performancesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.performances,
+    aliasName: $_aliasNameGenerator(db.players.id, db.performances.playerId),
+  );
+
+  $$PerformancesTableProcessedTableManager get performancesRefs {
+    final manager = $$PerformancesTableTableManager(
+      $_db,
+      $_db.performances,
+    ).filter((f) => f.playerId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_performancesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$PlayersTableFilterComposer
@@ -5662,6 +6750,31 @@ class $$PlayersTableFilterComposer
           }) => $$ValueHistoriesTableFilterComposer(
             $db: $db,
             $table: $db.valueHistories,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> performancesRefs(
+    Expression<bool> Function($$PerformancesTableFilterComposer f) f,
+  ) {
+    final $$PerformancesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.performances,
+      getReferencedColumn: (t) => t.playerId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PerformancesTableFilterComposer(
+            $db: $db,
+            $table: $db.performances,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -5946,6 +7059,31 @@ class $$PlayersTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> performancesRefs<T extends Object>(
+    Expression<T> Function($$PerformancesTableAnnotationComposer a) f,
+  ) {
+    final $$PerformancesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.performances,
+      getReferencedColumn: (t) => t.playerId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PerformancesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.performances,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$PlayersTableTableManager
@@ -5967,6 +7105,7 @@ class $$PlayersTableTableManager
             bool currentContractId,
             bool transfersRefs,
             bool valueHistoriesRefs,
+            bool performancesRefs,
           })
         > {
   $$PlayersTableTableManager(_$AppDatabase db, $PlayersTable table)
@@ -6047,12 +7186,14 @@ class $$PlayersTableTableManager
                 currentContractId = false,
                 transfersRefs = false,
                 valueHistoriesRefs = false,
+                performancesRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
                     if (transfersRefs) db.transfers,
                     if (valueHistoriesRefs) db.valueHistories,
+                    if (performancesRefs) db.performances,
                   ],
                   addJoins:
                       <
@@ -6156,6 +7297,27 @@ class $$PlayersTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (performancesRefs)
+                        await $_getPrefetchedData<
+                          Player,
+                          $PlayersTable,
+                          Performance
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PlayersTableReferences
+                              ._performancesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PlayersTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).performancesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.playerId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -6182,6 +7344,7 @@ typedef $$PlayersTableProcessedTableManager =
         bool currentContractId,
         bool transfersRefs,
         bool valueHistoriesRefs,
+        bool performancesRefs,
       })
     >;
 typedef $$TransfersTableCreateCompanionBuilder =
@@ -7397,6 +8560,1048 @@ typedef $$CountriesTableProcessedTableManager =
       Country,
       PrefetchHooks Function()
     >;
+typedef $$MatchesTableCreateCompanionBuilder =
+    MatchesCompanion Function({
+      Value<int> id,
+      required int homeClubId,
+      required int awayClubId,
+      Value<int?> homeScore,
+      Value<int?> awayScore,
+      required int season,
+      required int week,
+      Value<bool> isPlayed,
+    });
+typedef $$MatchesTableUpdateCompanionBuilder =
+    MatchesCompanion Function({
+      Value<int> id,
+      Value<int> homeClubId,
+      Value<int> awayClubId,
+      Value<int?> homeScore,
+      Value<int?> awayScore,
+      Value<int> season,
+      Value<int> week,
+      Value<bool> isPlayed,
+    });
+
+final class $$MatchesTableReferences
+    extends BaseReferences<_$AppDatabase, $MatchesTable, Matche> {
+  $$MatchesTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $ClubsTable _homeClubIdTable(_$AppDatabase db) => db.clubs.createAlias(
+    $_aliasNameGenerator(db.matches.homeClubId, db.clubs.id),
+  );
+
+  $$ClubsTableProcessedTableManager get homeClubId {
+    final $_column = $_itemColumn<int>('home_club_id')!;
+
+    final manager = $$ClubsTableTableManager(
+      $_db,
+      $_db.clubs,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_homeClubIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $ClubsTable _awayClubIdTable(_$AppDatabase db) => db.clubs.createAlias(
+    $_aliasNameGenerator(db.matches.awayClubId, db.clubs.id),
+  );
+
+  $$ClubsTableProcessedTableManager get awayClubId {
+    final $_column = $_itemColumn<int>('away_club_id')!;
+
+    final manager = $$ClubsTableTableManager(
+      $_db,
+      $_db.clubs,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_awayClubIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<$PerformancesTable, List<Performance>>
+  _performancesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.performances,
+    aliasName: $_aliasNameGenerator(db.matches.id, db.performances.matchId),
+  );
+
+  $$PerformancesTableProcessedTableManager get performancesRefs {
+    final manager = $$PerformancesTableTableManager(
+      $_db,
+      $_db.performances,
+    ).filter((f) => f.matchId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_performancesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$MatchesTableFilterComposer
+    extends Composer<_$AppDatabase, $MatchesTable> {
+  $$MatchesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get homeScore => $composableBuilder(
+    column: $table.homeScore,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get awayScore => $composableBuilder(
+    column: $table.awayScore,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get season => $composableBuilder(
+    column: $table.season,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get week => $composableBuilder(
+    column: $table.week,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isPlayed => $composableBuilder(
+    column: $table.isPlayed,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ClubsTableFilterComposer get homeClubId {
+    final $$ClubsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.homeClubId,
+      referencedTable: $db.clubs,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ClubsTableFilterComposer(
+            $db: $db,
+            $table: $db.clubs,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ClubsTableFilterComposer get awayClubId {
+    final $$ClubsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.awayClubId,
+      referencedTable: $db.clubs,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ClubsTableFilterComposer(
+            $db: $db,
+            $table: $db.clubs,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<bool> performancesRefs(
+    Expression<bool> Function($$PerformancesTableFilterComposer f) f,
+  ) {
+    final $$PerformancesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.performances,
+      getReferencedColumn: (t) => t.matchId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PerformancesTableFilterComposer(
+            $db: $db,
+            $table: $db.performances,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$MatchesTableOrderingComposer
+    extends Composer<_$AppDatabase, $MatchesTable> {
+  $$MatchesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get homeScore => $composableBuilder(
+    column: $table.homeScore,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get awayScore => $composableBuilder(
+    column: $table.awayScore,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get season => $composableBuilder(
+    column: $table.season,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get week => $composableBuilder(
+    column: $table.week,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isPlayed => $composableBuilder(
+    column: $table.isPlayed,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ClubsTableOrderingComposer get homeClubId {
+    final $$ClubsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.homeClubId,
+      referencedTable: $db.clubs,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ClubsTableOrderingComposer(
+            $db: $db,
+            $table: $db.clubs,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ClubsTableOrderingComposer get awayClubId {
+    final $$ClubsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.awayClubId,
+      referencedTable: $db.clubs,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ClubsTableOrderingComposer(
+            $db: $db,
+            $table: $db.clubs,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$MatchesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $MatchesTable> {
+  $$MatchesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get homeScore =>
+      $composableBuilder(column: $table.homeScore, builder: (column) => column);
+
+  GeneratedColumn<int> get awayScore =>
+      $composableBuilder(column: $table.awayScore, builder: (column) => column);
+
+  GeneratedColumn<int> get season =>
+      $composableBuilder(column: $table.season, builder: (column) => column);
+
+  GeneratedColumn<int> get week =>
+      $composableBuilder(column: $table.week, builder: (column) => column);
+
+  GeneratedColumn<bool> get isPlayed =>
+      $composableBuilder(column: $table.isPlayed, builder: (column) => column);
+
+  $$ClubsTableAnnotationComposer get homeClubId {
+    final $$ClubsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.homeClubId,
+      referencedTable: $db.clubs,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ClubsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.clubs,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ClubsTableAnnotationComposer get awayClubId {
+    final $$ClubsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.awayClubId,
+      referencedTable: $db.clubs,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ClubsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.clubs,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<T> performancesRefs<T extends Object>(
+    Expression<T> Function($$PerformancesTableAnnotationComposer a) f,
+  ) {
+    final $$PerformancesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.performances,
+      getReferencedColumn: (t) => t.matchId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PerformancesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.performances,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$MatchesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $MatchesTable,
+          Matche,
+          $$MatchesTableFilterComposer,
+          $$MatchesTableOrderingComposer,
+          $$MatchesTableAnnotationComposer,
+          $$MatchesTableCreateCompanionBuilder,
+          $$MatchesTableUpdateCompanionBuilder,
+          (Matche, $$MatchesTableReferences),
+          Matche,
+          PrefetchHooks Function({
+            bool homeClubId,
+            bool awayClubId,
+            bool performancesRefs,
+          })
+        > {
+  $$MatchesTableTableManager(_$AppDatabase db, $MatchesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$MatchesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$MatchesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$MatchesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> homeClubId = const Value.absent(),
+                Value<int> awayClubId = const Value.absent(),
+                Value<int?> homeScore = const Value.absent(),
+                Value<int?> awayScore = const Value.absent(),
+                Value<int> season = const Value.absent(),
+                Value<int> week = const Value.absent(),
+                Value<bool> isPlayed = const Value.absent(),
+              }) => MatchesCompanion(
+                id: id,
+                homeClubId: homeClubId,
+                awayClubId: awayClubId,
+                homeScore: homeScore,
+                awayScore: awayScore,
+                season: season,
+                week: week,
+                isPlayed: isPlayed,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int homeClubId,
+                required int awayClubId,
+                Value<int?> homeScore = const Value.absent(),
+                Value<int?> awayScore = const Value.absent(),
+                required int season,
+                required int week,
+                Value<bool> isPlayed = const Value.absent(),
+              }) => MatchesCompanion.insert(
+                id: id,
+                homeClubId: homeClubId,
+                awayClubId: awayClubId,
+                homeScore: homeScore,
+                awayScore: awayScore,
+                season: season,
+                week: week,
+                isPlayed: isPlayed,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$MatchesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({
+                homeClubId = false,
+                awayClubId = false,
+                performancesRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (performancesRefs) db.performances,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (homeClubId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.homeClubId,
+                                    referencedTable: $$MatchesTableReferences
+                                        ._homeClubIdTable(db),
+                                    referencedColumn: $$MatchesTableReferences
+                                        ._homeClubIdTable(db)
+                                        .id,
+                                  )
+                                  as T;
+                        }
+                        if (awayClubId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.awayClubId,
+                                    referencedTable: $$MatchesTableReferences
+                                        ._awayClubIdTable(db),
+                                    referencedColumn: $$MatchesTableReferences
+                                        ._awayClubIdTable(db)
+                                        .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (performancesRefs)
+                        await $_getPrefetchedData<
+                          Matche,
+                          $MatchesTable,
+                          Performance
+                        >(
+                          currentTable: table,
+                          referencedTable: $$MatchesTableReferences
+                              ._performancesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$MatchesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).performancesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.matchId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$MatchesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $MatchesTable,
+      Matche,
+      $$MatchesTableFilterComposer,
+      $$MatchesTableOrderingComposer,
+      $$MatchesTableAnnotationComposer,
+      $$MatchesTableCreateCompanionBuilder,
+      $$MatchesTableUpdateCompanionBuilder,
+      (Matche, $$MatchesTableReferences),
+      Matche,
+      PrefetchHooks Function({
+        bool homeClubId,
+        bool awayClubId,
+        bool performancesRefs,
+      })
+    >;
+typedef $$PerformancesTableCreateCompanionBuilder =
+    PerformancesCompanion Function({
+      Value<int> id,
+      required int matchId,
+      required int playerId,
+      Value<int> minutesPlayed,
+      Value<int> goals,
+      Value<int> assists,
+      Value<int> yellowCards,
+      Value<int> redCards,
+      Value<double> rating,
+    });
+typedef $$PerformancesTableUpdateCompanionBuilder =
+    PerformancesCompanion Function({
+      Value<int> id,
+      Value<int> matchId,
+      Value<int> playerId,
+      Value<int> minutesPlayed,
+      Value<int> goals,
+      Value<int> assists,
+      Value<int> yellowCards,
+      Value<int> redCards,
+      Value<double> rating,
+    });
+
+final class $$PerformancesTableReferences
+    extends BaseReferences<_$AppDatabase, $PerformancesTable, Performance> {
+  $$PerformancesTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $MatchesTable _matchIdTable(_$AppDatabase db) =>
+      db.matches.createAlias(
+        $_aliasNameGenerator(db.performances.matchId, db.matches.id),
+      );
+
+  $$MatchesTableProcessedTableManager get matchId {
+    final $_column = $_itemColumn<int>('match_id')!;
+
+    final manager = $$MatchesTableTableManager(
+      $_db,
+      $_db.matches,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_matchIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $PlayersTable _playerIdTable(_$AppDatabase db) =>
+      db.players.createAlias(
+        $_aliasNameGenerator(db.performances.playerId, db.players.id),
+      );
+
+  $$PlayersTableProcessedTableManager get playerId {
+    final $_column = $_itemColumn<int>('player_id')!;
+
+    final manager = $$PlayersTableTableManager(
+      $_db,
+      $_db.players,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_playerIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$PerformancesTableFilterComposer
+    extends Composer<_$AppDatabase, $PerformancesTable> {
+  $$PerformancesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get minutesPlayed => $composableBuilder(
+    column: $table.minutesPlayed,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get goals => $composableBuilder(
+    column: $table.goals,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get assists => $composableBuilder(
+    column: $table.assists,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get yellowCards => $composableBuilder(
+    column: $table.yellowCards,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get redCards => $composableBuilder(
+    column: $table.redCards,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get rating => $composableBuilder(
+    column: $table.rating,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$MatchesTableFilterComposer get matchId {
+    final $$MatchesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.matchId,
+      referencedTable: $db.matches,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MatchesTableFilterComposer(
+            $db: $db,
+            $table: $db.matches,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PlayersTableFilterComposer get playerId {
+    final $$PlayersTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.playerId,
+      referencedTable: $db.players,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlayersTableFilterComposer(
+            $db: $db,
+            $table: $db.players,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PerformancesTableOrderingComposer
+    extends Composer<_$AppDatabase, $PerformancesTable> {
+  $$PerformancesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get minutesPlayed => $composableBuilder(
+    column: $table.minutesPlayed,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get goals => $composableBuilder(
+    column: $table.goals,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get assists => $composableBuilder(
+    column: $table.assists,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get yellowCards => $composableBuilder(
+    column: $table.yellowCards,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get redCards => $composableBuilder(
+    column: $table.redCards,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get rating => $composableBuilder(
+    column: $table.rating,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$MatchesTableOrderingComposer get matchId {
+    final $$MatchesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.matchId,
+      referencedTable: $db.matches,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MatchesTableOrderingComposer(
+            $db: $db,
+            $table: $db.matches,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PlayersTableOrderingComposer get playerId {
+    final $$PlayersTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.playerId,
+      referencedTable: $db.players,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlayersTableOrderingComposer(
+            $db: $db,
+            $table: $db.players,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PerformancesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PerformancesTable> {
+  $$PerformancesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get minutesPlayed => $composableBuilder(
+    column: $table.minutesPlayed,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get goals =>
+      $composableBuilder(column: $table.goals, builder: (column) => column);
+
+  GeneratedColumn<int> get assists =>
+      $composableBuilder(column: $table.assists, builder: (column) => column);
+
+  GeneratedColumn<int> get yellowCards => $composableBuilder(
+    column: $table.yellowCards,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get redCards =>
+      $composableBuilder(column: $table.redCards, builder: (column) => column);
+
+  GeneratedColumn<double> get rating =>
+      $composableBuilder(column: $table.rating, builder: (column) => column);
+
+  $$MatchesTableAnnotationComposer get matchId {
+    final $$MatchesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.matchId,
+      referencedTable: $db.matches,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MatchesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.matches,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PlayersTableAnnotationComposer get playerId {
+    final $$PlayersTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.playerId,
+      referencedTable: $db.players,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlayersTableAnnotationComposer(
+            $db: $db,
+            $table: $db.players,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PerformancesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $PerformancesTable,
+          Performance,
+          $$PerformancesTableFilterComposer,
+          $$PerformancesTableOrderingComposer,
+          $$PerformancesTableAnnotationComposer,
+          $$PerformancesTableCreateCompanionBuilder,
+          $$PerformancesTableUpdateCompanionBuilder,
+          (Performance, $$PerformancesTableReferences),
+          Performance,
+          PrefetchHooks Function({bool matchId, bool playerId})
+        > {
+  $$PerformancesTableTableManager(_$AppDatabase db, $PerformancesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PerformancesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PerformancesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PerformancesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> matchId = const Value.absent(),
+                Value<int> playerId = const Value.absent(),
+                Value<int> minutesPlayed = const Value.absent(),
+                Value<int> goals = const Value.absent(),
+                Value<int> assists = const Value.absent(),
+                Value<int> yellowCards = const Value.absent(),
+                Value<int> redCards = const Value.absent(),
+                Value<double> rating = const Value.absent(),
+              }) => PerformancesCompanion(
+                id: id,
+                matchId: matchId,
+                playerId: playerId,
+                minutesPlayed: minutesPlayed,
+                goals: goals,
+                assists: assists,
+                yellowCards: yellowCards,
+                redCards: redCards,
+                rating: rating,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int matchId,
+                required int playerId,
+                Value<int> minutesPlayed = const Value.absent(),
+                Value<int> goals = const Value.absent(),
+                Value<int> assists = const Value.absent(),
+                Value<int> yellowCards = const Value.absent(),
+                Value<int> redCards = const Value.absent(),
+                Value<double> rating = const Value.absent(),
+              }) => PerformancesCompanion.insert(
+                id: id,
+                matchId: matchId,
+                playerId: playerId,
+                minutesPlayed: minutesPlayed,
+                goals: goals,
+                assists: assists,
+                yellowCards: yellowCards,
+                redCards: redCards,
+                rating: rating,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$PerformancesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({matchId = false, playerId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (matchId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.matchId,
+                                referencedTable: $$PerformancesTableReferences
+                                    ._matchIdTable(db),
+                                referencedColumn: $$PerformancesTableReferences
+                                    ._matchIdTable(db)
+                                    .id,
+                              )
+                              as T;
+                    }
+                    if (playerId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.playerId,
+                                referencedTable: $$PerformancesTableReferences
+                                    ._playerIdTable(db),
+                                referencedColumn: $$PerformancesTableReferences
+                                    ._playerIdTable(db)
+                                    .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$PerformancesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $PerformancesTable,
+      Performance,
+      $$PerformancesTableFilterComposer,
+      $$PerformancesTableOrderingComposer,
+      $$PerformancesTableAnnotationComposer,
+      $$PerformancesTableCreateCompanionBuilder,
+      $$PerformancesTableUpdateCompanionBuilder,
+      (Performance, $$PerformancesTableReferences),
+      Performance,
+      PrefetchHooks Function({bool matchId, bool playerId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -7419,4 +9624,8 @@ class $AppDatabaseManager {
       $$RelationshipsTableTableManager(_db, _db.relationships);
   $$CountriesTableTableManager get countries =>
       $$CountriesTableTableManager(_db, _db.countries);
+  $$MatchesTableTableManager get matches =>
+      $$MatchesTableTableManager(_db, _db.matches);
+  $$PerformancesTableTableManager get performances =>
+      $$PerformancesTableTableManager(_db, _db.performances);
 }

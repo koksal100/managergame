@@ -9,4 +9,5 @@ abstract class ClubRepository {
   Future<Either<Failure, int>> createClub(Club club);
   Future<Either<Failure, void>> updateClub(Club club);
   Future<Either<Failure, void>> deleteClub(int id);
+  Future<Either<Failure, List<Club>>> searchClubs(String query);
 }

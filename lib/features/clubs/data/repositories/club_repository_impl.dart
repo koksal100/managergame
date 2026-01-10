@@ -118,4 +118,23 @@ class ClubRepositoryImpl implements ClubRepository {
       return Left(CacheFailure(e.toString()));
     }
   }
+
+  @override
+  Future<Either<Failure, List<Club>>> searchClubs(String queryText) async {
+    try {
+      final query = database.select(database.clubs)..where((tbl) => tbl.name.like('%$queryText%'));
+      final rows = await query.get();
+      final list = rows.map((row) => Club(
+        id: row.id,
+        name: row.name,
+        leagueId: row.leagueId,
+        reputation: row.reputation,
+        transferBudget: row.transferBudget,
+        wageBudget: row.wageBudget,
+      )).toList();
+      return Right(list);
+    } catch (e) {
+      return Left(CacheFailure(e.toString()));
+    }
+  }
 }
