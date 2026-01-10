@@ -63,6 +63,13 @@ class UserAgentNotifier extends AsyncNotifier<Agent?> {
     return null; // Success
   }
 
+  // Helper: Check if capacity allows signing
+  Future<bool> checkCapacity() async {
+    final db = ref.read(appDatabaseProvider);
+    final myPlayersCount = await (db.select(db.players)..where((tbl) => tbl.agentId.equals(_userId))).get().then((l) => l.length);
+    return myPlayersCount < capacity;
+  }
+
   // Release a player (Terminate Contract)
   Future<void> releasePlayer(int playerId) async {
     final db = ref.read(appDatabaseProvider);

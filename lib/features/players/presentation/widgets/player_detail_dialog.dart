@@ -4,6 +4,7 @@ import '../../../agents/providers/user_agent_provider.dart';
 import '../../domain/entities/player.dart';
 import '../../../clubs/domain/entities/club.dart';
 import '../../../clubs/providers/club_provider.dart';
+import 'negotiation_game_dialog.dart';
 
 class PlayerDetailDialog extends ConsumerWidget {
   final Player player;
@@ -114,7 +115,43 @@ class PlayerDetailDialog extends ConsumerWidget {
                           return;
                         }
 
-                        // Case 2: Sign Player
+                        // Case 2: Sign Player (Negotiation Game)
+                        // 1. Check Capacity BEFORE Game (to avoid frustration)
+                        final capacityCheck = await notifier.checkCapacity();
+                        if (!capacityCheck) {
+                           if (context.mounted) {
+                             ScaffoldMessenger.of(context).showSnackBar(
+                               const SnackBar(content: Text('Capacity Full! You cannot sign more players.'), backgroundColor: Colors.redAccent),
+                             );
+                           }
+                           return;
+                        }
+
+                        // 2. Play Negotiation Game
+                        final userAgent = ref.read(userAgentProvider).value;
+                        final managerRep = userAgent?.reputation ?? 0;
+                        
+                        // Show Negotiation Dialog
+                        final success = await showDialog<bool>(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (context) => NegotiationGameDialog(
+                            playerReputation: player.reputation, 
+                            managerReputation: managerRep,
+                            playerName: player.name,
+                          ),
+                        );
+
+                        if (success != true) {
+                           if (context.mounted) {
+                             ScaffoldMessenger.of(context).showSnackBar(
+                               const SnackBar(content: Text('Negotiation Failed! Player refused your offer.'), backgroundColor: Colors.red),
+                             );
+                           }
+                           return; 
+                        }
+
+                        // 3. Sign Player (If game won)
                         final error = await notifier.signPlayer(player.id);
 
                         if (context.mounted) {
@@ -125,7 +162,7 @@ class PlayerDetailDialog extends ConsumerWidget {
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text('Offer Accepted! You are now the agent of ${player.name}.'),
+                                content: Text('Negotiation Successful! ${player.name} joined your agency.'),
                                 backgroundColor: Colors.green,
                               ),
                             );
