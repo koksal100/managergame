@@ -21,6 +21,7 @@ class PlayerFilter extends Equatable {
   final int? maxMarketValue;
   final PlayerSortType sortType;
   final bool ascending;
+  final bool? hasNoAgent;
 
   const PlayerFilter({
     this.nameQuery,
@@ -33,6 +34,7 @@ class PlayerFilter extends Equatable {
     this.maxMarketValue,
     this.sortType = PlayerSortType.ca,
     this.ascending = false,
+    this.hasNoAgent,
   });
 
   PlayerFilter copyWith({
@@ -46,6 +48,7 @@ class PlayerFilter extends Equatable {
     int? maxMarketValue,
     PlayerSortType? sortType,
     bool? ascending,
+    bool? hasNoAgent,
   }) {
     return PlayerFilter(
       nameQuery: nameQuery ?? this.nameQuery,
@@ -58,6 +61,7 @@ class PlayerFilter extends Equatable {
       maxMarketValue: maxMarketValue ?? this.maxMarketValue,
       sortType: sortType ?? this.sortType,
       ascending: ascending ?? this.ascending,
+      hasNoAgent: hasNoAgent ?? this.hasNoAgent,
     );
   }
 
@@ -71,8 +75,9 @@ class PlayerFilter extends Equatable {
     minMarketValue == null &&
     maxMarketValue == null &&
     sortType == PlayerSortType.ca && // Default sort
-    ascending == false;
+    ascending == false &&
+    (hasNoAgent == null || hasNoAgent == false);
 
   @override
-  List<Object?> get props => [nameQuery, positions, minAge, maxAge, minCa, minPa, minMarketValue, maxMarketValue, sortType, ascending];
+  List<Object?> get props => [nameQuery, positions, minAge, maxAge, minCa, minPa, minMarketValue, maxMarketValue, sortType, ascending, hasNoAgent];
 }

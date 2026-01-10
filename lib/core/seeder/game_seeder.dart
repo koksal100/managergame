@@ -267,7 +267,10 @@ class GameSeeder {
       // --- NEW AGENT ASSIGNMENT LOGIC (Weighted Random) ---
       int? assignedAgentId;
 
-      if (_cachedAgents.isNotEmpty) {
+      // 5% Chance of NO AGENT (Free Agent in terms of representation)
+      bool hasAgent = _random.nextInt(100) >= 5;
+
+      if (hasAgent && _cachedAgents.isNotEmpty) {
         // 1. Calculate Weights
         // Weight = 1 / (Distance + 1)^2
         // Distance = |AgentRep - PlayerCA|

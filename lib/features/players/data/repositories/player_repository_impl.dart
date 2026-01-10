@@ -42,6 +42,9 @@ class PlayerRepositoryImpl implements PlayerRepository {
         if (filter.maxMarketValue != null) {
           query.where((tbl) => tbl.marketValue.isSmallerOrEqualValue(filter.maxMarketValue!));
         }
+        if (filter.hasNoAgent == true) {
+           query.where((tbl) => tbl.agentId.isNull());
+        }
       }
 
       // Dynamic Sorting

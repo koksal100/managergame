@@ -19,6 +19,7 @@ class _PlayerFilterModalState extends ConsumerState<PlayerFilterModal> {
   double _minPa = 0;
   double _minMarketValue = 0;
   double _maxMarketValue = 150000000; // 150M
+  bool _hasNoAgent = false;
 
   // Design Constants - Elegant & Thin
   final Color _accentColor = const Color(0xFF3B82F6);
@@ -35,12 +36,13 @@ class _PlayerFilterModalState extends ConsumerState<PlayerFilterModal> {
     _minPa = currentFilter.minPa?.toDouble() ?? 0;
     _minMarketValue = currentFilter.minMarketValue?.toDouble() ?? 0;
     _maxMarketValue = currentFilter.maxMarketValue?.toDouble() ?? 150000000;
+    _hasNoAgent = currentFilter.hasNoAgent ?? false;
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.65, // Slightly more compact
+      height: MediaQuery.of(context).size.height * 0.70, // Slightly increased for new option
       padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
       decoration: BoxDecoration(
         color: _glassBackground, // Transparent elegant background
@@ -105,6 +107,34 @@ class _PlayerFilterModalState extends ConsumerState<PlayerFilterModal> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                   // Agent Status Toggle
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 20),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.04),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.white.withOpacity(0.1)),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          "No Agent Only",
+                          style: TextStyle(color: Colors.white70, fontSize: 15),
+                        ),
+                        Switch(
+                          value: _hasNoAgent,
+                          onChanged: (val) => setState(() => _hasNoAgent = val),
+                          activeColor: _accentColor,
+                          activeTrackColor: _accentColor.withOpacity(0.3),
+                          inactiveTrackColor: Colors.white10,
+                          inactiveThumbColor: Colors.white54,
+                        ),
+                      ],
+                    ),
+                  ),
+
                   // Positions
                   _buildSectionHeader('Positions', 'Select roles'),
                   const SizedBox(height: 10), // Closer elements
@@ -271,6 +301,7 @@ class _PlayerFilterModalState extends ConsumerState<PlayerFilterModal> {
       _minPa = 0;
       _minMarketValue = 0;
       _maxMarketValue = 150000000;
+      _hasNoAgent = false;
     });
   }
 
@@ -297,6 +328,7 @@ class _PlayerFilterModalState extends ConsumerState<PlayerFilterModal> {
       minPa: _minPa.round() > 0 ? _minPa.round() : null,
       minMarketValue: _minMarketValue.round(),
       maxMarketValue: _maxMarketValue.round(),
+      hasNoAgent: _hasNoAgent,
     );
 
     ref.read(playerFilterProvider.notifier).state = newFilter;
