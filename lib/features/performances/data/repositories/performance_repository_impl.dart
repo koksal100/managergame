@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 import '../../../../core/database/app_database.dart';
 import '../../domain/entities/performance.dart' as domain;
 import '../../domain/entities/player_stat.dart';
+import '../../domain/entities/match_detail_stat.dart';
 import '../../domain/repositories/performance_repository.dart';
 
 class PerformanceRepositoryImpl implements PerformanceRepository {
@@ -66,6 +67,35 @@ class PerformanceRepositoryImpl implements PerformanceRepository {
       redCards: row.redCards,
       rating: row.rating,
     )).toList();
+  }
+
+  @override
+  Future<List<MatchDetailStat>> getMatchStats(int matchId) async {
+    final p = _database.performances;
+    final pl = _database.players;
+    
+    // Join performances with players to get names and clubs
+    final query = _database.select(p).join([
+      innerJoin(pl, pl.id.equalsExp(p.playerId)),
+    ]);
+
+    query.where(p.matchId.equals(matchId));
+
+    final result = await query.get();
+
+    return result.map((row) {
+        final performance = row.readTable(p);
+        final player = row.readTable(pl);
+
+        return MatchDetailStat(
+            playerId: player.id,
+            playerName: player.name,
+            clubId: player.clubId ?? 0,
+            goals: performance.goals,
+            assists: performance.assists,
+            rating: performance.rating,
+        );
+    }).toList();
   }
   @override
   Future<List<PlayerStat>> getTopScorers(int leagueId, {int limit = 10}) async {

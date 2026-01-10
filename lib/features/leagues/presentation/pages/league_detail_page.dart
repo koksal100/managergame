@@ -10,6 +10,7 @@ import '../providers/fixture_provider.dart';
 import '../../domain/services/standings_service.dart';
 import '../../../performances/domain/entities/player_stat.dart';
 import '../../../../core/providers/game_date_provider.dart';
+import '../../../matches/presentation/widgets/match_detail_dialog.dart';
 
 class LeagueDetailPage extends ConsumerStatefulWidget {
   final League league;
@@ -153,32 +154,42 @@ class _LeagueDetailPageState extends ConsumerState<LeagueDetailPage> {
                 itemBuilder: (context, index) {
                   final item = fixtures[index];
                   final match = item.match;
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 8),
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.4),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.white.withOpacity(0.05)),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        // Home
-                        Expanded(child: Text(item.homeClubName, textAlign: TextAlign.end, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500))),
-                        
-                        // Score or VS
-                        Container(
-                          width: 80,
-                          alignment: Alignment.center,
-                          child: match.isPlayed 
-                            ? Text('${match.homeScore} - ${match.awayScore}', style: const TextStyle(color: Colors.yellowAccent, fontWeight: FontWeight.bold, fontSize: 16))
-                            : const Text('vs', style: TextStyle(color: Colors.white38, fontSize: 12)),
-                        ),
-
-                        // Away
-                        Expanded(child: Text(item.awayClubName, textAlign: TextAlign.start, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500))),
-                      ],
+                  return GestureDetector(
+                    onTap: () {
+                      if (match.isPlayed) {
+                        showDialog(
+                          context: context,
+                          builder: (_) => MatchDetailDialog(fixture: item),
+                        );
+                      }
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.4),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.white.withOpacity(match.isPlayed ? 0.2 : 0.05)), // Highlight played matches slightly
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          // Home
+                          Expanded(child: Text(item.homeClubName, textAlign: TextAlign.end, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500))),
+                          
+                          // Score or VS
+                          Container(
+                            width: 80,
+                            alignment: Alignment.center,
+                            child: match.isPlayed 
+                              ? Text('${match.homeScore} - ${match.awayScore}', style: const TextStyle(color: Colors.yellowAccent, fontWeight: FontWeight.bold, fontSize: 16))
+                              : const Text('vs', style: TextStyle(color: Colors.white38, fontSize: 12)),
+                          ),
+  
+                          // Away
+                          Expanded(child: Text(item.awayClubName, textAlign: TextAlign.start, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500))),
+                        ],
+                      ),
                     ),
                   );
                 },
