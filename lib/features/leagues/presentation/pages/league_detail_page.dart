@@ -33,7 +33,7 @@ class _LeagueDetailPageState extends ConsumerState<LeagueDetailPage> {
 
   void _changeWeek(int delta) {
     setState(() {
-      _selectedWeek = (_selectedWeek + delta).clamp(1, 38); // Assuming 38 weeks max for now
+      _selectedWeek = (_selectedWeek + delta).clamp(1, 52); // Updated to 52 weeks based on fixture.json
     });
   }
 
@@ -133,8 +133,8 @@ class _LeagueDetailPageState extends ConsumerState<LeagueDetailPage> {
                  style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
                ),
                IconButton(
-                 onPressed: _selectedWeek < 38 ? () => _changeWeek(1) : null,
-                 icon: Icon(Icons.arrow_forward_ios, size: 16, color: _selectedWeek < 38 ? Colors.white : Colors.white24),
+                 onPressed: _selectedWeek < 52 ? () => _changeWeek(1) : null,
+                 icon: Icon(Icons.arrow_forward_ios, size: 16, color: _selectedWeek < 52 ? Colors.white : Colors.white24),
                ),
              ],
            ),
