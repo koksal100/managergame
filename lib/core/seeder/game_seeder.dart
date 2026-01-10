@@ -265,6 +265,61 @@ class GameSeeder {
     }
   }
 
+  Future<void> seedFixtures() async {
+    final fixtureJson = await _loadJson('assets/data/fixture.json');
+    final Map<String, dynamic> fixtureData = fixtureJson as Map<String, dynamic>;
+
+    // Build Cache
+    final clubs = await database.select(database.clubs).get();
+    final clubCache = {for (var c in clubs) c.name: c.id};
+
+    for (var weekStr in fixtureData.keys) {
+        final week = int.tryParse(weekStr) ?? 0;
+        if (week == 0) continue;
+
+        // Check if week is seeded
+        final existingMatches = await (database.select(database.matches)..where((tbl) => tbl.week.equals(week))).get();
+        if (existingMatches.isNotEmpty) {
+           // Assume seeded or played
+           continue; 
+        }
+
+        final weekData = fixtureData[weekStr];
+        if (weekData['type'] == 'Match Week' || weekData['type'] == 'League Match') {
+             final matchesMap = weekData['matches'] as Map<String, dynamic>;
+             
+             List<MatchesCompanion> newMatches = [];
+             for (var leagueName in matchesMap.keys) {
+                 final matches = matchesMap[leagueName] as List;
+                 for (var m in matches) {
+                     final homeName = m['home'];
+                     final awayName = m['away'];
+                     final homeId = clubCache[homeName];
+                     final awayId = clubCache[awayName];
+
+                     if (homeId != null && awayId != null) {
+                        newMatches.add(MatchesCompanion(
+                           homeClubId: Value(homeId),
+                           awayClubId: Value(awayId),
+                           season: Value(1), // Default Season 1
+                           week: Value(week),
+                           isPlayed: Value(false),
+                           homeScore: const Value(null),
+                           awayScore: const Value(null),
+                        ));
+                     }
+                 }
+             }
+
+             if (newMatches.isNotEmpty) {
+               await database.batch((batch) {
+                 batch.insertAll(database.matches, newMatches);
+               });
+             }
+        }
+    }
+  }
+
 // Yardımcı Fonksiyon (Aynı kalacak)
   double _nextGaussian(double mean, double stdDev) {
     var u1 = 1.0 - _random.nextDouble();

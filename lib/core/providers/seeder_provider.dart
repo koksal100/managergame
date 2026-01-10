@@ -13,5 +13,9 @@ final initializationProvider = FutureProvider<void>((ref) async {
   final countries = await seeder.database.select(seeder.database.countries).get();
   if (countries.isEmpty) {
     await seeder.seed();
+    await seeder.seedFixtures();
+  } else {
+    // Ensure fixtures are seeded even if DB exists
+    await seeder.seedFixtures();
   }
 });

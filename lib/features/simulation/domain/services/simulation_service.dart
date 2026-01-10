@@ -99,65 +99,125 @@ class SimulationService {
     print("--- START SIMULATION: Season $season, Week $week ---");
     final random = Random();
 
-    // Step 1: Prepare Match objects
-    List<Match> preparedMatches = [];
-    print("Leagues with matches this week: ${leagueMatches.keys.toList()}");
+    // Step 0: Check for Existing Unplayed Matches (Seeded Fixtures)
+    List<Match> existingMatches = await _matchRepository.getMatchesByWeek(season, week);
+    List<Match> matchesToProcess = [];
 
-    for (final leagueName in leagueMatches.keys) {
-         final matches = List<Map<String, dynamic>>.from(leagueMatches[leagueName]);
-         print(">> Processing $leagueName: ${matches.length} matches.");
+    if (existingMatches.isNotEmpty) {
+      print("Found ${existingMatches.length} existing matches for Week $week. Updating...");
+      List<Match> updatedMatches = [];
+      
+      for (var match in existingMatches) {
+        if (!match.isPlayed) {
+          final updatedMatch = Match(
+            id: match.id,
+            homeClubId: match.homeClubId,
+            awayClubId: match.awayClubId,
+            homeScore: _simulateScore(random),
+            awayScore: _simulateScore(random),
+            season: match.season,
+            week: match.week,
+            isPlayed: true,
+          );
+          updatedMatches.add(updatedMatch);
+          matchesToProcess.add(updatedMatch);
+        } else {
+             matchesToProcess.add(match); // Already played, just add to processing list for performers
+        }
+      }
+      
+      if (updatedMatches.isNotEmpty) {
+        await _matchRepository.updateMatches(updatedMatches);
+        print("Updated ${updatedMatches.length} matches.");
+      }
+    } else {
+      // Step 1: Fallback - Generate Match objects (If not seeded)
+      print("No existing matches found. Generating new matches...");
+      print("Leagues with matches this week: ${leagueMatches.keys.toList()}");
 
-         for (final matchPair in matches) {
-             final homeTeamName = matchPair['home'];
-             final awayTeamName = matchPair['away'];
+      List<Match> preparedMatches = [];
+      for (final leagueName in leagueMatches.keys) {
+           final matches = List<Map<String, dynamic>>.from(leagueMatches[leagueName]);
+           print(">> Processing $leagueName: ${matches.length} matches.");
 
-             final homeId = await _getClubId(homeTeamName);
-             final awayId = await _getClubId(awayTeamName);
+           for (final matchPair in matches) {
+               final homeTeamName = matchPair['home'];
+               final awayTeamName = matchPair['away'];
 
-             if (homeId != null && awayId != null) {
-                 // print("   -> Simulating: $homeTeamName vs $awayTeamName");
-                 preparedMatches.add(Match(
-                     id: 0,
-                     homeClubId: homeId,
-                     awayClubId: awayId,
-                     homeScore: _simulateScore(random),
-                     awayScore: _simulateScore(random),
-                     season: season,
-                     week: week,
-                     isPlayed: true
-                 ));
-             } else {
-               print("!!! SKIPPING MATCH: $homeTeamName vs $awayTeamName (Club ID not found)");
-             }
-         }
+               final homeId = await _getClubId(homeTeamName);
+               final awayId = await _getClubId(awayTeamName);
+
+               if (homeId != null && awayId != null) {
+                   preparedMatches.add(Match(
+                       id: 0,
+                       homeClubId: homeId,
+                       awayClubId: awayId,
+                       homeScore: _simulateScore(random),
+                       awayScore: _simulateScore(random),
+                       season: season,
+                       week: week,
+                       isPlayed: true
+                   ));
+               } else {
+                 print("!!! SKIPPING MATCH: $homeTeamName vs $awayTeamName (Club ID not found)");
+               }
+           }
+      }
+      
+      print("Total Matches Prepared: ${preparedMatches.length}");
+
+      // Step 2: Batch Save Matches
+      if (preparedMatches.isNotEmpty) {
+        await _matchRepository.saveMatches(preparedMatches);
+        print("Matches Saved to Database.");
+        
+        // Fetch back to get IDs
+        matchesToProcess = await _matchRepository.getMatchesByWeek(season, week);
+      }
     }
-    
-    print("Total Matches Prepared: ${preparedMatches.length}");
-
-    // Step 2: Batch Save Matches
-    await _matchRepository.saveMatches(preparedMatches);
-    print("Matches Saved to Database.");
-    
-    // Step 3: Fetch Back Matches (to get IDs)
-    final savedMatches = await _matchRepository.getMatchesByWeek(season, week);
-    print("Fetched back ${savedMatches.length} matches from DB (Verification).");
     
     // Step 4: Generate Performances
     List<Performance> preparedPerformances = [];
     
-    for (final match in savedMatches) {
-        // Generate stats for Home Team
-        final homePlayers = await _getBest11(match.homeClubId);
-        _distributeStats(preparedPerformances, homePlayers, match.id, match.homeScore!, random);
+    for (final match in matchesToProcess) {
+        // Only generate stats if we just played it (or if performances missing? check later)
+        // For now, assume if isPlayed is true, we should have generated stats.
+        // But if we just updated it, we definitely need stats.
+        // If it was ALREADY played, we shouldn't regenerate stats.
         
-        // Generate stats for Away Team
-        final awayPlayers = await _getBest11(match.awayClubId);
-        _distributeStats(preparedPerformances, awayPlayers, match.id, match.awayScore!, random);
+        // Check if we updated this match?
+        // Logic: If 'existingMatches' was used, we only generate stats for the ones we updated.
+        // Simplify: Generate stats only if PERFORMANCES DON'T EXIST?
+        // Or simpler: Only generate for matches we just simulated (updatedMatches or preparedMatches).
+        
+        // Let's filter matchesToProcess to only those we handled.
+        // Note: For simplicity in this edit, I will regenerate checks.
+        // Actually, if I just updated the score, I MUST generate performance stats now.
+        // If it was already played, performances exist.
+        
+        // So:
+        bool needsStats = true;
+        // If it came from `existingMatches` AND `isPlayed` was ALREADY true, skip.
+        if (existingMatches.any((em) => em.id == match.id && em.isPlayed)) {
+           needsStats = false;
+        }
+
+        if (needsStats) {
+             // Generate stats for Home Team
+            final homePlayers = await _getBest11(match.homeClubId);
+            _distributeStats(preparedPerformances, homePlayers, match.id, match.homeScore!, random);
+            
+            // Generate stats for Away Team
+            final awayPlayers = await _getBest11(match.awayClubId);
+            _distributeStats(preparedPerformances, awayPlayers, match.id, match.awayScore!, random);
+        }
     }
     
     // Step 5: Batch Save Performances
-    await _performanceRepository.savePerformances(preparedPerformances);
-    print("Performances Saved. Simulation Complete for Week $week.");
+    if (preparedPerformances.isNotEmpty) {
+      await _performanceRepository.savePerformances(preparedPerformances);
+      print("Performances Saved. Simulation Complete for Week $week.");
+    }
   }
 
   void _distributeStats(List<Performance> performances, List<dynamic> players, int matchId, int teamGoals, Random r) {
