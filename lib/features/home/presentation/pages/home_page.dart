@@ -304,8 +304,11 @@ class HomeContent extends ConsumerWidget {
                     // Advance date
                     await ref.read(gameDateProvider.notifier).advanceWeek();
                     
-                    // Force refresh of Standings
+                    // Force refresh of Standings and Stats
                     ref.invalidate(standingsProvider);
+                    ref.invalidate(topScorersProvider);
+                    ref.invalidate(topAssistersProvider);
+                    ref.invalidate(topRatedProvider);
                   } catch (e) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Simulation Error: $e')),

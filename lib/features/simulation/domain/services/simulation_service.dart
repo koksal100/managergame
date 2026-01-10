@@ -161,28 +161,43 @@ class SimulationService {
   }
 
   void _distributeStats(List<Performance> performances, List<dynamic> players, int matchId, int teamGoals, Random r) {
-      // Create a map to track goals per player temporarily
+      if (players.isEmpty) return;
+
+      // Track goals and assists
       Map<int, int> playerGoals = {for (var p in players) p.id: 0};
+      Map<int, int> playerAssists = {for (var p in players) p.id: 0};
       
-      // Distribute goals randomly
+      // Distribute goals and assists
       for (int i = 0; i < teamGoals; i++) {
-          if (players.isEmpty) break;
-          // Weighted random could be better (strikers score more), but uniform is OK for now.
+          // 1. Goal Scorer
           final scorer = players[r.nextInt(players.length)];
           playerGoals[scorer.id] = playerGoals[scorer.id]! + 1;
+
+          // 2. Assist (70% chance)
+          if (r.nextDouble() < 0.7 && players.length > 1) {
+              dynamic assister;
+              do {
+                assister = players[r.nextInt(players.length)];
+              } while (assister.id == scorer.id); // Try not to assist self (basic logic)
+              
+              playerAssists[assister.id] = playerAssists[assister.id]! + 1;
+          }
       }
 
       for (var player in players) {
+          final goals = playerGoals[player.id]!;
+          final assists = playerAssists[player.id]!;
+          
           performances.add(Performance(
               id: 0,
               matchId: matchId,
               playerId: player.id,
               minutesPlayed: 90,
-              goals: playerGoals[player.id]!,
-              assists: 0,
+              goals: goals,
+              assists: assists,
               yellowCards: r.nextInt(20) == 0 ? 1 : 0, 
               redCards: 0,
-              rating: 6.0 + r.nextDouble() * 4.0 + (playerGoals[player.id]! * 0.5), 
+              rating: 6.0 + r.nextDouble() * 4.0 + (goals * 0.5) + (assists * 0.3), // Bonus rating
           ));
       }
   }

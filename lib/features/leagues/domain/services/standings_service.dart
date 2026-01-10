@@ -4,6 +4,8 @@
 import '../../../clubs/domain/entities/club.dart';
 import '../../../clubs/domain/repositories/club_repository.dart';
 import '../../../matches/domain/repositories/match_repository.dart';
+import '../../../performances/domain/repositories/performance_repository.dart';
+import '../../../performances/domain/entities/player_stat.dart';
 
 class LeagueStanding {
   final Club club;
@@ -28,11 +30,14 @@ class LeagueStanding {
   });
 }
 
+
+
 class StandingsService {
   final ClubRepository _clubRepository;
   final MatchRepository _matchRepository;
+  final PerformanceRepository _performanceRepository;
 
-  StandingsService(this._clubRepository, this._matchRepository);
+  StandingsService(this._clubRepository, this._matchRepository, this._performanceRepository);
 
   Future<List<LeagueStanding>> getStandings(int leagueId) async {
     // 1. Get clubs in league
@@ -96,5 +101,17 @@ class StandingsService {
         return standings;
       },
     );
+  }
+
+  Future<List<PlayerStat>> getTopScorers(int leagueId) async {
+    return _performanceRepository.getTopScorers(leagueId);
+  }
+
+  Future<List<PlayerStat>> getTopAssisters(int leagueId) async {
+    return _performanceRepository.getTopAssisters(leagueId);
+  }
+
+  Future<List<PlayerStat>> getTopRated(int leagueId) async {
+    return _performanceRepository.getTopRated(leagueId);
   }
 }

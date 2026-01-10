@@ -7,6 +7,7 @@ import '../../domain/entities/league.dart';
 import '../widgets/league_colors.dart';
 import '../providers/standings_provider.dart';
 import '../../domain/services/standings_service.dart';
+import '../../../performances/domain/entities/player_stat.dart';
 
 class LeagueDetailPage extends ConsumerWidget {
   final League league;
@@ -15,73 +16,173 @@ class LeagueDetailPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final standingsAsync = ref.watch(standingsProvider(league.id));
-
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        title: Text(league.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          // Background
-          Image.asset(
-            'assets/images/background.png',
-            fit: BoxFit.cover,
+    return DefaultTabController(
+      length: 4,
+      child: Scaffold(
+        extendBodyBehindAppBar: true,
+        appBar: AppBar(
+          title: Text(league.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          centerTitle: true,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () => Navigator.pop(context),
           ),
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.black.withOpacity(0.6),
-                  Colors.black.withOpacity(0.9),
+          bottom: const TabBar(
+            isScrollable: true,
+            indicatorColor: Colors.white,
+            labelColor: Colors.white,
+            unselectedLabelColor: Colors.white60,
+            tabs: [
+              Tab(text: 'Table'),
+              Tab(text: 'Goals'),
+              Tab(text: 'Assists'),
+              Tab(text: 'Rating'),
+            ],
+          ),
+        ),
+        body: Stack(
+          fit: StackFit.expand,
+          children: [
+            // Background
+            Image.asset(
+              'assets/images/background.png',
+              fit: BoxFit.cover,
+            ),
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withOpacity(0.6),
+                    Colors.black.withOpacity(0.9),
+                  ],
+                ),
+              ),
+            ),
+
+            // Content
+            Padding(
+              padding: const EdgeInsets.only(top: kToolbarHeight + 100), // Adjust for AppBar + TabBar
+              child: TabBarView(
+                children: [
+                   _buildStandingsTab(ref),
+                   _buildStatsTab(ref, topScorersProvider(league.id), 'Goals'),
+                   _buildStatsTab(ref, topAssistersProvider(league.id), 'Assists'),
+                   _buildStatsTab(ref, topRatedProvider(league.id), 'Rating', isRating: true),
                 ],
               ),
             ),
-          ),
-
-          // Content
-          standingsAsync.when(
-            data: (standings) {
-              if (standings.isEmpty) {
-                return const Center(child: Text('No clubs found', style: TextStyle(color: Colors.white)));
-              }
-              return SingleChildScrollView(
-                padding: const EdgeInsets.only(top: 100, bottom: 0, left: 16, right: 16),
-                child: Column(
-                  children: [
-                    // Table Header
-                    _buildTableHeader(),
-                    ListView.builder(
-                      padding: EdgeInsets.zero,
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: standings.length,
-                      itemBuilder: (context, index) {
-                        final standing = standings[index];
-                        return _buildTableRow(context, index + 1, standing);
-                      },
-                    ),
-                  ],
-                ),
-              );
-            },
-            loading: () => const Center(child: CircularProgressIndicator(color: Colors.teal)),
-            error: (err, stack) => Center(child: Text('Error: $err', style: const TextStyle(color: Colors.redAccent))),
-          ),
-        ],
+          ],
+        ),
       ),
     );
+  }
+
+  Widget _buildStandingsTab(WidgetRef ref) {
+    final standingsAsync = ref.watch(standingsProvider(league.id));
+
+    return standingsAsync.when(
+      data: (standings) {
+        if (standings.isEmpty) {
+          return const Center(child: Text('No clubs found', style: TextStyle(color: Colors.white)));
+        }
+        return  SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          child: Column(
+            children: [
+              _buildTableHeader(),
+              ListView.builder(
+                padding: EdgeInsets.zero,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: standings.length,
+                itemBuilder: (context, index) {
+                  final standing = standings[index];
+                  return _buildTableRow(context, index + 1, standing);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator(color: Colors.teal)),
+      error: (err, stack) => Center(child: Text('Error: $err', style: const TextStyle(color: Colors.redAccent))),
+    );
+  }
+
+  Widget _buildStatsTab(WidgetRef ref, ProviderListenable<AsyncValue<List<PlayerStat>>> provider, String metricLabel, {bool isRating = false}) {
+     final statsAsync = ref.watch(provider);
+
+     return statsAsync.when(
+       data: (stats) {
+         if (stats.isEmpty) {
+           return const Center(child: Text('No stats available', style: TextStyle(color: Colors.white)));
+         }
+         return SingleChildScrollView(
+           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+           child: Column(
+             children: [
+               // Header
+               Container(
+                 padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                 decoration: BoxDecoration(
+                   gradient: LeagueColors.getGradient(league.name),
+                   borderRadius: BorderRadius.circular(8),
+                   boxShadow: [
+                      BoxShadow(color: Colors.black.withOpacity(0.4), blurRadius: 4, offset: const Offset(0, 2))
+                   ]
+                 ),
+                 child: Row(
+                   children: [
+                     SizedBox(width: 30, child: Text('#', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
+                     Expanded(child: Text('Player', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
+                     Expanded(child: Text('Club', style: const TextStyle(color: Colors.white70))),
+                     SizedBox(width: 60, child: Text(metricLabel, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
+                   ],
+                 ),
+               ),
+               // List
+               ListView.builder(
+                 padding: EdgeInsets.zero,
+                 shrinkWrap: true,
+                 physics: const NeverScrollableScrollPhysics(),
+                 itemCount: stats.length,
+                 itemBuilder: (context, index) {
+                   final stat = stats[index];
+                   return Container(
+                     padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                     decoration: BoxDecoration(
+                       border: Border(bottom: BorderSide(color: Colors.white.withOpacity(0.05))),
+                       color: index % 2 == 0 ? Colors.white.withOpacity(0.02) : Colors.transparent,
+                     ),
+                     child: Row(
+                       children: [
+                          SizedBox(width: 30, child: Text('${index + 1}', style: const TextStyle(color: Colors.white54))),
+                          Expanded(child: Text(stat.playerName, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500))),
+                          Expanded(child: Text(stat.clubName, style: const TextStyle(color: Colors.white60, fontSize: 13))),
+                          SizedBox(
+                            width: 60, 
+                            child: Text(
+                              isRating ? stat.averageRating.toStringAsFixed(2) : (metricLabel == 'Goals' ? stat.goals.toString() : stat.assists.toString()), 
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(color: Colors.yellowAccent, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                       ],
+                     ),
+                   );
+                 },
+               ),
+             ],
+           ),
+         );
+       },
+       loading: () => const Center(child: CircularProgressIndicator(color: Colors.teal)),
+       error: (err, stack) => Center(child: Text('Error: $err', style: const TextStyle(color: Colors.redAccent))),
+     );
   }
 
   Widget _buildTableHeader() {
