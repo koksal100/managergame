@@ -28,10 +28,11 @@ class UserAgentNotifier extends AsyncNotifier<Agent?> {
     );
   }
 
-  // Capacity Formula: Base 5 + (Level / 3)
+  // Capacity Formula: Linear increase from 2 (Lvl 1) to 20 (Lvl 60)
   int get capacity {
     final level = state.value?.level ?? 1;
-    return 5 + (level / 3).floor();
+    // Formula: 2 + ((level - 1) * (20 - 2) / (60 - 1))
+    return 2 + ((level - 1) * 18 / 59).floor();
   }
 
   // --- ACTIONS ---
@@ -60,6 +61,20 @@ class UserAgentNotifier extends AsyncNotifier<Agent?> {
     ref.invalidate(filteredPlayersProvider);
 
     return null; // Success
+  }
+
+  // Release a player (Terminate Contract)
+  Future<void> releasePlayer(int playerId) async {
+    final db = ref.read(appDatabaseProvider);
+    
+    await (db.update(db.players)..where((tbl) => tbl.id.equals(playerId))).write(
+      const PlayersCompanion(agentId: Value(null)),
+    );
+
+    // Refresh UI
+    ref.invalidateSelf();
+    ref.invalidate(playersByAgentProvider(_userId));
+    ref.invalidate(filteredPlayersProvider);
   }
 
   // Debug: Level Up

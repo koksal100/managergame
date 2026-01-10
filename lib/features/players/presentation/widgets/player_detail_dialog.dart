@@ -86,14 +86,35 @@ class PlayerDetailDialog extends ConsumerWidget {
                       onPressed: () async {
                         final notifier = ref.read(userAgentProvider.notifier);
                         
-                        // Check if already managed
+                        // Case 1: Already Managed -> Option to Release
                         if (player.agentId == 1) {
-                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('You already manage this player!')),
-                          );
+                           // Show Confirmation Dialog
+                           final confirm = await showDialog<bool>(
+                             context: context,
+                             builder: (context) => AlertDialog(
+                               backgroundColor: const Color(0xFF1E1E1E),
+                               title: const Text("Terminate Contract?", style: TextStyle(color: Colors.white)),
+                               content: Text("Are you sure you want to release ${player.name}? This cannot be undone.", style: const TextStyle(color: Colors.white70)),
+                               actions: [
+                                 TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("Cancel")),
+                                 TextButton(onPressed: () => Navigator.pop(context, true), child: const Text("Terminate", style: TextStyle(color: Colors.redAccent))),
+                               ],
+                             ),
+                           );
+
+                           if (confirm == true) {
+                             await notifier.releasePlayer(player.id);
+                             if (context.mounted) {
+                               ScaffoldMessenger.of(context).showSnackBar(
+                                 SnackBar(content: Text('Contract Terminated: ${player.name} is now a free agent.'), backgroundColor: Colors.orangeAccent),
+                               );
+                               Navigator.of(context).pop();
+                             }
+                           }
                           return;
                         }
 
+                        // Case 2: Sign Player
                         final error = await notifier.signPlayer(player.id);
 
                         if (context.mounted) {
@@ -113,11 +134,11 @@ class PlayerDetailDialog extends ConsumerWidget {
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: (player.agentId == 1) ? Colors.grey : Colors.teal,
+                        backgroundColor: (player.agentId == 1) ? Colors.redAccent.withOpacity(0.8) : Colors.teal,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       ),
                       child: Text(
-                        (player.agentId == 1) ? 'Managed' : 'Offer Representation',
+                        (player.agentId == 1) ? 'Terminate Contract' : 'Offer Representation',
                         style: const TextStyle(color: Colors.white),
                       ),
                     ),
