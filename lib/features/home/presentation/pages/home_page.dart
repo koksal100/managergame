@@ -350,24 +350,23 @@ class HomeContent extends ConsumerWidget {
 }
 
 
-class _TickerWidget extends StatefulWidget {
+class _TickerWidget extends ConsumerStatefulWidget {
   const _TickerWidget();
 
   @override
-  State<_TickerWidget> createState() => _TickerWidgetState();
+  ConsumerState<_TickerWidget> createState() => _TickerWidgetState();
 }
 
-class _TickerWidgetState extends State<_TickerWidget> with SingleTickerProviderStateMixin {
+class _TickerWidgetState extends ConsumerState<_TickerWidget> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  // Added more dummy Super Lig matches
-  final String _text = "GALATASARAY 3-0 FENERBAHÇE   •   BEŞİKTAŞ 2-1 TRABZONSPOR   •   BAŞAKŞEHİR 1-0 KASIMPAŞA   •   ADANA DEMİR 2-2 SİVASSPOR   •   GÖZTEPE 3-2 RİZESPOR   •   ANTALYASPOR 0-1 ALANYASPOR";
+  String _text = "";
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 20), // Slower duration for longer text
+      duration: const Duration(seconds: 70),
     )..repeat();
   }
 
@@ -379,9 +378,11 @@ class _TickerWidgetState extends State<_TickerWidget> with SingleTickerProviderS
 
   @override
   Widget build(BuildContext context) {
+    final tickerAsync = ref.watch(tickerMatchesProvider);
+
     return Container(
       width: double.infinity,
-      height: 26, // Increased slightly for border
+      height: 26,
       decoration: const BoxDecoration(
         color: Colors.black,
         border: Border.symmetric(
@@ -389,40 +390,64 @@ class _TickerWidgetState extends State<_TickerWidget> with SingleTickerProviderS
         ),
       ),
       child: ClipRect(
-        child: AnimatedBuilder(
-          animation: _controller,
-          builder: (context, child) {
-            return LayoutBuilder(
-              builder: (context, constraints) {
-                final screenWidth = constraints.maxWidth;
-                // Calculate estimated text width (Char count * approx width per char)
-                // Courier 14px is approx 9-10px wide per char.
-                final textWidth = _text.length * 10.0; 
-                
-                // Scroll from [Screen Right] to [Pass Full Text]
-                final offset = screenWidth - (screenWidth + textWidth) * _controller.value;
-                
-                return Stack(
-                  children: [
-                    Positioned(
-                      left: offset,
-                      top: 4,
-                      child: Text(
-                        _text,
-                        style: const TextStyle(
-                          color: Color(0xFF89CFF0), // Baby Blue
-                          fontFamily: 'Courier', 
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                          letterSpacing: 2.0,
-                        ),
-                      ),
-                    ),
-                  ],
-                );
-              },
-            );
+        child: tickerAsync.when(
+          data: (matches) {
+            String displayText = matches.isEmpty 
+               ? "NO MATCHES PLAYED • PREPARE FOR NEXT WEEK • " 
+               : matches.join("   •   ") + "   •   ";
+
+             // Update text if changed
+             if (_text != displayText) {
+               _text = displayText;
+             }
+             
+             return AnimatedBuilder(
+                animation: _controller,
+                builder: (context, child) {
+                  return LayoutBuilder(
+                    builder: (context, constraints) {
+                      final screenWidth = constraints.maxWidth;
+                      
+                      // Approx width calculation
+                      final textWidth = _text.length * 9.5; 
+                      
+                      // Proper scrolling logic: Text moves LEFT.
+                      // Offset starts at screenWidth and goes to -textWidth
+                      
+                      // NOTE: Original code logic:
+                      // offset = screenWidth - (screenWidth + textWidth) * value
+                      // At 0: offset = screenWidth (Right edge)
+                      // At 1: offset = screenWidth - screenWidth - textWidth = -textWidth (Left edge offscreen)
+                      // This ensures text fully passes through.
+                      
+                      final totalDistance = screenWidth + textWidth;
+                      final offset = screenWidth - (totalDistance * _controller.value);
+                      
+                      return Stack(
+                        children: [
+                          Positioned(
+                            left: offset,
+                            top: 4,
+                            child: Text(
+                              _text,
+                              style: const TextStyle(
+                                color: Color(0xFF89CFF0), // Baby Blue
+                                fontFamily: 'Courier', 
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                                letterSpacing: 1.5,
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+             );
           },
+          loading: () => const Center(child: Text("LOADING RESULTS...", style: TextStyle(color: Colors.white54, fontSize: 10))),
+          error: (err, stack) => const SizedBox(),
         ),
       ),
     );

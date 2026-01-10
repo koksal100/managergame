@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/services/simulation_service.dart';
 import '../../../../core/providers/repository_providers.dart';
+import '../../../../core/providers/game_date_provider.dart';
 
 final simulationServiceProvider = Provider<SimulationService>((ref) {
   return SimulationService(
@@ -9,4 +10,37 @@ final simulationServiceProvider = Provider<SimulationService>((ref) {
     clubRepository: ref.watch(clubRepositoryProvider),
     playerRepository: ref.watch(playerRepositoryProvider),
   );
+});
+
+final tickerMatchesProvider = FutureProvider<List<String>>((ref) async {
+  final currentWeek = ref.watch(gameDateProvider);
+  // Fetch from previous week if possible, ensuring we show results of just played matches
+  final targetWeek = currentWeek > 1 ? currentWeek - 1 : 1;
+  
+  final matchRepo = ref.watch(matchRepositoryProvider);
+  final allMatches = await matchRepo.getMatchesByWeek(1, targetWeek); 
+  
+  // Filter played
+  final playedMatches = allMatches.where((m) => m.isPlayed).toList();
+  
+  if (playedMatches.isEmpty) return [];
+  
+  // Shuffle and take 20
+  playedMatches.shuffle();
+  final selected = playedMatches.take(20).toList();
+  
+  final clubRepo = ref.watch(clubRepositoryProvider);
+  final clubsResult = await clubRepo.getClubs();
+  
+  // Map ID -> Name
+  final clubsMap = clubsResult.fold(
+      (l) => <int, String>{}, 
+      (r) => {for (var c in r) c.id: c.name}
+  );
+  
+  return selected.map((m) {
+      final homeName = clubsMap[m.homeClubId] ?? '?';
+      final awayName = clubsMap[m.awayClubId] ?? '?';
+      return '${homeName.toUpperCase()} ${m.homeScore}-${m.awayScore} ${awayName.toUpperCase()}';
+  }).toList();
 });
