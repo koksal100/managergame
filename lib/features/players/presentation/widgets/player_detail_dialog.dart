@@ -116,7 +116,7 @@ class PlayerDetailDialog extends ConsumerWidget {
                         }
 
                         // Case 2: Sign Player (Negotiation Game)
-                        // 1. Check Capacity BEFORE Game (to avoid frustration)
+                        // 1. Check Capacity BEFORE Game
                         final capacityCheck = await notifier.checkCapacity();
                         if (!capacityCheck) {
                            if (context.mounted) {
@@ -127,7 +127,21 @@ class PlayerDetailDialog extends ConsumerWidget {
                            return;
                         }
 
-                        // 2. Play Negotiation Game
+                        // 2. Check Weekly Offer Limit
+                        final canOffer = await notifier.checkCanMakeOffer();
+                        if (!canOffer) {
+                           if (context.mounted) {
+                             ScaffoldMessenger.of(context).showSnackBar(
+                               const SnackBar(content: Text('Weekly Offer Limit Reached! (Max 2 per week)'), backgroundColor: Colors.redAccent),
+                             );
+                           }
+                           return;
+                        }
+
+                        // 3. Play Negotiation Game
+                        // Consume Offer Attempt
+                        await notifier.incrementOfferCount();
+
                         final userAgent = ref.read(userAgentProvider).value;
                         final managerRep = userAgent?.reputation ?? 0;
                         

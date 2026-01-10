@@ -1,10 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:drift/drift.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/providers/database_provider.dart';
 import '../../../../core/database/app_database.dart' hide Player, Agent;
 import '../../agents/domain/entities/agent.dart';
 import '../../agents/providers/agent_provider.dart';
 import '../../players/presentation/providers/player_provider.dart';
+import '../../../../core/providers/game_date_provider.dart';
 
 // Provides the current user agent (Agent ID 1)
 final userAgentProvider = AsyncNotifierProvider<UserAgentNotifier, Agent?>(() {
@@ -13,6 +15,7 @@ final userAgentProvider = AsyncNotifierProvider<UserAgentNotifier, Agent?>(() {
 
 class UserAgentNotifier extends AsyncNotifier<Agent?> {
   static const int _userId = 1;
+  static const int _weeklyOfferLimit = 2; // Limit per week
 
   @override
   Future<Agent?> build() async {
@@ -105,5 +108,28 @@ class UserAgentNotifier extends AsyncNotifier<Agent?> {
       AgentsCompanion(name: Value(newName)),
     );
     ref.invalidateSelf();
+  }
+
+  // --- NEGOTIATION LIMITS ---
+
+  String _getOfferKey(int week) => 'weekly_offers_used_week_$week';
+
+  Future<int> getWeeklyOffersUsed() async {
+    final currentWeek = ref.read(gameDateProvider);
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(_getOfferKey(currentWeek)) ?? 0;
+  }
+
+  Future<bool> checkCanMakeOffer() async {
+    final used = await getWeeklyOffersUsed();
+    return used < _weeklyOfferLimit;
+  }
+
+  Future<void> incrementOfferCount() async {
+    final currentWeek = ref.read(gameDateProvider);
+    final prefs = await SharedPreferences.getInstance();
+    final key = _getOfferKey(currentWeek);
+    final current = prefs.getInt(key) ?? 0;
+    await prefs.setInt(key, current + 1);
   }
 }

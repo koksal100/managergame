@@ -27,6 +27,9 @@ class _NegotiationGameDialogState extends State<NegotiationGameDialog> with Sing
   bool? _success;
   String _difficultyText = "Normal";
 
+  int _requiredHits = 1;
+  int _currentHits = 0;
+  
   @override
   void initState() {
     super.initState();
@@ -44,45 +47,36 @@ class _NegotiationGameDialogState extends State<NegotiationGameDialog> with Sing
 
     int durationMs = 1500;
     
-    if (diff <= 60) {
-      // EASY / NORMAL ZONE
-      // Even with 60 diff, we keep it relatively easy.
-      // Maybe slight speed up but generally friendly.
-      durationMs = 1500; // 1.5s per rotation
-      _targetSweepAngle = pi / 4; // 45 degrees
+    if (diff <= 20) {
+      // EASY (1 Hit)
+      _requiredHits = 1;
+      _difficultyText = "Easy (1 Hit)";
+      _targetSweepAngle = pi / 3; 
+      durationMs = 1800;
       
-      if (diff <= 0) {
-        _difficultyText = "Very Easy";
-        _targetSweepAngle = pi / 3; // 60 degrees for superior manager
-        durationMs = 2000;
-      } else {
-        _difficultyText = "Easy";
-      }
+    } else if (diff <= 50) {
+      // MEDIUM (2 Hits)
+      _requiredHits = 2;
+      _difficultyText = "Medium (2 Consecutive Hits)";
+      _targetSweepAngle = pi / 4;
+      durationMs = 1500;
       
     } else {
-      // HARD ZONE (60 to 100+)
-      // Scale linearly between 60 (Normal) and 100 (Impossible)
-      int excess = diff - 60; // 0 to 40+
+      // HARD (3 Hits)
+      _requiredHits = 3;
       
-      // Speed: 
-      // At excess 0 (Diff 60) -> 1500ms
-      // At excess 40 (Diff 100) -> 300ms (Super Fast)
-      durationMs = (1500 - (excess * 30)).clamp(300, 1500);
+      int excess = diff - 50; 
+      durationMs = (1500 - (excess * 20)).clamp(500, 1500);
       
-      // Angle:
-      // At excess 0 -> 45 deg
-      // At excess 40 -> 5 deg (Tiny)
       double baseSweep = pi / 4;
-      double reduction = excess * 0.02; // 40 * 0.02 = 0.8 rads (approx 45 deg)
-      _targetSweepAngle = (baseSweep - reduction).clamp(pi / 36, baseSweep); // Min 5 degrees
-      
-      if (diff >= 100) _difficultyText = "IMPOSSIBLE";
-      else if (diff >= 80) _difficultyText = "Very Hard";
-      else _difficultyText = "Hard";
+      double reduction = excess * 0.015; 
+      _targetSweepAngle = (baseSweep - reduction).clamp(pi / 36, baseSweep); 
+
+      if (diff >= 90) _difficultyText = "IMPOSSIBLE (3 Hits)";
+      else _difficultyText = "Hard (3 Consecutive Hits)";
     }
     
-    // Randomize Target Position
-    _targetStartAngle = Random().nextDouble() * 2 * pi;
+    _randomizeTarget();
 
     _controller = AnimationController(
       vsync: this,
@@ -96,13 +90,12 @@ class _NegotiationGameDialogState extends State<NegotiationGameDialog> with Sing
     });
   }
 
+  void _randomizeTarget() {
+     _targetStartAngle = Random().nextDouble() * 2 * pi;
+  }
+
   void _handleTap() {
     if (!_isPlaying) return;
-
-    _controller.stop();
-    setState(() {
-      _isPlaying = false;
-    });
 
     // Check Hit Logic
     // We normalize everything to 0 -> 2*pi range
@@ -112,26 +105,45 @@ class _NegotiationGameDialogState extends State<NegotiationGameDialog> with Sing
 
     bool hit = false;
     
-    // Handle wrap-around case (e.g. start at 350 deg, width 20 deg -> ends at 10 deg)
+    // Handle wrap-around case
     if (start + _targetSweepAngle > 2 * pi) {
-       // Target crosses the 0 boundary
-       // Hit if pointer is > start OR pointer < (end normalized)
        double endNormalized = (start + _targetSweepAngle) - (2 * pi);
        hit = pointer >= start || pointer <= endNormalized;
     } else {
-       // Standard case
        hit = pointer >= start && pointer <= (start + _targetSweepAngle);
-       // Visual correction: sometimes painting and logical check might drift slightly due to stroke width?
-       // But math is solid.
     }
 
-    setState(() {
-      _success = hit;
-    });
-    
-    Future.delayed(const Duration(milliseconds: 1500), () {
-        if (mounted) Navigator.pop(context, hit);
-    });
+    if (hit) {
+      _currentHits++;
+      if (_currentHits >= _requiredHits) {
+         // WIN
+         _controller.stop();
+         setState(() {
+           _isPlaying = false;
+           _success = true;
+         });
+         Future.delayed(const Duration(milliseconds: 1500), () {
+             if (mounted) Navigator.pop(context, true);
+         });
+      } else {
+         // CONTINUE STREAK
+         setState(() {
+           // Speed up slightly for next hit? Optional.
+           _randomizeTarget(); // Move target
+         });
+      }
+    } else {
+      // MISS - IMMEDIATE FAILURE
+      _controller.stop();
+      setState(() {
+        _isPlaying = false;
+        _success = false;
+      });
+      
+      Future.delayed(const Duration(milliseconds: 1500), () {
+          if (mounted) Navigator.pop(context, false);
+      });
+    }
   }
 
   @override
@@ -153,6 +165,10 @@ class _NegotiationGameDialogState extends State<NegotiationGameDialog> with Sing
         statusColor = Colors.redAccent;
         statusText = "NEGOTIATION FAILED";
       }
+    } else {
+      // Show progress
+       statusText = "STREAK: $_currentHits / $_requiredHits";
+       if (_currentHits == 0) statusText = "TAP TO START STREAK";
     }
 
     return Dialog(
