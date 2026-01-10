@@ -1,6 +1,7 @@
 import 'dart:ui'; // Blur efekti için gerekli
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../agents/providers/user_agent_provider.dart';
 import '../../../players/presentation/pages/players_page.dart';
 import '../../../scouting/presentation/pages/scouting_page.dart';
 import '../../../contracts/presentation/pages/contracts_page.dart';
@@ -48,14 +49,23 @@ class _HomePageState extends ConsumerState<HomePage> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Ticker Widget'ı Navigasyonun hemen üstüne, şeffaf şerit olarak koyuyoruz
-                  const Padding(
-                    padding: EdgeInsets.only(bottom: 10.0),
-                    child: GlassContainer(
-                      height: 30,
-                      child: _TickerWidget(),
+                  // Stats and Ticker only visible on Home Tab
+                  if (_currentIndex == 0) ...[
+                    // Stats Footer (Above Ticker)
+                    const Padding(
+                      padding: EdgeInsets.only(bottom: 8.0),
+                      child: _ManagerStatsFooter(),
                     ),
-                  ),
+
+                    // Ticker Widget
+                    const Padding(
+                      padding: EdgeInsets.only(bottom: 10.0),
+                      child: GlassContainer(
+                        height: 30,
+                        child: _TickerWidget(),
+                      ),
+                    ),
+                  ],
 
                   // Ana Navigasyon Dock'u
                   _buildFloatingNavBar(context),
@@ -151,7 +161,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
             child: Container(color: Colors.black.withOpacity(0.6)),
           ),
-          const Center(
+          Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -216,45 +226,8 @@ class HomeContent extends ConsumerWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Tarih/Hafta Göstergesi (Minimalist)
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'SEASON 2025-26',
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.5),
-                            fontSize: 10,
-                            letterSpacing: 2.0,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.baseline,
-                          textBaseline: TextBaseline.alphabetic,
-                          children: [
-                            const Text(
-                              'WEEK',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w300,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              '$currentWeek',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 32,
-                                fontWeight: FontWeight.w200, // İnce font elegant durur
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                    // Manager Profile & Week Info
+                    const _ManagerProfileHeader(),
 
                     // İlerle Butonu (Glass Effect + Glow)
                     GestureDetector(
@@ -334,7 +307,196 @@ class HomeContent extends ConsumerWidget {
 
 // --- YARDIMCI WIDGETLAR (Stil için) ---
 
-// Navigasyon Elemanı
+class _ManagerProfileHeader extends ConsumerWidget {
+  const _ManagerProfileHeader();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final userAgentAsync = ref.watch(userAgentProvider);
+    final userAgentNotifier = ref.read(userAgentProvider.notifier);
+    final currentWeek = ref.watch(gameDateProvider);
+
+    return userAgentAsync.when(
+      data: (agent) {
+         if (agent == null) return const SizedBox.shrink();
+         
+         final capacity = userAgentNotifier.capacity;
+         
+         return Column(
+           crossAxisAlignment: CrossAxisAlignment.start,
+           children: [
+             // 1. Name & Level
+             Row(
+               children: [
+                 Container(
+                   padding: const EdgeInsets.all(8),
+                   decoration: BoxDecoration(
+                     shape: BoxShape.circle,
+                     border: Border.all(color: Colors.amberAccent, width: 2),
+                     color: Colors.black26,
+                   ),
+                   child: Text(
+                     "${agent.level}",
+                     style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                   ),
+                 ),
+                 const SizedBox(width: 12),
+                 Column(
+                   crossAxisAlignment: CrossAxisAlignment.start,
+                   children: [
+                     Row(
+                      mainAxisSize: MainAxisSize.min,
+                       children: [
+                         Text(
+                           agent.name.toUpperCase(),
+                           style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16, letterSpacing: 1),
+                         ),
+                         const SizedBox(width: 4),
+                         GestureDetector(
+                           onTap: () {
+                             _showRenameDialog(context, userAgentNotifier, agent.name);
+                           },
+                           child: Icon(Icons.edit, color: Colors.white.withOpacity(0.5), size: 14),
+                         ),
+                       ],
+                     ),
+                     const SizedBox(height: 2),
+                     Text(
+                       "WEEK $currentWeek",
+                        style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 12, fontWeight: FontWeight.w500),
+                     ),
+                   ],
+                 )
+               ],
+             ),
+             
+             const SizedBox(height: 12),
+
+            ],
+          );
+       },
+       loading: () => const Text("Loading...", style: TextStyle(color: Colors.white54)),
+       error: (e, s) => const Text("Error", style: TextStyle(color: Colors.redAccent)),
+     );
+   }
+
+  }
+
+  void _showRenameDialog(BuildContext context, UserAgentNotifier notifier, String currentName) {
+    final controller = TextEditingController(text: currentName);
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: const Color(0xFF1E1E1E),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text("Rename Manager", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 15),
+              TextField(
+                controller: controller,
+                style: const TextStyle(color: Colors.white),
+                decoration: const InputDecoration(
+                  hintText: "Enter Name",
+                  hintStyle: TextStyle(color: Colors.white30),
+                  filled: true,
+                  fillColor: Colors.black26,
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                   TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text("Cancel", style: TextStyle(color: Colors.grey)),
+                  ),
+                  const SizedBox(width: 10),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (controller.text.isNotEmpty) {
+                        notifier.updateName(controller.text);
+                        Navigator.pop(context);
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.teal),
+                    child: const Text("Variable", style: TextStyle(color: Colors.white)),
+                  ),
+                ],
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+
+
+class _ManagerStatsFooter extends ConsumerWidget {
+  const _ManagerStatsFooter();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final userAgentAsync = ref.watch(userAgentProvider);
+    final userAgentNotifier = ref.read(userAgentProvider.notifier);
+
+    return userAgentAsync.when(
+      data: (agent) {
+        if (agent == null) return const SizedBox.shrink();
+        final capacity = userAgentNotifier.capacity;
+
+        return Container(
+               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+               decoration: BoxDecoration(
+                 color: Colors.black.withOpacity(0.4), // Darker background for contrast
+                 borderRadius: BorderRadius.circular(20),
+                 border: Border.all(color: Colors.white10),
+               ),
+               child: Row(
+                 mainAxisSize: MainAxisSize.min,
+                 children: [
+                   _buildStatItem(Icons.attach_money, "\$${_formatMoney(agent.balance)}", Colors.greenAccent),
+                   const SizedBox(width: 15),
+                   Container(width: 1, height: 12, color: Colors.white24),
+                   const SizedBox(width: 15),
+                   _buildStatItem(Icons.star, "${agent.reputation}", Colors.amberAccent),
+                   const SizedBox(width: 15),
+                   Container(width: 1, height: 12, color: Colors.white24),
+                    const SizedBox(width: 15),
+                   _buildStatItem(Icons.group, "Cap: $capacity", Colors.blueAccent), 
+                 ],
+               ),
+             );
+      },
+      loading: () => const SizedBox(),
+      error: (_, __) => const SizedBox(),
+    );
+  }
+
+  Widget _buildStatItem(IconData icon, String text, Color color) {
+    return Row(
+      children: [
+        Icon(icon, color: color, size: 16),
+        const SizedBox(width: 6),
+        Text(text, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
+      ],
+    );
+  }
+
+   String _formatMoney(double amount) {
+    if (amount >= 1000000) {
+      return "${(amount / 1000000).toStringAsFixed(1)}M";
+    } else if (amount >= 1000) {
+      return "${(amount / 1000).toStringAsFixed(1)}K";
+    }
+    return amount.toStringAsFixed(0);
+  }
+}
 
 // Navigasyon Elemanı
 class _NavBarItem extends StatelessWidget {

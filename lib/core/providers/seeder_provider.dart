@@ -17,5 +17,7 @@ final initializationProvider = FutureProvider<void>((ref) async {
   } else {
     // Ensure fixtures are seeded even if DB exists
     await seeder.seedFixtures();
+    // Ensure user agent exists for upgraded saves
+    await seeder.seedUserAgent();
   }
 });

@@ -145,6 +145,36 @@ class PlayerRepositoryImpl implements PlayerRepository {
   }
 
   @override
+  Future<Either<Failure, List<Player>>> getPlayersByAgentId(int agentId) async {
+    try {
+      final query = database.select(database.players)..where((tbl) => tbl.agentId.equals(agentId));
+      
+      // Sort by CA descending
+      query.orderBy([(t) => OrderingTerm(expression: t.ca, mode: OrderingMode.desc)]);
+
+      final playerRows = await query.get();
+
+      final players = playerRows.map((row) => Player(
+        id: row.id,
+        name: row.name,
+        age: row.age,
+        clubId: row.clubId,
+        agentId: row.agentId,
+        position: row.position,
+        ca: row.ca,
+        pa: row.pa,
+        reputation: row.reputation,
+        marketValue: row.marketValue,
+        currentContractId: row.currentContractId,
+      )).toList();
+
+      return Right(players);
+    } catch (e) {
+      return Left(CacheFailure(e.toString()));
+    }
+  }
+
+  @override
   Future<Either<Failure, Player>> getPlayerById(int id) async {
     try {
       final query = database.select(database.players)..where((tbl) => tbl.id.equals(id));

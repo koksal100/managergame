@@ -40,3 +40,13 @@ final playersByClubProvider = FutureProvider.family<List<Player>, int>((ref, clu
     (players) => players,
   );
 });
+
+// Players by Agent Provider (Family)
+final playersByAgentProvider = FutureProvider.family<List<Player>, int>((ref, agentId) async {
+  final repository = ref.watch(playerRepositoryProvider);
+  final result = await repository.getPlayersByAgentId(agentId);
+  return result.fold(
+    (failure) => throw Exception(failure.message),
+    (players) => players,
+  );
+});

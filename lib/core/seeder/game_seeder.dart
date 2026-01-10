@@ -29,6 +29,26 @@ class GameSeeder {
 
     // 3. Seed Leagues and Clubs
     await _seedLeaguesAndClubs(leagueDTOs, teamDTOs, namesDTO, countryDTOs);
+
+    // 4. Seed User Agent
+    await seedUserAgent();
+  }
+
+  Future<void> seedUserAgent() async {
+    final userAgent = await (database.select(database.agents)..where((tbl) => tbl.id.equals(1))).getSingleOrNull();
+    if (userAgent == null) {
+      await database.into(database.agents).insert(
+        AgentsCompanion(
+          id: const Value(1),
+          name: const Value("Player One"),
+          balance: const Value(0.0),
+          reputation: const Value(0),
+          negotiationSkill: const Value(10), // Base stats
+          scoutingSkill: const Value(10),
+          level: const Value(1),
+        ),
+      );
+    }
   }
 
   Future<dynamic> _loadJson(String path) async {

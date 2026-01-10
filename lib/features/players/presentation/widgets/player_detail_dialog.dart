@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../agents/providers/user_agent_provider.dart';
 import '../../domain/entities/player.dart';
 import '../../../clubs/domain/entities/club.dart';
 import '../../../clubs/providers/club_provider.dart';
@@ -82,14 +83,43 @@ class PlayerDetailDialog extends ConsumerWidget {
                   const SizedBox(width: 10),
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () {
-                        // Implement Offer Contract or Scout further
+                      onPressed: () async {
+                        final notifier = ref.read(userAgentProvider.notifier);
+                        
+                        // Check if already managed
+                        if (player.agentId == 1) {
+                           ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('You already manage this player!')),
+                          );
+                          return;
+                        }
+
+                        final error = await notifier.signPlayer(player.id);
+
+                        if (context.mounted) {
+                          if (error != null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(error), backgroundColor: Colors.red),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Offer Accepted! You are now the agent of ${player.name}.'),
+                                backgroundColor: Colors.green,
+                              ),
+                            );
+                            Navigator.of(context).pop(); // Close dialog on success
+                          }
+                        }
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.teal,
+                        backgroundColor: (player.agentId == 1) ? Colors.grey : Colors.teal,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       ),
-                      child: const Text('Offer Contract', style: TextStyle(color: Colors.white)),
+                      child: Text(
+                        (player.agentId == 1) ? 'Managed' : 'Offer Representation',
+                        style: const TextStyle(color: Colors.white),
+                      ),
                     ),
                   ),
                 ],
