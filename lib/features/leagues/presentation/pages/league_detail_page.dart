@@ -29,7 +29,7 @@ class _LeagueDetailPageState extends ConsumerState<LeagueDetailPage> {
     super.initState();
     // Initialize with current week, but handle if week 0 (not started?)
     final currentWeek = ref.read(gameDateProvider);
-    _selectedWeek = currentWeek > 0 ? currentWeek : 1; 
+    _selectedWeek = currentWeek > 1 ? currentWeek - 1 : (currentWeek > 0 ? currentWeek : 1); 
   }
 
   void _changeWeek(int delta) {
