@@ -2,6 +2,7 @@ import 'dart:ui'; // Blur efekti için gerekli
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../agents/providers/user_agent_provider.dart';
+import '../../../leagues/presentation/providers/fixture_provider.dart';
 import '../../../players/presentation/pages/players_page.dart';
 import '../../../scouting/presentation/pages/scouting_page.dart';
 import '../../../contracts/presentation/pages/contracts_page.dart';
@@ -319,9 +320,16 @@ class HomeContent extends ConsumerWidget {
       await simulationService.simulateWeek(1, currentWeek);
       await ref.read(gameDateProvider.notifier).advanceWeek();
 
+      // Invalidate Providers
       ref.invalidate(standingsProvider);
       ref.invalidate(tickerMatchesProvider);
-      // Diğer invalidate işlemleri...
+      ref.invalidate(topScorersProvider);
+      ref.invalidate(topAssistersProvider);
+      ref.invalidate(topRatedProvider);
+      ref.invalidate(fixtureProvider);
+      
+      // Refresh User Agent to update weekly offers limit if needed (though it uses SP directly)
+      ref.invalidate(userAgentProvider);
 
     } catch (e) {
       if (context.mounted) {
