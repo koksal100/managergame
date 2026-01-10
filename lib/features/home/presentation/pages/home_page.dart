@@ -103,35 +103,38 @@ class _HomePageState extends ConsumerState<HomePage> {
           ),
 
           // Orta Navigasyon İkonları
+          // Orta Navigasyon İkonları
           Expanded(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _NavBarItem(
-                  icon: Icons.home_rounded,
-                  label: "Home",
-                  isSelected: _currentIndex == 0,
-                  onTap: () => setState(() => _currentIndex = 0),
-                ),
-                _NavBarItem(
-                  icon: Icons.people_rounded,
-                  label: "Club",
-                  isSelected: _currentIndex == 1,
-                  onTap: () => setState(() => _currentIndex = 1),
-                ),
-                _NavBarItem(
-                  icon: Icons.travel_explore_rounded,
-                  label: "Scout",
-                  isSelected: _currentIndex == 2,
-                  onTap: () => setState(() => _currentIndex = 2),
-                ),
-                _NavBarItem(
-                  icon: Icons.description_rounded,
-                  label: "Office",
-                  isSelected: _currentIndex == 3,
-                  onTap: () => setState(() => _currentIndex = 3),
-                ),
-              ],
+            child: Container(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _NavBarItem(
+                    icon: Icons.home_rounded,
+                    label: "Home",
+                    isSelected: _currentIndex == 0,
+                    onTap: () => setState(() => _currentIndex = 0),
+                  ),
+                  _NavBarItem(
+                    icon: Icons.people_rounded,
+                    label: "Club",
+                    isSelected: _currentIndex == 1,
+                    onTap: () => setState(() => _currentIndex = 1),
+                  ),
+                  _NavBarItem(
+                    icon: Icons.travel_explore_rounded,
+                    label: "Scout",
+                    isSelected: _currentIndex == 2,
+                    onTap: () => setState(() => _currentIndex = 2),
+                  ),
+                  _NavBarItem(
+                    icon: Icons.description_rounded,
+                    label: "Office",
+                    isSelected: _currentIndex == 3,
+                    onTap: () => setState(() => _currentIndex = 3),
+                  ),
+                ],
+              ),
             ),
           ),
 

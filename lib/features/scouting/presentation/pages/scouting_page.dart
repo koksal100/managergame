@@ -99,7 +99,7 @@ class ScoutingPage extends ConsumerWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10),
                 child: Row(
                   children: [
-                    Expanded(child: _buildSortHeader(ref, 'Name', PlayerSortType.name)),
+                    _buildSortHeader(ref, 'Name', PlayerSortType.name),
                     const SizedBox(width: 8),
                     _buildSortHeader(ref, 'Age', PlayerSortType.age, flex: 0, width: 40),
                     const SizedBox(width: 8),
