@@ -9,6 +9,7 @@ import '../../../../core/providers/seeder_provider.dart';
 import '../../../../core/providers/game_date_provider.dart';
 import '../../../simulation/presentation/providers/simulation_provider.dart';
 import '../../../leagues/presentation/providers/standings_provider.dart';
+import '../../../../core/presentation/widgets/glass_container.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -50,7 +51,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                   // Ticker Widget'ı Navigasyonun hemen üstüne, şeffaf şerit olarak koyuyoruz
                   const Padding(
                     padding: EdgeInsets.only(bottom: 10.0),
-                    child: _GlassContainer(
+                    child: GlassContainer(
                       height: 30,
                       child: _TickerWidget(),
                     ),
@@ -75,7 +76,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   Widget _buildFloatingNavBar(BuildContext context) {
-    return _GlassContainer(
+    return GlassContainer(
       height: 75,
       padding: const EdgeInsets.symmetric(horizontal: 15),
       child: Row(
@@ -277,7 +278,7 @@ class HomeContent extends ConsumerWidget {
                         child: const Row(
                           children: [
                             Text(
-                              "NEXT MATCH",
+                              "NEXT WEEK",
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 12,
@@ -286,6 +287,7 @@ class HomeContent extends ConsumerWidget {
                               ),
                             ),
                             SizedBox(width: 8),
+                            Icon(Icons.arrow_forward_ios_rounded, color: Colors.white, size: 14),
                             Icon(Icons.arrow_forward_ios_rounded, color: Colors.white, size: 14),
                           ],
                         ),
@@ -332,37 +334,7 @@ class HomeContent extends ConsumerWidget {
 
 // --- YARDIMCI WIDGETLAR (Stil için) ---
 
-// Buzlu Cam (Glassmorphism) Konteyner
-class _GlassContainer extends StatelessWidget {
-  final Widget child;
-  final double? height;
-  final EdgeInsetsGeometry? padding;
-
-  const _GlassContainer({required this.child, this.height, this.padding});
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(24),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15), // Blur miktarı
-        child: Container(
-          height: height,
-          padding: padding,
-          decoration: BoxDecoration(
-            color: const Color(0xFF1E1E1E).withOpacity(0.65), // Yarı saydam koyu gri
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.08), // Çok ince beyaz kenarlık
-              width: 1,
-            ),
-          ),
-          child: child,
-        ),
-      ),
-    );
-  }
-}
+// Navigasyon Elemanı
 
 // Navigasyon Elemanı
 class _NavBarItem extends StatelessWidget {
@@ -496,7 +468,7 @@ class _TickerWidgetState extends ConsumerState<_TickerWidget> with SingleTickerP
                       child: Text(
                         _text,
                         style: const TextStyle(
-                          color: Colors.white70,
+                          color: Colors.white,
                           fontFamily: 'Courier',
                           fontWeight: FontWeight.w600,
                           fontSize: 12,
