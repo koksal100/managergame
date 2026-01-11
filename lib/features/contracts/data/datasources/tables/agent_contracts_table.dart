@@ -14,12 +14,15 @@ import 'package:drift/drift.dart';
 import '../../../../players/data/datasources/tables/players_table.dart';
 import '../../../../agents/data/datasources/tables/agents_table.dart';
 
-class Contracts extends Table {
+class AgentContracts extends Table {
+  String get tableName => 'agent_contracts';
+
   IntColumn get id => integer().autoIncrement()();
+  IntColumn get agentId => integer().references(Agents, #id)();
   IntColumn get playerId => integer().references(Players, #id)();
-  IntColumn get agentId => integer().nullable().references(Agents, #id)();
   DateTimeColumn get startDate => dateTime()();
   DateTimeColumn get endDate => dateTime()();
+  RealColumn get feePercentage => real().withDefault(const Constant(10.0))(); // Typical agent fee
   RealColumn get wage => real()();
   RealColumn get releaseClause => real()();
   TextColumn get status => text()(); // Active, Pending vs.

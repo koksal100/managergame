@@ -336,6 +336,47 @@ class GameSeeder {
           value: Value(marketValue.toDouble()),
         ),
       );
+
+      // --- CONTRACT GENERATION ---
+      
+      // 1. Club Contract
+      // Salary estimation: ~10-20% of Market Value per year, divided by 52 weeks? 
+      // Simplified: Market Value / 200 (Roughly)
+      int weeklySalary = (marketValue / 200).round();
+      if (weeklySalary < 500) weeklySalary = 500; // Minimum wage
+      
+      // Duration: 1 to 5 years from now
+      final now = DateTime.now();
+      final contractYears = 1 + _random.nextInt(5);
+      final endDate = now.add(Duration(days: 365 * contractYears));
+
+      await database.into(database.clubContracts).insert(
+        ClubContractsCompanion(
+          clubId: Value(clubId),
+          playerId: Value(playerId),
+          weeklySalary: Value(weeklySalary),
+          startDate: Value(now),
+          endDate: Value(endDate),
+          status: const Value('active'),
+          releaseClause: Value((marketValue * 1.5).round()), // Optional
+        ),
+      );
+
+      // 2. Agent Contract (If assigned)
+      if (assignedAgentId != null) {
+        await database.into(database.agentContracts).insert(
+          AgentContractsCompanion(
+             agentId: Value(assignedAgentId),
+             playerId: Value(playerId),
+             startDate: Value(now),
+             endDate: Value(now.add(const Duration(days: 365 * 2))), // Agents usually 2 years
+             feePercentage: const Value(10.0), // Standard 10%
+             wage: const Value(0.0), // Unused legacy field or remove? Keeping for now to avoid compilation error if user hasn't cleaned table
+             releaseClause: const Value(0.0), // Legacy
+             status: const Value('Active'),
+          ),
+        );
+      }
     }
   }
 

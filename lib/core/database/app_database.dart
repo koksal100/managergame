@@ -8,7 +8,8 @@ import '../../features/players/data/datasources/tables/players_table.dart';
 import '../../features/clubs/data/datasources/tables/clubs_table.dart';
 import '../../features/agents/data/datasources/tables/agents_table.dart';
 import '../../features/leagues/data/datasources/tables/leagues_table.dart';
-import '../../features/contracts/data/datasources/tables/contracts_table.dart';
+import '../../features/contracts/data/datasources/tables/agent_contracts_table.dart';
+import '../../features/contracts/data/datasources/tables/club_contracts_table.dart';
 import '../../features/transfers/data/datasources/tables/transfers_table.dart';
 import '../../features/players/data/datasources/tables/value_histories_table.dart';
 import '../../features/relationships/data/datasources/tables/relationships_table.dart';
@@ -25,7 +26,8 @@ part 'app_database.g.dart';
   Clubs,
   Agents,
   Leagues,
-  Contracts,
+  AgentContracts,
+  ClubContracts,
   Transfers,
   ValueHistories,
   Relationships,

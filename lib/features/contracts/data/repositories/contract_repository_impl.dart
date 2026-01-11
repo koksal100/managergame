@@ -1,9 +1,8 @@
 import 'package:dartz/dartz.dart';
-import 'package:drift/drift.dart';
-import '../../../../core/database/app_database.dart' hide Contract;
 import '../../../../core/error/failures.dart';
+import '../../../../core/database/app_database.dart';
+import '../../domain/entities/new_contracts.dart';
 import '../../domain/repositories/contract_repository.dart';
-import '../../domain/entities/contract.dart';
 
 
 class ContractRepositoryImpl implements ContractRepository {
@@ -12,41 +11,49 @@ class ContractRepositoryImpl implements ContractRepository {
   ContractRepositoryImpl(this.database);
 
   @override
-  Future<Either<Failure, List<Contract>>> getContracts() async {
+  Future<Either<Failure, AgentContractEntity?>> getAgentContract(int playerId) async {
     try {
-      final rows = await database.select(database.contracts).get();
-      final list = rows.map((row) => Contract(
-        id: row.id,
-        playerId: row.playerId,
-        agentId: row.agentId,
-        startDate: row.startDate,
-        endDate: row.endDate,
-        wage: row.wage,
-        releaseClause: row.releaseClause,
-        status: row.status,
-      )).toList();
-      return Right(list);
+      final query = database.select(database.agentContracts)..where((t) => t.playerId.equals(playerId));
+      final result = await query.getSingleOrNull();
+      
+      if (result == null) return const Right(null);
+
+      // Mapping Logic (Row -> Entity)
+      return Right(AgentContractEntity(
+        id: result.id,
+        agentId: result.agentId,
+        playerId: result.playerId,
+        feePercentage: result.feePercentage,
+        startDate: result.startDate,
+        endDate: result.endDate,
+        status: result.status,
+      ));
     } catch (e) {
-      return Left(CacheFailure(e.toString()));
+      return Left(DatabaseFailure(e.toString()));
     }
   }
 
   @override
-  Future<Either<Failure, int>> createContract(Contract contract) async {
+  Future<Either<Failure, ClubContractEntity?>> getClubContract(int playerId) async {
     try {
-      final companion = ContractsCompanion(
-        playerId: Value(contract.playerId),
-        agentId: Value(contract.agentId),
-        startDate: Value(contract.startDate),
-        endDate: Value(contract.endDate),
-        wage: Value(contract.wage),
-        releaseClause: Value(contract.releaseClause),
-        status: Value(contract.status),
-      );
-      final id = await database.into(database.contracts).insert(companion);
-      return Right(id);
+      final query = database.select(database.clubContracts)..where((t) => t.playerId.equals(playerId));
+      final result = await query.getSingleOrNull();
+      
+      if (result == null) return const Right(null);
+
+      // Mapping Logic
+      return Right(ClubContractEntity(
+        id: result.id,
+        clubId: result.clubId,
+        playerId: result.playerId,
+        weeklySalary: result.weeklySalary,
+        startDate: result.startDate,
+        endDate: result.endDate,
+        status: result.status,
+        releaseClause: result.releaseClause,
+      ));
     } catch (e) {
-      return Left(CacheFailure(e.toString()));
+      return Left(DatabaseFailure(e.toString()));
     }
   }
 }

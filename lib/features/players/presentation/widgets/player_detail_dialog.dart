@@ -4,6 +4,7 @@ import '../../../agents/providers/user_agent_provider.dart';
 import '../../domain/entities/player.dart';
 import '../../../clubs/domain/entities/club.dart';
 import '../../../clubs/providers/club_provider.dart';
+import '../../../contracts/providers/contract_provider.dart';
 import 'negotiation_game_dialog.dart';
 
 class PlayerDetailDialog extends ConsumerWidget {
@@ -61,6 +62,7 @@ class PlayerDetailDialog extends ConsumerWidget {
                     
                     // Club Name Fetcher
                     _buildClubRow(ref),
+                    _buildAgentRow(ref),
                   ],
                 ),
               ),
@@ -208,24 +210,94 @@ class PlayerDetailDialog extends ConsumerWidget {
       return _buildStatRow('Club', 'Free Agent');
     }
 
-    return FutureBuilder(
-      future: ref.read(clubRepositoryProvider).getClubById(player.clubId!),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-           return _buildStatRow('Club', 'Loading...');
+    final clubFuture = ref.watch(clubRepositoryProvider).getClubById(player.clubId!);
+    final contractFuture = ref.watch(playerClubContractProvider(player.id));
+
+    return GestureDetector(
+      onTap: () async {
+        final contract = contractFuture.value;
+        if (contract != null) {
+           _showContractDetails(ref.context, "Club Contract", [
+             MapEntry("Weekly Salary", _formatCurrency(contract.weeklySalary)),
+             MapEntry("Start Date", _formatDate(contract.startDate)),
+             MapEntry("End Date", _formatDate(contract.endDate)),
+             MapEntry("Status", contract.status),
+             if (contract.releaseClause != null) MapEntry("Release Clause", _formatCurrency(contract.releaseClause!)),
+           ]);
         }
-        if (snapshot.hasError) {
-           return _buildStatRow('Club', 'Unknown');
-        }
-        
-        final result = snapshot.data;
-        return result!.fold(
-          (failure) => _buildStatRow('Club', 'Unknown'),
-          (club) => _buildStatRow('Club', club.name),
-        );
       },
+      child: FutureBuilder(
+        future: clubFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) return _buildStatRow('Club', 'Loading...');
+          
+          final result = snapshot.data;
+          String name = result?.fold((l) => 'Unknown', (r) => r.name) ?? 'Unknown';
+          
+          // Show "Active" tag if contract exists
+          return _buildStatRow('Club', name, trailing: const Icon(Icons.info_outline, color: Colors.white24, size: 16));
+        },
+      ),
     );
   }
+
+  Widget _buildAgentRow(WidgetRef ref) {
+    if (player.agentId == null) {
+      return _buildStatRow('Agent', 'None');
+    }
+
+    final contractFuture = ref.watch(playerAgentContractProvider(player.id));
+    
+    // We already have Agent Name in the database or need to fetch it? 
+    // Agent name is NOT in Player entity, only ID.
+    // Need to fetch Agent.
+    
+    // Simpler: Just show "View Agent" or fetch Agent name. 
+    // Assuming we can fetch agent name easily.
+    // For now, let's just use the ID or generic "Agent".
+    
+    return GestureDetector(
+      onTap: () async {
+         final contract = contractFuture.value;
+         if (contract != null) {
+            _showContractDetails(ref.context, "Agent Contract", [
+               MapEntry("Fee Percentage", "${contract.feePercentage}%"),
+               MapEntry("Start Date", _formatDate(contract.startDate)),
+               MapEntry("End Date", _formatDate(contract.endDate)),
+            ]);
+         }
+      },
+      child: _buildStatRow('Agent', 'View Agent', trailing: const Icon(Icons.info_outline, color: Colors.white24, size: 16)),
+    );
+  }
+
+  void _showContractDetails(BuildContext context, String title, List<MapEntry<String, String>> details) {
+    showDialog(context: context, builder: (c) => AlertDialog(
+      backgroundColor: const Color(0xFF1E1E1E),
+      title: Text(title, style: const TextStyle(color: Colors.white)),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: details.map((e) => Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(e.key, style: const TextStyle(color: Colors.white70)),
+              Text(e.value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            ],
+          ),
+        )).toList(),
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(c), child: const Text("Close"))
+      ],
+    ));
+  }
+
+  String _formatDate(DateTime date) {
+    return "${date.day}/${date.month}/${date.year}";
+  }
+
 
   Widget _buildHeader(WidgetRef ref) {
     // We can also fetch Club name for subtitle here if we want
@@ -275,14 +347,22 @@ class PlayerDetailDialog extends ConsumerWidget {
     );
   }
 
-  Widget _buildStatRow(String label, String value) {
+  Widget _buildStatRow(String label, String value, {Widget? trailing}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label, style: TextStyle(color: Colors.white.withOpacity(0.6))),
-          Text(value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          Row(
+            children: [
+              Text(value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              if (trailing != null) ...[
+                 const SizedBox(width: 8),
+                 trailing,
+              ]
+            ],
+          ),
         ],
       ),
     );

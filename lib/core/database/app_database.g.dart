@@ -1169,513 +1169,6 @@ class AgentsCompanion extends UpdateCompanion<Agent> {
   }
 }
 
-class $ContractsTable extends Contracts
-    with TableInfo<$ContractsTable, Contract> {
-  @override
-  final GeneratedDatabase attachedDatabase;
-  final String? _alias;
-  $ContractsTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _idMeta = const VerificationMeta('id');
-  @override
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
-    'id',
-    aliasedName,
-    false,
-    hasAutoIncrement: true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'PRIMARY KEY AUTOINCREMENT',
-    ),
-  );
-  static const VerificationMeta _playerIdMeta = const VerificationMeta(
-    'playerId',
-  );
-  @override
-  late final GeneratedColumn<int> playerId = GeneratedColumn<int>(
-    'player_id',
-    aliasedName,
-    false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _agentIdMeta = const VerificationMeta(
-    'agentId',
-  );
-  @override
-  late final GeneratedColumn<int> agentId = GeneratedColumn<int>(
-    'agent_id',
-    aliasedName,
-    true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES agents (id)',
-    ),
-  );
-  static const VerificationMeta _startDateMeta = const VerificationMeta(
-    'startDate',
-  );
-  @override
-  late final GeneratedColumn<DateTime> startDate = GeneratedColumn<DateTime>(
-    'start_date',
-    aliasedName,
-    false,
-    type: DriftSqlType.dateTime,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _endDateMeta = const VerificationMeta(
-    'endDate',
-  );
-  @override
-  late final GeneratedColumn<DateTime> endDate = GeneratedColumn<DateTime>(
-    'end_date',
-    aliasedName,
-    false,
-    type: DriftSqlType.dateTime,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _wageMeta = const VerificationMeta('wage');
-  @override
-  late final GeneratedColumn<double> wage = GeneratedColumn<double>(
-    'wage',
-    aliasedName,
-    false,
-    type: DriftSqlType.double,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _releaseClauseMeta = const VerificationMeta(
-    'releaseClause',
-  );
-  @override
-  late final GeneratedColumn<double> releaseClause = GeneratedColumn<double>(
-    'release_clause',
-    aliasedName,
-    false,
-    type: DriftSqlType.double,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _statusMeta = const VerificationMeta('status');
-  @override
-  late final GeneratedColumn<String> status = GeneratedColumn<String>(
-    'status',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  @override
-  List<GeneratedColumn> get $columns => [
-    id,
-    playerId,
-    agentId,
-    startDate,
-    endDate,
-    wage,
-    releaseClause,
-    status,
-  ];
-  @override
-  String get aliasedName => _alias ?? actualTableName;
-  @override
-  String get actualTableName => $name;
-  static const String $name = 'contracts';
-  @override
-  VerificationContext validateIntegrity(
-    Insertable<Contract> instance, {
-    bool isInserting = false,
-  }) {
-    final context = VerificationContext();
-    final data = instance.toColumns(true);
-    if (data.containsKey('id')) {
-      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    }
-    if (data.containsKey('player_id')) {
-      context.handle(
-        _playerIdMeta,
-        playerId.isAcceptableOrUnknown(data['player_id']!, _playerIdMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_playerIdMeta);
-    }
-    if (data.containsKey('agent_id')) {
-      context.handle(
-        _agentIdMeta,
-        agentId.isAcceptableOrUnknown(data['agent_id']!, _agentIdMeta),
-      );
-    }
-    if (data.containsKey('start_date')) {
-      context.handle(
-        _startDateMeta,
-        startDate.isAcceptableOrUnknown(data['start_date']!, _startDateMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_startDateMeta);
-    }
-    if (data.containsKey('end_date')) {
-      context.handle(
-        _endDateMeta,
-        endDate.isAcceptableOrUnknown(data['end_date']!, _endDateMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_endDateMeta);
-    }
-    if (data.containsKey('wage')) {
-      context.handle(
-        _wageMeta,
-        wage.isAcceptableOrUnknown(data['wage']!, _wageMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_wageMeta);
-    }
-    if (data.containsKey('release_clause')) {
-      context.handle(
-        _releaseClauseMeta,
-        releaseClause.isAcceptableOrUnknown(
-          data['release_clause']!,
-          _releaseClauseMeta,
-        ),
-      );
-    } else if (isInserting) {
-      context.missing(_releaseClauseMeta);
-    }
-    if (data.containsKey('status')) {
-      context.handle(
-        _statusMeta,
-        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_statusMeta);
-    }
-    return context;
-  }
-
-  @override
-  Set<GeneratedColumn> get $primaryKey => {id};
-  @override
-  Contract map(Map<String, dynamic> data, {String? tablePrefix}) {
-    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return Contract(
-      id: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}id'],
-      )!,
-      playerId: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}player_id'],
-      )!,
-      agentId: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}agent_id'],
-      ),
-      startDate: attachedDatabase.typeMapping.read(
-        DriftSqlType.dateTime,
-        data['${effectivePrefix}start_date'],
-      )!,
-      endDate: attachedDatabase.typeMapping.read(
-        DriftSqlType.dateTime,
-        data['${effectivePrefix}end_date'],
-      )!,
-      wage: attachedDatabase.typeMapping.read(
-        DriftSqlType.double,
-        data['${effectivePrefix}wage'],
-      )!,
-      releaseClause: attachedDatabase.typeMapping.read(
-        DriftSqlType.double,
-        data['${effectivePrefix}release_clause'],
-      )!,
-      status: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}status'],
-      )!,
-    );
-  }
-
-  @override
-  $ContractsTable createAlias(String alias) {
-    return $ContractsTable(attachedDatabase, alias);
-  }
-}
-
-class Contract extends DataClass implements Insertable<Contract> {
-  final int id;
-  final int playerId;
-  final int? agentId;
-  final DateTime startDate;
-  final DateTime endDate;
-  final double wage;
-  final double releaseClause;
-  final String status;
-  const Contract({
-    required this.id,
-    required this.playerId,
-    this.agentId,
-    required this.startDate,
-    required this.endDate,
-    required this.wage,
-    required this.releaseClause,
-    required this.status,
-  });
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
-    map['player_id'] = Variable<int>(playerId);
-    if (!nullToAbsent || agentId != null) {
-      map['agent_id'] = Variable<int>(agentId);
-    }
-    map['start_date'] = Variable<DateTime>(startDate);
-    map['end_date'] = Variable<DateTime>(endDate);
-    map['wage'] = Variable<double>(wage);
-    map['release_clause'] = Variable<double>(releaseClause);
-    map['status'] = Variable<String>(status);
-    return map;
-  }
-
-  ContractsCompanion toCompanion(bool nullToAbsent) {
-    return ContractsCompanion(
-      id: Value(id),
-      playerId: Value(playerId),
-      agentId: agentId == null && nullToAbsent
-          ? const Value.absent()
-          : Value(agentId),
-      startDate: Value(startDate),
-      endDate: Value(endDate),
-      wage: Value(wage),
-      releaseClause: Value(releaseClause),
-      status: Value(status),
-    );
-  }
-
-  factory Contract.fromJson(
-    Map<String, dynamic> json, {
-    ValueSerializer? serializer,
-  }) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return Contract(
-      id: serializer.fromJson<int>(json['id']),
-      playerId: serializer.fromJson<int>(json['playerId']),
-      agentId: serializer.fromJson<int?>(json['agentId']),
-      startDate: serializer.fromJson<DateTime>(json['startDate']),
-      endDate: serializer.fromJson<DateTime>(json['endDate']),
-      wage: serializer.fromJson<double>(json['wage']),
-      releaseClause: serializer.fromJson<double>(json['releaseClause']),
-      status: serializer.fromJson<String>(json['status']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
-      'playerId': serializer.toJson<int>(playerId),
-      'agentId': serializer.toJson<int?>(agentId),
-      'startDate': serializer.toJson<DateTime>(startDate),
-      'endDate': serializer.toJson<DateTime>(endDate),
-      'wage': serializer.toJson<double>(wage),
-      'releaseClause': serializer.toJson<double>(releaseClause),
-      'status': serializer.toJson<String>(status),
-    };
-  }
-
-  Contract copyWith({
-    int? id,
-    int? playerId,
-    Value<int?> agentId = const Value.absent(),
-    DateTime? startDate,
-    DateTime? endDate,
-    double? wage,
-    double? releaseClause,
-    String? status,
-  }) => Contract(
-    id: id ?? this.id,
-    playerId: playerId ?? this.playerId,
-    agentId: agentId.present ? agentId.value : this.agentId,
-    startDate: startDate ?? this.startDate,
-    endDate: endDate ?? this.endDate,
-    wage: wage ?? this.wage,
-    releaseClause: releaseClause ?? this.releaseClause,
-    status: status ?? this.status,
-  );
-  Contract copyWithCompanion(ContractsCompanion data) {
-    return Contract(
-      id: data.id.present ? data.id.value : this.id,
-      playerId: data.playerId.present ? data.playerId.value : this.playerId,
-      agentId: data.agentId.present ? data.agentId.value : this.agentId,
-      startDate: data.startDate.present ? data.startDate.value : this.startDate,
-      endDate: data.endDate.present ? data.endDate.value : this.endDate,
-      wage: data.wage.present ? data.wage.value : this.wage,
-      releaseClause: data.releaseClause.present
-          ? data.releaseClause.value
-          : this.releaseClause,
-      status: data.status.present ? data.status.value : this.status,
-    );
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('Contract(')
-          ..write('id: $id, ')
-          ..write('playerId: $playerId, ')
-          ..write('agentId: $agentId, ')
-          ..write('startDate: $startDate, ')
-          ..write('endDate: $endDate, ')
-          ..write('wage: $wage, ')
-          ..write('releaseClause: $releaseClause, ')
-          ..write('status: $status')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode => Object.hash(
-    id,
-    playerId,
-    agentId,
-    startDate,
-    endDate,
-    wage,
-    releaseClause,
-    status,
-  );
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is Contract &&
-          other.id == this.id &&
-          other.playerId == this.playerId &&
-          other.agentId == this.agentId &&
-          other.startDate == this.startDate &&
-          other.endDate == this.endDate &&
-          other.wage == this.wage &&
-          other.releaseClause == this.releaseClause &&
-          other.status == this.status);
-}
-
-class ContractsCompanion extends UpdateCompanion<Contract> {
-  final Value<int> id;
-  final Value<int> playerId;
-  final Value<int?> agentId;
-  final Value<DateTime> startDate;
-  final Value<DateTime> endDate;
-  final Value<double> wage;
-  final Value<double> releaseClause;
-  final Value<String> status;
-  const ContractsCompanion({
-    this.id = const Value.absent(),
-    this.playerId = const Value.absent(),
-    this.agentId = const Value.absent(),
-    this.startDate = const Value.absent(),
-    this.endDate = const Value.absent(),
-    this.wage = const Value.absent(),
-    this.releaseClause = const Value.absent(),
-    this.status = const Value.absent(),
-  });
-  ContractsCompanion.insert({
-    this.id = const Value.absent(),
-    required int playerId,
-    this.agentId = const Value.absent(),
-    required DateTime startDate,
-    required DateTime endDate,
-    required double wage,
-    required double releaseClause,
-    required String status,
-  }) : playerId = Value(playerId),
-       startDate = Value(startDate),
-       endDate = Value(endDate),
-       wage = Value(wage),
-       releaseClause = Value(releaseClause),
-       status = Value(status);
-  static Insertable<Contract> custom({
-    Expression<int>? id,
-    Expression<int>? playerId,
-    Expression<int>? agentId,
-    Expression<DateTime>? startDate,
-    Expression<DateTime>? endDate,
-    Expression<double>? wage,
-    Expression<double>? releaseClause,
-    Expression<String>? status,
-  }) {
-    return RawValuesInsertable({
-      if (id != null) 'id': id,
-      if (playerId != null) 'player_id': playerId,
-      if (agentId != null) 'agent_id': agentId,
-      if (startDate != null) 'start_date': startDate,
-      if (endDate != null) 'end_date': endDate,
-      if (wage != null) 'wage': wage,
-      if (releaseClause != null) 'release_clause': releaseClause,
-      if (status != null) 'status': status,
-    });
-  }
-
-  ContractsCompanion copyWith({
-    Value<int>? id,
-    Value<int>? playerId,
-    Value<int?>? agentId,
-    Value<DateTime>? startDate,
-    Value<DateTime>? endDate,
-    Value<double>? wage,
-    Value<double>? releaseClause,
-    Value<String>? status,
-  }) {
-    return ContractsCompanion(
-      id: id ?? this.id,
-      playerId: playerId ?? this.playerId,
-      agentId: agentId ?? this.agentId,
-      startDate: startDate ?? this.startDate,
-      endDate: endDate ?? this.endDate,
-      wage: wage ?? this.wage,
-      releaseClause: releaseClause ?? this.releaseClause,
-      status: status ?? this.status,
-    );
-  }
-
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    if (id.present) {
-      map['id'] = Variable<int>(id.value);
-    }
-    if (playerId.present) {
-      map['player_id'] = Variable<int>(playerId.value);
-    }
-    if (agentId.present) {
-      map['agent_id'] = Variable<int>(agentId.value);
-    }
-    if (startDate.present) {
-      map['start_date'] = Variable<DateTime>(startDate.value);
-    }
-    if (endDate.present) {
-      map['end_date'] = Variable<DateTime>(endDate.value);
-    }
-    if (wage.present) {
-      map['wage'] = Variable<double>(wage.value);
-    }
-    if (releaseClause.present) {
-      map['release_clause'] = Variable<double>(releaseClause.value);
-    }
-    if (status.present) {
-      map['status'] = Variable<String>(status.value);
-    }
-    return map;
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('ContractsCompanion(')
-          ..write('id: $id, ')
-          ..write('playerId: $playerId, ')
-          ..write('agentId: $agentId, ')
-          ..write('startDate: $startDate, ')
-          ..write('endDate: $endDate, ')
-          ..write('wage: $wage, ')
-          ..write('releaseClause: $releaseClause, ')
-          ..write('status: $status')
-          ..write(')'))
-        .toString();
-  }
-}
-
 class $PlayersTable extends Players with TableInfo<$PlayersTable, Player> {
   @override
   final GeneratedDatabase attachedDatabase;
@@ -1799,9 +1292,6 @@ class $PlayersTable extends Players with TableInfo<$PlayersTable, Player> {
     true,
     type: DriftSqlType.int,
     requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES contracts (id)',
-    ),
   );
   @override
   List<GeneratedColumn> get $columns => [
@@ -2326,6 +1816,1081 @@ class PlayersCompanion extends UpdateCompanion<Player> {
           ..write('reputation: $reputation, ')
           ..write('marketValue: $marketValue, ')
           ..write('currentContractId: $currentContractId')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $AgentContractsTable extends AgentContracts
+    with TableInfo<$AgentContractsTable, AgentContract> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AgentContractsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _agentIdMeta = const VerificationMeta(
+    'agentId',
+  );
+  @override
+  late final GeneratedColumn<int> agentId = GeneratedColumn<int>(
+    'agent_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES agents (id)',
+    ),
+  );
+  static const VerificationMeta _playerIdMeta = const VerificationMeta(
+    'playerId',
+  );
+  @override
+  late final GeneratedColumn<int> playerId = GeneratedColumn<int>(
+    'player_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES players (id)',
+    ),
+  );
+  static const VerificationMeta _startDateMeta = const VerificationMeta(
+    'startDate',
+  );
+  @override
+  late final GeneratedColumn<DateTime> startDate = GeneratedColumn<DateTime>(
+    'start_date',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _endDateMeta = const VerificationMeta(
+    'endDate',
+  );
+  @override
+  late final GeneratedColumn<DateTime> endDate = GeneratedColumn<DateTime>(
+    'end_date',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _feePercentageMeta = const VerificationMeta(
+    'feePercentage',
+  );
+  @override
+  late final GeneratedColumn<double> feePercentage = GeneratedColumn<double>(
+    'fee_percentage',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(10.0),
+  );
+  static const VerificationMeta _wageMeta = const VerificationMeta('wage');
+  @override
+  late final GeneratedColumn<double> wage = GeneratedColumn<double>(
+    'wage',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _releaseClauseMeta = const VerificationMeta(
+    'releaseClause',
+  );
+  @override
+  late final GeneratedColumn<double> releaseClause = GeneratedColumn<double>(
+    'release_clause',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    agentId,
+    playerId,
+    startDate,
+    endDate,
+    feePercentage,
+    wage,
+    releaseClause,
+    status,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'agent_contracts';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AgentContract> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('agent_id')) {
+      context.handle(
+        _agentIdMeta,
+        agentId.isAcceptableOrUnknown(data['agent_id']!, _agentIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_agentIdMeta);
+    }
+    if (data.containsKey('player_id')) {
+      context.handle(
+        _playerIdMeta,
+        playerId.isAcceptableOrUnknown(data['player_id']!, _playerIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_playerIdMeta);
+    }
+    if (data.containsKey('start_date')) {
+      context.handle(
+        _startDateMeta,
+        startDate.isAcceptableOrUnknown(data['start_date']!, _startDateMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_startDateMeta);
+    }
+    if (data.containsKey('end_date')) {
+      context.handle(
+        _endDateMeta,
+        endDate.isAcceptableOrUnknown(data['end_date']!, _endDateMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_endDateMeta);
+    }
+    if (data.containsKey('fee_percentage')) {
+      context.handle(
+        _feePercentageMeta,
+        feePercentage.isAcceptableOrUnknown(
+          data['fee_percentage']!,
+          _feePercentageMeta,
+        ),
+      );
+    }
+    if (data.containsKey('wage')) {
+      context.handle(
+        _wageMeta,
+        wage.isAcceptableOrUnknown(data['wage']!, _wageMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_wageMeta);
+    }
+    if (data.containsKey('release_clause')) {
+      context.handle(
+        _releaseClauseMeta,
+        releaseClause.isAcceptableOrUnknown(
+          data['release_clause']!,
+          _releaseClauseMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_releaseClauseMeta);
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_statusMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  AgentContract map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AgentContract(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      agentId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}agent_id'],
+      )!,
+      playerId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}player_id'],
+      )!,
+      startDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}start_date'],
+      )!,
+      endDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}end_date'],
+      )!,
+      feePercentage: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}fee_percentage'],
+      )!,
+      wage: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}wage'],
+      )!,
+      releaseClause: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}release_clause'],
+      )!,
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
+    );
+  }
+
+  @override
+  $AgentContractsTable createAlias(String alias) {
+    return $AgentContractsTable(attachedDatabase, alias);
+  }
+}
+
+class AgentContract extends DataClass implements Insertable<AgentContract> {
+  final int id;
+  final int agentId;
+  final int playerId;
+  final DateTime startDate;
+  final DateTime endDate;
+  final double feePercentage;
+  final double wage;
+  final double releaseClause;
+  final String status;
+  const AgentContract({
+    required this.id,
+    required this.agentId,
+    required this.playerId,
+    required this.startDate,
+    required this.endDate,
+    required this.feePercentage,
+    required this.wage,
+    required this.releaseClause,
+    required this.status,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['agent_id'] = Variable<int>(agentId);
+    map['player_id'] = Variable<int>(playerId);
+    map['start_date'] = Variable<DateTime>(startDate);
+    map['end_date'] = Variable<DateTime>(endDate);
+    map['fee_percentage'] = Variable<double>(feePercentage);
+    map['wage'] = Variable<double>(wage);
+    map['release_clause'] = Variable<double>(releaseClause);
+    map['status'] = Variable<String>(status);
+    return map;
+  }
+
+  AgentContractsCompanion toCompanion(bool nullToAbsent) {
+    return AgentContractsCompanion(
+      id: Value(id),
+      agentId: Value(agentId),
+      playerId: Value(playerId),
+      startDate: Value(startDate),
+      endDate: Value(endDate),
+      feePercentage: Value(feePercentage),
+      wage: Value(wage),
+      releaseClause: Value(releaseClause),
+      status: Value(status),
+    );
+  }
+
+  factory AgentContract.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AgentContract(
+      id: serializer.fromJson<int>(json['id']),
+      agentId: serializer.fromJson<int>(json['agentId']),
+      playerId: serializer.fromJson<int>(json['playerId']),
+      startDate: serializer.fromJson<DateTime>(json['startDate']),
+      endDate: serializer.fromJson<DateTime>(json['endDate']),
+      feePercentage: serializer.fromJson<double>(json['feePercentage']),
+      wage: serializer.fromJson<double>(json['wage']),
+      releaseClause: serializer.fromJson<double>(json['releaseClause']),
+      status: serializer.fromJson<String>(json['status']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'agentId': serializer.toJson<int>(agentId),
+      'playerId': serializer.toJson<int>(playerId),
+      'startDate': serializer.toJson<DateTime>(startDate),
+      'endDate': serializer.toJson<DateTime>(endDate),
+      'feePercentage': serializer.toJson<double>(feePercentage),
+      'wage': serializer.toJson<double>(wage),
+      'releaseClause': serializer.toJson<double>(releaseClause),
+      'status': serializer.toJson<String>(status),
+    };
+  }
+
+  AgentContract copyWith({
+    int? id,
+    int? agentId,
+    int? playerId,
+    DateTime? startDate,
+    DateTime? endDate,
+    double? feePercentage,
+    double? wage,
+    double? releaseClause,
+    String? status,
+  }) => AgentContract(
+    id: id ?? this.id,
+    agentId: agentId ?? this.agentId,
+    playerId: playerId ?? this.playerId,
+    startDate: startDate ?? this.startDate,
+    endDate: endDate ?? this.endDate,
+    feePercentage: feePercentage ?? this.feePercentage,
+    wage: wage ?? this.wage,
+    releaseClause: releaseClause ?? this.releaseClause,
+    status: status ?? this.status,
+  );
+  AgentContract copyWithCompanion(AgentContractsCompanion data) {
+    return AgentContract(
+      id: data.id.present ? data.id.value : this.id,
+      agentId: data.agentId.present ? data.agentId.value : this.agentId,
+      playerId: data.playerId.present ? data.playerId.value : this.playerId,
+      startDate: data.startDate.present ? data.startDate.value : this.startDate,
+      endDate: data.endDate.present ? data.endDate.value : this.endDate,
+      feePercentage: data.feePercentage.present
+          ? data.feePercentage.value
+          : this.feePercentage,
+      wage: data.wage.present ? data.wage.value : this.wage,
+      releaseClause: data.releaseClause.present
+          ? data.releaseClause.value
+          : this.releaseClause,
+      status: data.status.present ? data.status.value : this.status,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AgentContract(')
+          ..write('id: $id, ')
+          ..write('agentId: $agentId, ')
+          ..write('playerId: $playerId, ')
+          ..write('startDate: $startDate, ')
+          ..write('endDate: $endDate, ')
+          ..write('feePercentage: $feePercentage, ')
+          ..write('wage: $wage, ')
+          ..write('releaseClause: $releaseClause, ')
+          ..write('status: $status')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    agentId,
+    playerId,
+    startDate,
+    endDate,
+    feePercentage,
+    wage,
+    releaseClause,
+    status,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AgentContract &&
+          other.id == this.id &&
+          other.agentId == this.agentId &&
+          other.playerId == this.playerId &&
+          other.startDate == this.startDate &&
+          other.endDate == this.endDate &&
+          other.feePercentage == this.feePercentage &&
+          other.wage == this.wage &&
+          other.releaseClause == this.releaseClause &&
+          other.status == this.status);
+}
+
+class AgentContractsCompanion extends UpdateCompanion<AgentContract> {
+  final Value<int> id;
+  final Value<int> agentId;
+  final Value<int> playerId;
+  final Value<DateTime> startDate;
+  final Value<DateTime> endDate;
+  final Value<double> feePercentage;
+  final Value<double> wage;
+  final Value<double> releaseClause;
+  final Value<String> status;
+  const AgentContractsCompanion({
+    this.id = const Value.absent(),
+    this.agentId = const Value.absent(),
+    this.playerId = const Value.absent(),
+    this.startDate = const Value.absent(),
+    this.endDate = const Value.absent(),
+    this.feePercentage = const Value.absent(),
+    this.wage = const Value.absent(),
+    this.releaseClause = const Value.absent(),
+    this.status = const Value.absent(),
+  });
+  AgentContractsCompanion.insert({
+    this.id = const Value.absent(),
+    required int agentId,
+    required int playerId,
+    required DateTime startDate,
+    required DateTime endDate,
+    this.feePercentage = const Value.absent(),
+    required double wage,
+    required double releaseClause,
+    required String status,
+  }) : agentId = Value(agentId),
+       playerId = Value(playerId),
+       startDate = Value(startDate),
+       endDate = Value(endDate),
+       wage = Value(wage),
+       releaseClause = Value(releaseClause),
+       status = Value(status);
+  static Insertable<AgentContract> custom({
+    Expression<int>? id,
+    Expression<int>? agentId,
+    Expression<int>? playerId,
+    Expression<DateTime>? startDate,
+    Expression<DateTime>? endDate,
+    Expression<double>? feePercentage,
+    Expression<double>? wage,
+    Expression<double>? releaseClause,
+    Expression<String>? status,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (agentId != null) 'agent_id': agentId,
+      if (playerId != null) 'player_id': playerId,
+      if (startDate != null) 'start_date': startDate,
+      if (endDate != null) 'end_date': endDate,
+      if (feePercentage != null) 'fee_percentage': feePercentage,
+      if (wage != null) 'wage': wage,
+      if (releaseClause != null) 'release_clause': releaseClause,
+      if (status != null) 'status': status,
+    });
+  }
+
+  AgentContractsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? agentId,
+    Value<int>? playerId,
+    Value<DateTime>? startDate,
+    Value<DateTime>? endDate,
+    Value<double>? feePercentage,
+    Value<double>? wage,
+    Value<double>? releaseClause,
+    Value<String>? status,
+  }) {
+    return AgentContractsCompanion(
+      id: id ?? this.id,
+      agentId: agentId ?? this.agentId,
+      playerId: playerId ?? this.playerId,
+      startDate: startDate ?? this.startDate,
+      endDate: endDate ?? this.endDate,
+      feePercentage: feePercentage ?? this.feePercentage,
+      wage: wage ?? this.wage,
+      releaseClause: releaseClause ?? this.releaseClause,
+      status: status ?? this.status,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (agentId.present) {
+      map['agent_id'] = Variable<int>(agentId.value);
+    }
+    if (playerId.present) {
+      map['player_id'] = Variable<int>(playerId.value);
+    }
+    if (startDate.present) {
+      map['start_date'] = Variable<DateTime>(startDate.value);
+    }
+    if (endDate.present) {
+      map['end_date'] = Variable<DateTime>(endDate.value);
+    }
+    if (feePercentage.present) {
+      map['fee_percentage'] = Variable<double>(feePercentage.value);
+    }
+    if (wage.present) {
+      map['wage'] = Variable<double>(wage.value);
+    }
+    if (releaseClause.present) {
+      map['release_clause'] = Variable<double>(releaseClause.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AgentContractsCompanion(')
+          ..write('id: $id, ')
+          ..write('agentId: $agentId, ')
+          ..write('playerId: $playerId, ')
+          ..write('startDate: $startDate, ')
+          ..write('endDate: $endDate, ')
+          ..write('feePercentage: $feePercentage, ')
+          ..write('wage: $wage, ')
+          ..write('releaseClause: $releaseClause, ')
+          ..write('status: $status')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ClubContractsTable extends ClubContracts
+    with TableInfo<$ClubContractsTable, ClubContract> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ClubContractsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _clubIdMeta = const VerificationMeta('clubId');
+  @override
+  late final GeneratedColumn<int> clubId = GeneratedColumn<int>(
+    'club_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES clubs (id)',
+    ),
+  );
+  static const VerificationMeta _playerIdMeta = const VerificationMeta(
+    'playerId',
+  );
+  @override
+  late final GeneratedColumn<int> playerId = GeneratedColumn<int>(
+    'player_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES players (id)',
+    ),
+  );
+  static const VerificationMeta _weeklySalaryMeta = const VerificationMeta(
+    'weeklySalary',
+  );
+  @override
+  late final GeneratedColumn<int> weeklySalary = GeneratedColumn<int>(
+    'weekly_salary',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _releaseClauseMeta = const VerificationMeta(
+    'releaseClause',
+  );
+  @override
+  late final GeneratedColumn<int> releaseClause = GeneratedColumn<int>(
+    'release_clause',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _startDateMeta = const VerificationMeta(
+    'startDate',
+  );
+  @override
+  late final GeneratedColumn<DateTime> startDate = GeneratedColumn<DateTime>(
+    'start_date',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _endDateMeta = const VerificationMeta(
+    'endDate',
+  );
+  @override
+  late final GeneratedColumn<DateTime> endDate = GeneratedColumn<DateTime>(
+    'end_date',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('active'),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    clubId,
+    playerId,
+    weeklySalary,
+    releaseClause,
+    startDate,
+    endDate,
+    status,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'club_contracts';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ClubContract> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('club_id')) {
+      context.handle(
+        _clubIdMeta,
+        clubId.isAcceptableOrUnknown(data['club_id']!, _clubIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_clubIdMeta);
+    }
+    if (data.containsKey('player_id')) {
+      context.handle(
+        _playerIdMeta,
+        playerId.isAcceptableOrUnknown(data['player_id']!, _playerIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_playerIdMeta);
+    }
+    if (data.containsKey('weekly_salary')) {
+      context.handle(
+        _weeklySalaryMeta,
+        weeklySalary.isAcceptableOrUnknown(
+          data['weekly_salary']!,
+          _weeklySalaryMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_weeklySalaryMeta);
+    }
+    if (data.containsKey('release_clause')) {
+      context.handle(
+        _releaseClauseMeta,
+        releaseClause.isAcceptableOrUnknown(
+          data['release_clause']!,
+          _releaseClauseMeta,
+        ),
+      );
+    }
+    if (data.containsKey('start_date')) {
+      context.handle(
+        _startDateMeta,
+        startDate.isAcceptableOrUnknown(data['start_date']!, _startDateMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_startDateMeta);
+    }
+    if (data.containsKey('end_date')) {
+      context.handle(
+        _endDateMeta,
+        endDate.isAcceptableOrUnknown(data['end_date']!, _endDateMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_endDateMeta);
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ClubContract map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ClubContract(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      clubId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}club_id'],
+      )!,
+      playerId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}player_id'],
+      )!,
+      weeklySalary: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}weekly_salary'],
+      )!,
+      releaseClause: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}release_clause'],
+      ),
+      startDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}start_date'],
+      )!,
+      endDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}end_date'],
+      )!,
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
+    );
+  }
+
+  @override
+  $ClubContractsTable createAlias(String alias) {
+    return $ClubContractsTable(attachedDatabase, alias);
+  }
+}
+
+class ClubContract extends DataClass implements Insertable<ClubContract> {
+  final int id;
+  final int clubId;
+  final int playerId;
+  final int weeklySalary;
+  final int? releaseClause;
+  final DateTime startDate;
+  final DateTime endDate;
+  final String status;
+  const ClubContract({
+    required this.id,
+    required this.clubId,
+    required this.playerId,
+    required this.weeklySalary,
+    this.releaseClause,
+    required this.startDate,
+    required this.endDate,
+    required this.status,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['club_id'] = Variable<int>(clubId);
+    map['player_id'] = Variable<int>(playerId);
+    map['weekly_salary'] = Variable<int>(weeklySalary);
+    if (!nullToAbsent || releaseClause != null) {
+      map['release_clause'] = Variable<int>(releaseClause);
+    }
+    map['start_date'] = Variable<DateTime>(startDate);
+    map['end_date'] = Variable<DateTime>(endDate);
+    map['status'] = Variable<String>(status);
+    return map;
+  }
+
+  ClubContractsCompanion toCompanion(bool nullToAbsent) {
+    return ClubContractsCompanion(
+      id: Value(id),
+      clubId: Value(clubId),
+      playerId: Value(playerId),
+      weeklySalary: Value(weeklySalary),
+      releaseClause: releaseClause == null && nullToAbsent
+          ? const Value.absent()
+          : Value(releaseClause),
+      startDate: Value(startDate),
+      endDate: Value(endDate),
+      status: Value(status),
+    );
+  }
+
+  factory ClubContract.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ClubContract(
+      id: serializer.fromJson<int>(json['id']),
+      clubId: serializer.fromJson<int>(json['clubId']),
+      playerId: serializer.fromJson<int>(json['playerId']),
+      weeklySalary: serializer.fromJson<int>(json['weeklySalary']),
+      releaseClause: serializer.fromJson<int?>(json['releaseClause']),
+      startDate: serializer.fromJson<DateTime>(json['startDate']),
+      endDate: serializer.fromJson<DateTime>(json['endDate']),
+      status: serializer.fromJson<String>(json['status']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'clubId': serializer.toJson<int>(clubId),
+      'playerId': serializer.toJson<int>(playerId),
+      'weeklySalary': serializer.toJson<int>(weeklySalary),
+      'releaseClause': serializer.toJson<int?>(releaseClause),
+      'startDate': serializer.toJson<DateTime>(startDate),
+      'endDate': serializer.toJson<DateTime>(endDate),
+      'status': serializer.toJson<String>(status),
+    };
+  }
+
+  ClubContract copyWith({
+    int? id,
+    int? clubId,
+    int? playerId,
+    int? weeklySalary,
+    Value<int?> releaseClause = const Value.absent(),
+    DateTime? startDate,
+    DateTime? endDate,
+    String? status,
+  }) => ClubContract(
+    id: id ?? this.id,
+    clubId: clubId ?? this.clubId,
+    playerId: playerId ?? this.playerId,
+    weeklySalary: weeklySalary ?? this.weeklySalary,
+    releaseClause: releaseClause.present
+        ? releaseClause.value
+        : this.releaseClause,
+    startDate: startDate ?? this.startDate,
+    endDate: endDate ?? this.endDate,
+    status: status ?? this.status,
+  );
+  ClubContract copyWithCompanion(ClubContractsCompanion data) {
+    return ClubContract(
+      id: data.id.present ? data.id.value : this.id,
+      clubId: data.clubId.present ? data.clubId.value : this.clubId,
+      playerId: data.playerId.present ? data.playerId.value : this.playerId,
+      weeklySalary: data.weeklySalary.present
+          ? data.weeklySalary.value
+          : this.weeklySalary,
+      releaseClause: data.releaseClause.present
+          ? data.releaseClause.value
+          : this.releaseClause,
+      startDate: data.startDate.present ? data.startDate.value : this.startDate,
+      endDate: data.endDate.present ? data.endDate.value : this.endDate,
+      status: data.status.present ? data.status.value : this.status,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ClubContract(')
+          ..write('id: $id, ')
+          ..write('clubId: $clubId, ')
+          ..write('playerId: $playerId, ')
+          ..write('weeklySalary: $weeklySalary, ')
+          ..write('releaseClause: $releaseClause, ')
+          ..write('startDate: $startDate, ')
+          ..write('endDate: $endDate, ')
+          ..write('status: $status')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    clubId,
+    playerId,
+    weeklySalary,
+    releaseClause,
+    startDate,
+    endDate,
+    status,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ClubContract &&
+          other.id == this.id &&
+          other.clubId == this.clubId &&
+          other.playerId == this.playerId &&
+          other.weeklySalary == this.weeklySalary &&
+          other.releaseClause == this.releaseClause &&
+          other.startDate == this.startDate &&
+          other.endDate == this.endDate &&
+          other.status == this.status);
+}
+
+class ClubContractsCompanion extends UpdateCompanion<ClubContract> {
+  final Value<int> id;
+  final Value<int> clubId;
+  final Value<int> playerId;
+  final Value<int> weeklySalary;
+  final Value<int?> releaseClause;
+  final Value<DateTime> startDate;
+  final Value<DateTime> endDate;
+  final Value<String> status;
+  const ClubContractsCompanion({
+    this.id = const Value.absent(),
+    this.clubId = const Value.absent(),
+    this.playerId = const Value.absent(),
+    this.weeklySalary = const Value.absent(),
+    this.releaseClause = const Value.absent(),
+    this.startDate = const Value.absent(),
+    this.endDate = const Value.absent(),
+    this.status = const Value.absent(),
+  });
+  ClubContractsCompanion.insert({
+    this.id = const Value.absent(),
+    required int clubId,
+    required int playerId,
+    required int weeklySalary,
+    this.releaseClause = const Value.absent(),
+    required DateTime startDate,
+    required DateTime endDate,
+    this.status = const Value.absent(),
+  }) : clubId = Value(clubId),
+       playerId = Value(playerId),
+       weeklySalary = Value(weeklySalary),
+       startDate = Value(startDate),
+       endDate = Value(endDate);
+  static Insertable<ClubContract> custom({
+    Expression<int>? id,
+    Expression<int>? clubId,
+    Expression<int>? playerId,
+    Expression<int>? weeklySalary,
+    Expression<int>? releaseClause,
+    Expression<DateTime>? startDate,
+    Expression<DateTime>? endDate,
+    Expression<String>? status,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (clubId != null) 'club_id': clubId,
+      if (playerId != null) 'player_id': playerId,
+      if (weeklySalary != null) 'weekly_salary': weeklySalary,
+      if (releaseClause != null) 'release_clause': releaseClause,
+      if (startDate != null) 'start_date': startDate,
+      if (endDate != null) 'end_date': endDate,
+      if (status != null) 'status': status,
+    });
+  }
+
+  ClubContractsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? clubId,
+    Value<int>? playerId,
+    Value<int>? weeklySalary,
+    Value<int?>? releaseClause,
+    Value<DateTime>? startDate,
+    Value<DateTime>? endDate,
+    Value<String>? status,
+  }) {
+    return ClubContractsCompanion(
+      id: id ?? this.id,
+      clubId: clubId ?? this.clubId,
+      playerId: playerId ?? this.playerId,
+      weeklySalary: weeklySalary ?? this.weeklySalary,
+      releaseClause: releaseClause ?? this.releaseClause,
+      startDate: startDate ?? this.startDate,
+      endDate: endDate ?? this.endDate,
+      status: status ?? this.status,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (clubId.present) {
+      map['club_id'] = Variable<int>(clubId.value);
+    }
+    if (playerId.present) {
+      map['player_id'] = Variable<int>(playerId.value);
+    }
+    if (weeklySalary.present) {
+      map['weekly_salary'] = Variable<int>(weeklySalary.value);
+    }
+    if (releaseClause.present) {
+      map['release_clause'] = Variable<int>(releaseClause.value);
+    }
+    if (startDate.present) {
+      map['start_date'] = Variable<DateTime>(startDate.value);
+    }
+    if (endDate.present) {
+      map['end_date'] = Variable<DateTime>(endDate.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ClubContractsCompanion(')
+          ..write('id: $id, ')
+          ..write('clubId: $clubId, ')
+          ..write('playerId: $playerId, ')
+          ..write('weeklySalary: $weeklySalary, ')
+          ..write('releaseClause: $releaseClause, ')
+          ..write('startDate: $startDate, ')
+          ..write('endDate: $endDate, ')
+          ..write('status: $status')
           ..write(')'))
         .toString();
   }
@@ -4844,8 +5409,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $LeaguesTable leagues = $LeaguesTable(this);
   late final $ClubsTable clubs = $ClubsTable(this);
   late final $AgentsTable agents = $AgentsTable(this);
-  late final $ContractsTable contracts = $ContractsTable(this);
   late final $PlayersTable players = $PlayersTable(this);
+  late final $AgentContractsTable agentContracts = $AgentContractsTable(this);
+  late final $ClubContractsTable clubContracts = $ClubContractsTable(this);
   late final $TransfersTable transfers = $TransfersTable(this);
   late final $ValueHistoriesTable valueHistories = $ValueHistoriesTable(this);
   late final $RelationshipsTable relationships = $RelationshipsTable(this);
@@ -4860,8 +5426,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     leagues,
     clubs,
     agents,
-    contracts,
     players,
+    agentContracts,
+    clubContracts,
     transfers,
     valueHistories,
     relationships,
@@ -5201,6 +5768,24 @@ final class $$ClubsTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<$ClubContractsTable, List<ClubContract>>
+  _clubContractsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.clubContracts,
+    aliasName: $_aliasNameGenerator(db.clubs.id, db.clubContracts.clubId),
+  );
+
+  $$ClubContractsTableProcessedTableManager get clubContractsRefs {
+    final manager = $$ClubContractsTableTableManager(
+      $_db,
+      $_db.clubContracts,
+    ).filter((f) => f.clubId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_clubContractsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$ClubsTableFilterComposer extends Composer<_$AppDatabase, $ClubsTable> {
@@ -5275,6 +5860,31 @@ class $$ClubsTableFilterComposer extends Composer<_$AppDatabase, $ClubsTable> {
           }) => $$PlayersTableFilterComposer(
             $db: $db,
             $table: $db.players,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> clubContractsRefs(
+    Expression<bool> Function($$ClubContractsTableFilterComposer f) f,
+  ) {
+    final $$ClubContractsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.clubContracts,
+      getReferencedColumn: (t) => t.clubId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ClubContractsTableFilterComposer(
+            $db: $db,
+            $table: $db.clubContracts,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -5420,6 +6030,31 @@ class $$ClubsTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> clubContractsRefs<T extends Object>(
+    Expression<T> Function($$ClubContractsTableAnnotationComposer a) f,
+  ) {
+    final $$ClubContractsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.clubContracts,
+      getReferencedColumn: (t) => t.clubId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ClubContractsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.clubContracts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$ClubsTableTableManager
@@ -5435,7 +6070,11 @@ class $$ClubsTableTableManager
           $$ClubsTableUpdateCompanionBuilder,
           (Club, $$ClubsTableReferences),
           Club,
-          PrefetchHooks Function({bool leagueId, bool playersRefs})
+          PrefetchHooks Function({
+            bool leagueId,
+            bool playersRefs,
+            bool clubContractsRefs,
+          })
         > {
   $$ClubsTableTableManager(_$AppDatabase db, $ClubsTable table)
     : super(
@@ -5486,60 +6125,90 @@ class $$ClubsTableTableManager
                     (e.readTable(table), $$ClubsTableReferences(db, table, e)),
               )
               .toList(),
-          prefetchHooksCallback: ({leagueId = false, playersRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [if (playersRefs) db.players],
-              addJoins:
-                  <
-                    T extends TableManagerState<
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic
-                    >
-                  >(state) {
-                    if (leagueId) {
-                      state =
-                          state.withJoin(
-                                currentTable: table,
-                                currentColumn: table.leagueId,
-                                referencedTable: $$ClubsTableReferences
-                                    ._leagueIdTable(db),
-                                referencedColumn: $$ClubsTableReferences
-                                    ._leagueIdTable(db)
-                                    .id,
-                              )
-                              as T;
-                    }
+          prefetchHooksCallback:
+              ({
+                leagueId = false,
+                playersRefs = false,
+                clubContractsRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (playersRefs) db.players,
+                    if (clubContractsRefs) db.clubContracts,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (leagueId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.leagueId,
+                                    referencedTable: $$ClubsTableReferences
+                                        ._leagueIdTable(db),
+                                    referencedColumn: $$ClubsTableReferences
+                                        ._leagueIdTable(db)
+                                        .id,
+                                  )
+                                  as T;
+                        }
 
-                    return state;
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (playersRefs)
+                        await $_getPrefetchedData<Club, $ClubsTable, Player>(
+                          currentTable: table,
+                          referencedTable: $$ClubsTableReferences
+                              ._playersRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ClubsTableReferences(db, table, p0).playersRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.clubId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (clubContractsRefs)
+                        await $_getPrefetchedData<
+                          Club,
+                          $ClubsTable,
+                          ClubContract
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ClubsTableReferences
+                              ._clubContractsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ClubsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).clubContractsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.clubId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
                   },
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (playersRefs)
-                    await $_getPrefetchedData<Club, $ClubsTable, Player>(
-                      currentTable: table,
-                      referencedTable: $$ClubsTableReferences._playersRefsTable(
-                        db,
-                      ),
-                      managerFromTypedResult: (p0) =>
-                          $$ClubsTableReferences(db, table, p0).playersRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where((e) => e.clubId == item.id),
-                      typedResults: items,
-                    ),
-                ];
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -5556,7 +6225,11 @@ typedef $$ClubsTableProcessedTableManager =
       $$ClubsTableUpdateCompanionBuilder,
       (Club, $$ClubsTableReferences),
       Club,
-      PrefetchHooks Function({bool leagueId, bool playersRefs})
+      PrefetchHooks Function({
+        bool leagueId,
+        bool playersRefs,
+        bool clubContractsRefs,
+      })
     >;
 typedef $$AgentsTableCreateCompanionBuilder =
     AgentsCompanion Function({
@@ -5583,24 +6256,6 @@ final class $$AgentsTableReferences
     extends BaseReferences<_$AppDatabase, $AgentsTable, Agent> {
   $$AgentsTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
-  static MultiTypedResultKey<$ContractsTable, List<Contract>>
-  _contractsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
-    db.contracts,
-    aliasName: $_aliasNameGenerator(db.agents.id, db.contracts.agentId),
-  );
-
-  $$ContractsTableProcessedTableManager get contractsRefs {
-    final manager = $$ContractsTableTableManager(
-      $_db,
-      $_db.contracts,
-    ).filter((f) => f.agentId.id.sqlEquals($_itemColumn<int>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(_contractsRefsTable($_db));
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-
   static MultiTypedResultKey<$PlayersTable, List<Player>> _playersRefsTable(
     _$AppDatabase db,
   ) => MultiTypedResultKey.fromTable(
@@ -5615,6 +6270,24 @@ final class $$AgentsTableReferences
     ).filter((f) => f.agentId.id.sqlEquals($_itemColumn<int>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_playersRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$AgentContractsTable, List<AgentContract>>
+  _agentContractsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.agentContracts,
+    aliasName: $_aliasNameGenerator(db.agents.id, db.agentContracts.agentId),
+  );
+
+  $$AgentContractsTableProcessedTableManager get agentContractsRefs {
+    final manager = $$AgentContractsTableTableManager(
+      $_db,
+      $_db.agentContracts,
+    ).filter((f) => f.agentId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_agentContractsRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -5665,31 +6338,6 @@ class $$AgentsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  Expression<bool> contractsRefs(
-    Expression<bool> Function($$ContractsTableFilterComposer f) f,
-  ) {
-    final $$ContractsTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.contracts,
-      getReferencedColumn: (t) => t.agentId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$ContractsTableFilterComposer(
-            $db: $db,
-            $table: $db.contracts,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
   Expression<bool> playersRefs(
     Expression<bool> Function($$PlayersTableFilterComposer f) f,
   ) {
@@ -5706,6 +6354,31 @@ class $$AgentsTableFilterComposer
           }) => $$PlayersTableFilterComposer(
             $db: $db,
             $table: $db.players,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> agentContractsRefs(
+    Expression<bool> Function($$AgentContractsTableFilterComposer f) f,
+  ) {
+    final $$AgentContractsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.agentContracts,
+      getReferencedColumn: (t) => t.agentId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AgentContractsTableFilterComposer(
+            $db: $db,
+            $table: $db.agentContracts,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -5797,31 +6470,6 @@ class $$AgentsTableAnnotationComposer
   GeneratedColumn<int> get level =>
       $composableBuilder(column: $table.level, builder: (column) => column);
 
-  Expression<T> contractsRefs<T extends Object>(
-    Expression<T> Function($$ContractsTableAnnotationComposer a) f,
-  ) {
-    final $$ContractsTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.contracts,
-      getReferencedColumn: (t) => t.agentId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$ContractsTableAnnotationComposer(
-            $db: $db,
-            $table: $db.contracts,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
   Expression<T> playersRefs<T extends Object>(
     Expression<T> Function($$PlayersTableAnnotationComposer a) f,
   ) {
@@ -5846,6 +6494,31 @@ class $$AgentsTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> agentContractsRefs<T extends Object>(
+    Expression<T> Function($$AgentContractsTableAnnotationComposer a) f,
+  ) {
+    final $$AgentContractsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.agentContracts,
+      getReferencedColumn: (t) => t.agentId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AgentContractsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.agentContracts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$AgentsTableTableManager
@@ -5861,7 +6534,7 @@ class $$AgentsTableTableManager
           $$AgentsTableUpdateCompanionBuilder,
           (Agent, $$AgentsTableReferences),
           Agent,
-          PrefetchHooks Function({bool contractsRefs, bool playersRefs})
+          PrefetchHooks Function({bool playersRefs, bool agentContractsRefs})
         > {
   $$AgentsTableTableManager(_$AppDatabase db, $AgentsTable table)
     : super(
@@ -5917,37 +6590,16 @@ class $$AgentsTableTableManager
               )
               .toList(),
           prefetchHooksCallback:
-              ({contractsRefs = false, playersRefs = false}) {
+              ({playersRefs = false, agentContractsRefs = false}) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
-                    if (contractsRefs) db.contracts,
                     if (playersRefs) db.players,
+                    if (agentContractsRefs) db.agentContracts,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
                     return [
-                      if (contractsRefs)
-                        await $_getPrefetchedData<
-                          Agent,
-                          $AgentsTable,
-                          Contract
-                        >(
-                          currentTable: table,
-                          referencedTable: $$AgentsTableReferences
-                              ._contractsRefsTable(db),
-                          managerFromTypedResult: (p0) =>
-                              $$AgentsTableReferences(
-                                db,
-                                table,
-                                p0,
-                              ).contractsRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.agentId == item.id,
-                              ),
-                          typedResults: items,
-                        ),
                       if (playersRefs)
                         await $_getPrefetchedData<Agent, $AgentsTable, Player>(
                           currentTable: table,
@@ -5959,6 +6611,27 @@ class $$AgentsTableTableManager
                                 table,
                                 p0,
                               ).playersRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.agentId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (agentContractsRefs)
+                        await $_getPrefetchedData<
+                          Agent,
+                          $AgentsTable,
+                          AgentContract
+                        >(
+                          currentTable: table,
+                          referencedTable: $$AgentsTableReferences
+                              ._agentContractsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$AgentsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).agentContractsRefs,
                           referencedItemsForCurrentItem:
                               (item, referencedItems) => referencedItems.where(
                                 (e) => e.agentId == item.id,
@@ -5985,468 +6658,7 @@ typedef $$AgentsTableProcessedTableManager =
       $$AgentsTableUpdateCompanionBuilder,
       (Agent, $$AgentsTableReferences),
       Agent,
-      PrefetchHooks Function({bool contractsRefs, bool playersRefs})
-    >;
-typedef $$ContractsTableCreateCompanionBuilder =
-    ContractsCompanion Function({
-      Value<int> id,
-      required int playerId,
-      Value<int?> agentId,
-      required DateTime startDate,
-      required DateTime endDate,
-      required double wage,
-      required double releaseClause,
-      required String status,
-    });
-typedef $$ContractsTableUpdateCompanionBuilder =
-    ContractsCompanion Function({
-      Value<int> id,
-      Value<int> playerId,
-      Value<int?> agentId,
-      Value<DateTime> startDate,
-      Value<DateTime> endDate,
-      Value<double> wage,
-      Value<double> releaseClause,
-      Value<String> status,
-    });
-
-final class $$ContractsTableReferences
-    extends BaseReferences<_$AppDatabase, $ContractsTable, Contract> {
-  $$ContractsTableReferences(super.$_db, super.$_table, super.$_typedResult);
-
-  static $AgentsTable _agentIdTable(_$AppDatabase db) => db.agents.createAlias(
-    $_aliasNameGenerator(db.contracts.agentId, db.agents.id),
-  );
-
-  $$AgentsTableProcessedTableManager? get agentId {
-    final $_column = $_itemColumn<int>('agent_id');
-    if ($_column == null) return null;
-    final manager = $$AgentsTableTableManager(
-      $_db,
-      $_db.agents,
-    ).filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_agentIdTable($_db));
-    if (item == null) return manager;
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: [item]),
-    );
-  }
-
-  static MultiTypedResultKey<$PlayersTable, List<Player>> _playersRefsTable(
-    _$AppDatabase db,
-  ) => MultiTypedResultKey.fromTable(
-    db.players,
-    aliasName: $_aliasNameGenerator(
-      db.contracts.id,
-      db.players.currentContractId,
-    ),
-  );
-
-  $$PlayersTableProcessedTableManager get playersRefs {
-    final manager = $$PlayersTableTableManager(
-      $_db,
-      $_db.players,
-    ).filter((f) => f.currentContractId.id.sqlEquals($_itemColumn<int>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(_playersRefsTable($_db));
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-}
-
-class $$ContractsTableFilterComposer
-    extends Composer<_$AppDatabase, $ContractsTable> {
-  $$ContractsTableFilterComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnFilters<int> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<int> get playerId => $composableBuilder(
-    column: $table.playerId,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<DateTime> get startDate => $composableBuilder(
-    column: $table.startDate,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<DateTime> get endDate => $composableBuilder(
-    column: $table.endDate,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<double> get wage => $composableBuilder(
-    column: $table.wage,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<double> get releaseClause => $composableBuilder(
-    column: $table.releaseClause,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get status => $composableBuilder(
-    column: $table.status,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  $$AgentsTableFilterComposer get agentId {
-    final $$AgentsTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.agentId,
-      referencedTable: $db.agents,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$AgentsTableFilterComposer(
-            $db: $db,
-            $table: $db.agents,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-
-  Expression<bool> playersRefs(
-    Expression<bool> Function($$PlayersTableFilterComposer f) f,
-  ) {
-    final $$PlayersTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.players,
-      getReferencedColumn: (t) => t.currentContractId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$PlayersTableFilterComposer(
-            $db: $db,
-            $table: $db.players,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-}
-
-class $$ContractsTableOrderingComposer
-    extends Composer<_$AppDatabase, $ContractsTable> {
-  $$ContractsTableOrderingComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnOrderings<int> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<int> get playerId => $composableBuilder(
-    column: $table.playerId,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<DateTime> get startDate => $composableBuilder(
-    column: $table.startDate,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<DateTime> get endDate => $composableBuilder(
-    column: $table.endDate,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<double> get wage => $composableBuilder(
-    column: $table.wage,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<double> get releaseClause => $composableBuilder(
-    column: $table.releaseClause,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get status => $composableBuilder(
-    column: $table.status,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  $$AgentsTableOrderingComposer get agentId {
-    final $$AgentsTableOrderingComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.agentId,
-      referencedTable: $db.agents,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$AgentsTableOrderingComposer(
-            $db: $db,
-            $table: $db.agents,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-}
-
-class $$ContractsTableAnnotationComposer
-    extends Composer<_$AppDatabase, $ContractsTable> {
-  $$ContractsTableAnnotationComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  GeneratedColumn<int> get id =>
-      $composableBuilder(column: $table.id, builder: (column) => column);
-
-  GeneratedColumn<int> get playerId =>
-      $composableBuilder(column: $table.playerId, builder: (column) => column);
-
-  GeneratedColumn<DateTime> get startDate =>
-      $composableBuilder(column: $table.startDate, builder: (column) => column);
-
-  GeneratedColumn<DateTime> get endDate =>
-      $composableBuilder(column: $table.endDate, builder: (column) => column);
-
-  GeneratedColumn<double> get wage =>
-      $composableBuilder(column: $table.wage, builder: (column) => column);
-
-  GeneratedColumn<double> get releaseClause => $composableBuilder(
-    column: $table.releaseClause,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<String> get status =>
-      $composableBuilder(column: $table.status, builder: (column) => column);
-
-  $$AgentsTableAnnotationComposer get agentId {
-    final $$AgentsTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.agentId,
-      referencedTable: $db.agents,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$AgentsTableAnnotationComposer(
-            $db: $db,
-            $table: $db.agents,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-
-  Expression<T> playersRefs<T extends Object>(
-    Expression<T> Function($$PlayersTableAnnotationComposer a) f,
-  ) {
-    final $$PlayersTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.players,
-      getReferencedColumn: (t) => t.currentContractId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$PlayersTableAnnotationComposer(
-            $db: $db,
-            $table: $db.players,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-}
-
-class $$ContractsTableTableManager
-    extends
-        RootTableManager<
-          _$AppDatabase,
-          $ContractsTable,
-          Contract,
-          $$ContractsTableFilterComposer,
-          $$ContractsTableOrderingComposer,
-          $$ContractsTableAnnotationComposer,
-          $$ContractsTableCreateCompanionBuilder,
-          $$ContractsTableUpdateCompanionBuilder,
-          (Contract, $$ContractsTableReferences),
-          Contract,
-          PrefetchHooks Function({bool agentId, bool playersRefs})
-        > {
-  $$ContractsTableTableManager(_$AppDatabase db, $ContractsTable table)
-    : super(
-        TableManagerState(
-          db: db,
-          table: table,
-          createFilteringComposer: () =>
-              $$ContractsTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$ContractsTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () =>
-              $$ContractsTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback:
-              ({
-                Value<int> id = const Value.absent(),
-                Value<int> playerId = const Value.absent(),
-                Value<int?> agentId = const Value.absent(),
-                Value<DateTime> startDate = const Value.absent(),
-                Value<DateTime> endDate = const Value.absent(),
-                Value<double> wage = const Value.absent(),
-                Value<double> releaseClause = const Value.absent(),
-                Value<String> status = const Value.absent(),
-              }) => ContractsCompanion(
-                id: id,
-                playerId: playerId,
-                agentId: agentId,
-                startDate: startDate,
-                endDate: endDate,
-                wage: wage,
-                releaseClause: releaseClause,
-                status: status,
-              ),
-          createCompanionCallback:
-              ({
-                Value<int> id = const Value.absent(),
-                required int playerId,
-                Value<int?> agentId = const Value.absent(),
-                required DateTime startDate,
-                required DateTime endDate,
-                required double wage,
-                required double releaseClause,
-                required String status,
-              }) => ContractsCompanion.insert(
-                id: id,
-                playerId: playerId,
-                agentId: agentId,
-                startDate: startDate,
-                endDate: endDate,
-                wage: wage,
-                releaseClause: releaseClause,
-                status: status,
-              ),
-          withReferenceMapper: (p0) => p0
-              .map(
-                (e) => (
-                  e.readTable(table),
-                  $$ContractsTableReferences(db, table, e),
-                ),
-              )
-              .toList(),
-          prefetchHooksCallback: ({agentId = false, playersRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [if (playersRefs) db.players],
-              addJoins:
-                  <
-                    T extends TableManagerState<
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic
-                    >
-                  >(state) {
-                    if (agentId) {
-                      state =
-                          state.withJoin(
-                                currentTable: table,
-                                currentColumn: table.agentId,
-                                referencedTable: $$ContractsTableReferences
-                                    ._agentIdTable(db),
-                                referencedColumn: $$ContractsTableReferences
-                                    ._agentIdTable(db)
-                                    .id,
-                              )
-                              as T;
-                    }
-
-                    return state;
-                  },
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (playersRefs)
-                    await $_getPrefetchedData<
-                      Contract,
-                      $ContractsTable,
-                      Player
-                    >(
-                      currentTable: table,
-                      referencedTable: $$ContractsTableReferences
-                          ._playersRefsTable(db),
-                      managerFromTypedResult: (p0) =>
-                          $$ContractsTableReferences(db, table, p0).playersRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where(
-                            (e) => e.currentContractId == item.id,
-                          ),
-                      typedResults: items,
-                    ),
-                ];
-              },
-            );
-          },
-        ),
-      );
-}
-
-typedef $$ContractsTableProcessedTableManager =
-    ProcessedTableManager<
-      _$AppDatabase,
-      $ContractsTable,
-      Contract,
-      $$ContractsTableFilterComposer,
-      $$ContractsTableOrderingComposer,
-      $$ContractsTableAnnotationComposer,
-      $$ContractsTableCreateCompanionBuilder,
-      $$ContractsTableUpdateCompanionBuilder,
-      (Contract, $$ContractsTableReferences),
-      Contract,
-      PrefetchHooks Function({bool agentId, bool playersRefs})
+      PrefetchHooks Function({bool playersRefs, bool agentContractsRefs})
     >;
 typedef $$PlayersTableCreateCompanionBuilder =
     PlayersCompanion Function({
@@ -6517,22 +6729,39 @@ final class $$PlayersTableReferences
     );
   }
 
-  static $ContractsTable _currentContractIdTable(_$AppDatabase db) =>
-      db.contracts.createAlias(
-        $_aliasNameGenerator(db.players.currentContractId, db.contracts.id),
-      );
+  static MultiTypedResultKey<$AgentContractsTable, List<AgentContract>>
+  _agentContractsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.agentContracts,
+    aliasName: $_aliasNameGenerator(db.players.id, db.agentContracts.playerId),
+  );
 
-  $$ContractsTableProcessedTableManager? get currentContractId {
-    final $_column = $_itemColumn<int>('current_contract_id');
-    if ($_column == null) return null;
-    final manager = $$ContractsTableTableManager(
+  $$AgentContractsTableProcessedTableManager get agentContractsRefs {
+    final manager = $$AgentContractsTableTableManager(
       $_db,
-      $_db.contracts,
-    ).filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_currentContractIdTable($_db));
-    if (item == null) return manager;
+      $_db.agentContracts,
+    ).filter((f) => f.playerId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_agentContractsRefsTable($_db));
     return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: [item]),
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$ClubContractsTable, List<ClubContract>>
+  _clubContractsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.clubContracts,
+    aliasName: $_aliasNameGenerator(db.players.id, db.clubContracts.playerId),
+  );
+
+  $$ClubContractsTableProcessedTableManager get clubContractsRefs {
+    final manager = $$ClubContractsTableTableManager(
+      $_db,
+      $_db.clubContracts,
+    ).filter((f) => f.playerId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_clubContractsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
     );
   }
 
@@ -6640,6 +6869,11 @@ class $$PlayersTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<int> get currentContractId => $composableBuilder(
+    column: $table.currentContractId,
+    builder: (column) => ColumnFilters(column),
+  );
+
   $$ClubsTableFilterComposer get clubId {
     final $$ClubsTableFilterComposer composer = $composerBuilder(
       composer: this,
@@ -6686,27 +6920,54 @@ class $$PlayersTableFilterComposer
     return composer;
   }
 
-  $$ContractsTableFilterComposer get currentContractId {
-    final $$ContractsTableFilterComposer composer = $composerBuilder(
+  Expression<bool> agentContractsRefs(
+    Expression<bool> Function($$AgentContractsTableFilterComposer f) f,
+  ) {
+    final $$AgentContractsTableFilterComposer composer = $composerBuilder(
       composer: this,
-      getCurrentColumn: (t) => t.currentContractId,
-      referencedTable: $db.contracts,
-      getReferencedColumn: (t) => t.id,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.agentContracts,
+      getReferencedColumn: (t) => t.playerId,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$ContractsTableFilterComposer(
+          }) => $$AgentContractsTableFilterComposer(
             $db: $db,
-            $table: $db.contracts,
+            $table: $db.agentContracts,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
                 $removeJoinBuilderFromRootComposer,
           ),
     );
-    return composer;
+    return f(composer);
+  }
+
+  Expression<bool> clubContractsRefs(
+    Expression<bool> Function($$ClubContractsTableFilterComposer f) f,
+  ) {
+    final $$ClubContractsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.clubContracts,
+      getReferencedColumn: (t) => t.playerId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ClubContractsTableFilterComposer(
+            $db: $db,
+            $table: $db.clubContracts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
   }
 
   Expression<bool> transfersRefs(
@@ -6834,6 +7095,11 @@ class $$PlayersTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get currentContractId => $composableBuilder(
+    column: $table.currentContractId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$ClubsTableOrderingComposer get clubId {
     final $$ClubsTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -6879,29 +7145,6 @@ class $$PlayersTableOrderingComposer
     );
     return composer;
   }
-
-  $$ContractsTableOrderingComposer get currentContractId {
-    final $$ContractsTableOrderingComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.currentContractId,
-      referencedTable: $db.contracts,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$ContractsTableOrderingComposer(
-            $db: $db,
-            $table: $db.contracts,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
 }
 
 class $$PlayersTableAnnotationComposer
@@ -6938,6 +7181,11 @@ class $$PlayersTableAnnotationComposer
 
   GeneratedColumn<int> get marketValue => $composableBuilder(
     column: $table.marketValue,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get currentContractId => $composableBuilder(
+    column: $table.currentContractId,
     builder: (column) => column,
   );
 
@@ -6987,27 +7235,54 @@ class $$PlayersTableAnnotationComposer
     return composer;
   }
 
-  $$ContractsTableAnnotationComposer get currentContractId {
-    final $$ContractsTableAnnotationComposer composer = $composerBuilder(
+  Expression<T> agentContractsRefs<T extends Object>(
+    Expression<T> Function($$AgentContractsTableAnnotationComposer a) f,
+  ) {
+    final $$AgentContractsTableAnnotationComposer composer = $composerBuilder(
       composer: this,
-      getCurrentColumn: (t) => t.currentContractId,
-      referencedTable: $db.contracts,
-      getReferencedColumn: (t) => t.id,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.agentContracts,
+      getReferencedColumn: (t) => t.playerId,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$ContractsTableAnnotationComposer(
+          }) => $$AgentContractsTableAnnotationComposer(
             $db: $db,
-            $table: $db.contracts,
+            $table: $db.agentContracts,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
                 $removeJoinBuilderFromRootComposer,
           ),
     );
-    return composer;
+    return f(composer);
+  }
+
+  Expression<T> clubContractsRefs<T extends Object>(
+    Expression<T> Function($$ClubContractsTableAnnotationComposer a) f,
+  ) {
+    final $$ClubContractsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.clubContracts,
+      getReferencedColumn: (t) => t.playerId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ClubContractsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.clubContracts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
   }
 
   Expression<T> transfersRefs<T extends Object>(
@@ -7102,7 +7377,8 @@ class $$PlayersTableTableManager
           PrefetchHooks Function({
             bool clubId,
             bool agentId,
-            bool currentContractId,
+            bool agentContractsRefs,
+            bool clubContractsRefs,
             bool transfersRefs,
             bool valueHistoriesRefs,
             bool performancesRefs,
@@ -7183,7 +7459,8 @@ class $$PlayersTableTableManager
               ({
                 clubId = false,
                 agentId = false,
-                currentContractId = false,
+                agentContractsRefs = false,
+                clubContractsRefs = false,
                 transfersRefs = false,
                 valueHistoriesRefs = false,
                 performancesRefs = false,
@@ -7191,6 +7468,8 @@ class $$PlayersTableTableManager
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
+                    if (agentContractsRefs) db.agentContracts,
+                    if (clubContractsRefs) db.clubContracts,
                     if (transfersRefs) db.transfers,
                     if (valueHistoriesRefs) db.valueHistories,
                     if (performancesRefs) db.performances,
@@ -7237,24 +7516,53 @@ class $$PlayersTableTableManager
                                   )
                                   as T;
                         }
-                        if (currentContractId) {
-                          state =
-                              state.withJoin(
-                                    currentTable: table,
-                                    currentColumn: table.currentContractId,
-                                    referencedTable: $$PlayersTableReferences
-                                        ._currentContractIdTable(db),
-                                    referencedColumn: $$PlayersTableReferences
-                                        ._currentContractIdTable(db)
-                                        .id,
-                                  )
-                                  as T;
-                        }
 
                         return state;
                       },
                   getPrefetchedDataCallback: (items) async {
                     return [
+                      if (agentContractsRefs)
+                        await $_getPrefetchedData<
+                          Player,
+                          $PlayersTable,
+                          AgentContract
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PlayersTableReferences
+                              ._agentContractsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PlayersTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).agentContractsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.playerId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (clubContractsRefs)
+                        await $_getPrefetchedData<
+                          Player,
+                          $PlayersTable,
+                          ClubContract
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PlayersTableReferences
+                              ._clubContractsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PlayersTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).clubContractsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.playerId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                       if (transfersRefs)
                         await $_getPrefetchedData<
                           Player,
@@ -7341,11 +7649,965 @@ typedef $$PlayersTableProcessedTableManager =
       PrefetchHooks Function({
         bool clubId,
         bool agentId,
-        bool currentContractId,
+        bool agentContractsRefs,
+        bool clubContractsRefs,
         bool transfersRefs,
         bool valueHistoriesRefs,
         bool performancesRefs,
       })
+    >;
+typedef $$AgentContractsTableCreateCompanionBuilder =
+    AgentContractsCompanion Function({
+      Value<int> id,
+      required int agentId,
+      required int playerId,
+      required DateTime startDate,
+      required DateTime endDate,
+      Value<double> feePercentage,
+      required double wage,
+      required double releaseClause,
+      required String status,
+    });
+typedef $$AgentContractsTableUpdateCompanionBuilder =
+    AgentContractsCompanion Function({
+      Value<int> id,
+      Value<int> agentId,
+      Value<int> playerId,
+      Value<DateTime> startDate,
+      Value<DateTime> endDate,
+      Value<double> feePercentage,
+      Value<double> wage,
+      Value<double> releaseClause,
+      Value<String> status,
+    });
+
+final class $$AgentContractsTableReferences
+    extends BaseReferences<_$AppDatabase, $AgentContractsTable, AgentContract> {
+  $$AgentContractsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $AgentsTable _agentIdTable(_$AppDatabase db) => db.agents.createAlias(
+    $_aliasNameGenerator(db.agentContracts.agentId, db.agents.id),
+  );
+
+  $$AgentsTableProcessedTableManager get agentId {
+    final $_column = $_itemColumn<int>('agent_id')!;
+
+    final manager = $$AgentsTableTableManager(
+      $_db,
+      $_db.agents,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_agentIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $PlayersTable _playerIdTable(_$AppDatabase db) =>
+      db.players.createAlias(
+        $_aliasNameGenerator(db.agentContracts.playerId, db.players.id),
+      );
+
+  $$PlayersTableProcessedTableManager get playerId {
+    final $_column = $_itemColumn<int>('player_id')!;
+
+    final manager = $$PlayersTableTableManager(
+      $_db,
+      $_db.players,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_playerIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$AgentContractsTableFilterComposer
+    extends Composer<_$AppDatabase, $AgentContractsTable> {
+  $$AgentContractsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get startDate => $composableBuilder(
+    column: $table.startDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get endDate => $composableBuilder(
+    column: $table.endDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get feePercentage => $composableBuilder(
+    column: $table.feePercentage,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get wage => $composableBuilder(
+    column: $table.wage,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get releaseClause => $composableBuilder(
+    column: $table.releaseClause,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$AgentsTableFilterComposer get agentId {
+    final $$AgentsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.agentId,
+      referencedTable: $db.agents,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AgentsTableFilterComposer(
+            $db: $db,
+            $table: $db.agents,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PlayersTableFilterComposer get playerId {
+    final $$PlayersTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.playerId,
+      referencedTable: $db.players,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlayersTableFilterComposer(
+            $db: $db,
+            $table: $db.players,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$AgentContractsTableOrderingComposer
+    extends Composer<_$AppDatabase, $AgentContractsTable> {
+  $$AgentContractsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get startDate => $composableBuilder(
+    column: $table.startDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get endDate => $composableBuilder(
+    column: $table.endDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get feePercentage => $composableBuilder(
+    column: $table.feePercentage,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get wage => $composableBuilder(
+    column: $table.wage,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get releaseClause => $composableBuilder(
+    column: $table.releaseClause,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$AgentsTableOrderingComposer get agentId {
+    final $$AgentsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.agentId,
+      referencedTable: $db.agents,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AgentsTableOrderingComposer(
+            $db: $db,
+            $table: $db.agents,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PlayersTableOrderingComposer get playerId {
+    final $$PlayersTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.playerId,
+      referencedTable: $db.players,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlayersTableOrderingComposer(
+            $db: $db,
+            $table: $db.players,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$AgentContractsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AgentContractsTable> {
+  $$AgentContractsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get startDate =>
+      $composableBuilder(column: $table.startDate, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get endDate =>
+      $composableBuilder(column: $table.endDate, builder: (column) => column);
+
+  GeneratedColumn<double> get feePercentage => $composableBuilder(
+    column: $table.feePercentage,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get wage =>
+      $composableBuilder(column: $table.wage, builder: (column) => column);
+
+  GeneratedColumn<double> get releaseClause => $composableBuilder(
+    column: $table.releaseClause,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  $$AgentsTableAnnotationComposer get agentId {
+    final $$AgentsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.agentId,
+      referencedTable: $db.agents,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AgentsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.agents,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PlayersTableAnnotationComposer get playerId {
+    final $$PlayersTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.playerId,
+      referencedTable: $db.players,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlayersTableAnnotationComposer(
+            $db: $db,
+            $table: $db.players,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$AgentContractsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AgentContractsTable,
+          AgentContract,
+          $$AgentContractsTableFilterComposer,
+          $$AgentContractsTableOrderingComposer,
+          $$AgentContractsTableAnnotationComposer,
+          $$AgentContractsTableCreateCompanionBuilder,
+          $$AgentContractsTableUpdateCompanionBuilder,
+          (AgentContract, $$AgentContractsTableReferences),
+          AgentContract,
+          PrefetchHooks Function({bool agentId, bool playerId})
+        > {
+  $$AgentContractsTableTableManager(
+    _$AppDatabase db,
+    $AgentContractsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AgentContractsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AgentContractsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$AgentContractsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> agentId = const Value.absent(),
+                Value<int> playerId = const Value.absent(),
+                Value<DateTime> startDate = const Value.absent(),
+                Value<DateTime> endDate = const Value.absent(),
+                Value<double> feePercentage = const Value.absent(),
+                Value<double> wage = const Value.absent(),
+                Value<double> releaseClause = const Value.absent(),
+                Value<String> status = const Value.absent(),
+              }) => AgentContractsCompanion(
+                id: id,
+                agentId: agentId,
+                playerId: playerId,
+                startDate: startDate,
+                endDate: endDate,
+                feePercentage: feePercentage,
+                wage: wage,
+                releaseClause: releaseClause,
+                status: status,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int agentId,
+                required int playerId,
+                required DateTime startDate,
+                required DateTime endDate,
+                Value<double> feePercentage = const Value.absent(),
+                required double wage,
+                required double releaseClause,
+                required String status,
+              }) => AgentContractsCompanion.insert(
+                id: id,
+                agentId: agentId,
+                playerId: playerId,
+                startDate: startDate,
+                endDate: endDate,
+                feePercentage: feePercentage,
+                wage: wage,
+                releaseClause: releaseClause,
+                status: status,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$AgentContractsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({agentId = false, playerId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (agentId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.agentId,
+                                referencedTable: $$AgentContractsTableReferences
+                                    ._agentIdTable(db),
+                                referencedColumn:
+                                    $$AgentContractsTableReferences
+                                        ._agentIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+                    if (playerId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.playerId,
+                                referencedTable: $$AgentContractsTableReferences
+                                    ._playerIdTable(db),
+                                referencedColumn:
+                                    $$AgentContractsTableReferences
+                                        ._playerIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$AgentContractsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AgentContractsTable,
+      AgentContract,
+      $$AgentContractsTableFilterComposer,
+      $$AgentContractsTableOrderingComposer,
+      $$AgentContractsTableAnnotationComposer,
+      $$AgentContractsTableCreateCompanionBuilder,
+      $$AgentContractsTableUpdateCompanionBuilder,
+      (AgentContract, $$AgentContractsTableReferences),
+      AgentContract,
+      PrefetchHooks Function({bool agentId, bool playerId})
+    >;
+typedef $$ClubContractsTableCreateCompanionBuilder =
+    ClubContractsCompanion Function({
+      Value<int> id,
+      required int clubId,
+      required int playerId,
+      required int weeklySalary,
+      Value<int?> releaseClause,
+      required DateTime startDate,
+      required DateTime endDate,
+      Value<String> status,
+    });
+typedef $$ClubContractsTableUpdateCompanionBuilder =
+    ClubContractsCompanion Function({
+      Value<int> id,
+      Value<int> clubId,
+      Value<int> playerId,
+      Value<int> weeklySalary,
+      Value<int?> releaseClause,
+      Value<DateTime> startDate,
+      Value<DateTime> endDate,
+      Value<String> status,
+    });
+
+final class $$ClubContractsTableReferences
+    extends BaseReferences<_$AppDatabase, $ClubContractsTable, ClubContract> {
+  $$ClubContractsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ClubsTable _clubIdTable(_$AppDatabase db) => db.clubs.createAlias(
+    $_aliasNameGenerator(db.clubContracts.clubId, db.clubs.id),
+  );
+
+  $$ClubsTableProcessedTableManager get clubId {
+    final $_column = $_itemColumn<int>('club_id')!;
+
+    final manager = $$ClubsTableTableManager(
+      $_db,
+      $_db.clubs,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_clubIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $PlayersTable _playerIdTable(_$AppDatabase db) =>
+      db.players.createAlias(
+        $_aliasNameGenerator(db.clubContracts.playerId, db.players.id),
+      );
+
+  $$PlayersTableProcessedTableManager get playerId {
+    final $_column = $_itemColumn<int>('player_id')!;
+
+    final manager = $$PlayersTableTableManager(
+      $_db,
+      $_db.players,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_playerIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$ClubContractsTableFilterComposer
+    extends Composer<_$AppDatabase, $ClubContractsTable> {
+  $$ClubContractsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get weeklySalary => $composableBuilder(
+    column: $table.weeklySalary,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get releaseClause => $composableBuilder(
+    column: $table.releaseClause,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get startDate => $composableBuilder(
+    column: $table.startDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get endDate => $composableBuilder(
+    column: $table.endDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ClubsTableFilterComposer get clubId {
+    final $$ClubsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.clubId,
+      referencedTable: $db.clubs,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ClubsTableFilterComposer(
+            $db: $db,
+            $table: $db.clubs,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PlayersTableFilterComposer get playerId {
+    final $$PlayersTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.playerId,
+      referencedTable: $db.players,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlayersTableFilterComposer(
+            $db: $db,
+            $table: $db.players,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ClubContractsTableOrderingComposer
+    extends Composer<_$AppDatabase, $ClubContractsTable> {
+  $$ClubContractsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get weeklySalary => $composableBuilder(
+    column: $table.weeklySalary,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get releaseClause => $composableBuilder(
+    column: $table.releaseClause,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get startDate => $composableBuilder(
+    column: $table.startDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get endDate => $composableBuilder(
+    column: $table.endDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ClubsTableOrderingComposer get clubId {
+    final $$ClubsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.clubId,
+      referencedTable: $db.clubs,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ClubsTableOrderingComposer(
+            $db: $db,
+            $table: $db.clubs,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PlayersTableOrderingComposer get playerId {
+    final $$PlayersTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.playerId,
+      referencedTable: $db.players,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlayersTableOrderingComposer(
+            $db: $db,
+            $table: $db.players,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ClubContractsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ClubContractsTable> {
+  $$ClubContractsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get weeklySalary => $composableBuilder(
+    column: $table.weeklySalary,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get releaseClause => $composableBuilder(
+    column: $table.releaseClause,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get startDate =>
+      $composableBuilder(column: $table.startDate, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get endDate =>
+      $composableBuilder(column: $table.endDate, builder: (column) => column);
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  $$ClubsTableAnnotationComposer get clubId {
+    final $$ClubsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.clubId,
+      referencedTable: $db.clubs,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ClubsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.clubs,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PlayersTableAnnotationComposer get playerId {
+    final $$PlayersTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.playerId,
+      referencedTable: $db.players,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlayersTableAnnotationComposer(
+            $db: $db,
+            $table: $db.players,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ClubContractsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ClubContractsTable,
+          ClubContract,
+          $$ClubContractsTableFilterComposer,
+          $$ClubContractsTableOrderingComposer,
+          $$ClubContractsTableAnnotationComposer,
+          $$ClubContractsTableCreateCompanionBuilder,
+          $$ClubContractsTableUpdateCompanionBuilder,
+          (ClubContract, $$ClubContractsTableReferences),
+          ClubContract,
+          PrefetchHooks Function({bool clubId, bool playerId})
+        > {
+  $$ClubContractsTableTableManager(_$AppDatabase db, $ClubContractsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ClubContractsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ClubContractsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ClubContractsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> clubId = const Value.absent(),
+                Value<int> playerId = const Value.absent(),
+                Value<int> weeklySalary = const Value.absent(),
+                Value<int?> releaseClause = const Value.absent(),
+                Value<DateTime> startDate = const Value.absent(),
+                Value<DateTime> endDate = const Value.absent(),
+                Value<String> status = const Value.absent(),
+              }) => ClubContractsCompanion(
+                id: id,
+                clubId: clubId,
+                playerId: playerId,
+                weeklySalary: weeklySalary,
+                releaseClause: releaseClause,
+                startDate: startDate,
+                endDate: endDate,
+                status: status,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int clubId,
+                required int playerId,
+                required int weeklySalary,
+                Value<int?> releaseClause = const Value.absent(),
+                required DateTime startDate,
+                required DateTime endDate,
+                Value<String> status = const Value.absent(),
+              }) => ClubContractsCompanion.insert(
+                id: id,
+                clubId: clubId,
+                playerId: playerId,
+                weeklySalary: weeklySalary,
+                releaseClause: releaseClause,
+                startDate: startDate,
+                endDate: endDate,
+                status: status,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$ClubContractsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({clubId = false, playerId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (clubId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.clubId,
+                                referencedTable: $$ClubContractsTableReferences
+                                    ._clubIdTable(db),
+                                referencedColumn: $$ClubContractsTableReferences
+                                    ._clubIdTable(db)
+                                    .id,
+                              )
+                              as T;
+                    }
+                    if (playerId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.playerId,
+                                referencedTable: $$ClubContractsTableReferences
+                                    ._playerIdTable(db),
+                                referencedColumn: $$ClubContractsTableReferences
+                                    ._playerIdTable(db)
+                                    .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$ClubContractsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ClubContractsTable,
+      ClubContract,
+      $$ClubContractsTableFilterComposer,
+      $$ClubContractsTableOrderingComposer,
+      $$ClubContractsTableAnnotationComposer,
+      $$ClubContractsTableCreateCompanionBuilder,
+      $$ClubContractsTableUpdateCompanionBuilder,
+      (ClubContract, $$ClubContractsTableReferences),
+      ClubContract,
+      PrefetchHooks Function({bool clubId, bool playerId})
     >;
 typedef $$TransfersTableCreateCompanionBuilder =
     TransfersCompanion Function({
@@ -9612,10 +10874,12 @@ class $AppDatabaseManager {
       $$ClubsTableTableManager(_db, _db.clubs);
   $$AgentsTableTableManager get agents =>
       $$AgentsTableTableManager(_db, _db.agents);
-  $$ContractsTableTableManager get contracts =>
-      $$ContractsTableTableManager(_db, _db.contracts);
   $$PlayersTableTableManager get players =>
       $$PlayersTableTableManager(_db, _db.players);
+  $$AgentContractsTableTableManager get agentContracts =>
+      $$AgentContractsTableTableManager(_db, _db.agentContracts);
+  $$ClubContractsTableTableManager get clubContracts =>
+      $$ClubContractsTableTableManager(_db, _db.clubContracts);
   $$TransfersTableTableManager get transfers =>
       $$TransfersTableTableManager(_db, _db.transfers);
   $$ValueHistoriesTableTableManager get valueHistories =>

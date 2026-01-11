@@ -1,7 +1,6 @@
 import 'package:drift/drift.dart';
 import '../../../../clubs/data/datasources/tables/clubs_table.dart';
 import '../../../../agents/data/datasources/tables/agents_table.dart';
-import '../../../../contracts/data/datasources/tables/contracts_table.dart';
 
 class Players extends Table {
   IntColumn get id => integer().autoIncrement()();
@@ -17,5 +16,4 @@ class Players extends Table {
   IntColumn get marketValue => integer()();
   // Using nullable references for circular dependencies might be needed, 
   // but drift handles simple references.
-  IntColumn get currentContractId => integer().nullable().references(Contracts, #id)();
 }
