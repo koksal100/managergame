@@ -13,7 +13,8 @@ final simulationServiceProvider = Provider<SimulationService>((ref) {
 });
 
 final tickerMatchesProvider = FutureProvider<List<String>>((ref) async {
-  final currentWeek = ref.watch(gameDateProvider);
+  final currentGameTime = ref.watch(gameDateProvider);
+  final currentWeek = currentGameTime.week;
   // Fetch from previous week if possible, ensuring we show results of just played matches
   final targetWeek = currentWeek > 1 ? currentWeek - 1 : 1;
   

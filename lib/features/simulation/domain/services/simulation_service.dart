@@ -205,11 +205,11 @@ class SimulationService {
         if (needsStats) {
              // Generate stats for Home Team
             final homePlayers = await _getBest11(match.homeClubId);
-            _distributeStats(preparedPerformances, homePlayers, match.id, match.homeScore!, random);
+            _distributeStats(preparedPerformances, homePlayers, match.id, match.homeScore!, random, season);
             
             // Generate stats for Away Team
             final awayPlayers = await _getBest11(match.awayClubId);
-            _distributeStats(preparedPerformances, awayPlayers, match.id, match.awayScore!, random);
+            _distributeStats(preparedPerformances, awayPlayers, match.id, match.awayScore!, random, season);
         }
     }
     
@@ -220,7 +220,7 @@ class SimulationService {
     }
   }
 
-  void _distributeStats(List<Performance> performances, List<dynamic> players, int matchId, int teamGoals, Random r) {
+  void _distributeStats(List<Performance> performances, List<dynamic> players, int matchId, int teamGoals, Random r, int season) {
       if (players.isEmpty) return;
 
       // Track goals and assists
@@ -258,6 +258,7 @@ class SimulationService {
               yellowCards: r.nextInt(20) == 0 ? 1 : 0, 
               redCards: 0,
               rating: 6.0 + r.nextDouble() * 4.0 + (goals * 0.5) + (assists * 0.3), // Bonus rating
+              season: season,
           ));
       }
   }

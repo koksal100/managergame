@@ -17,6 +17,7 @@ import '../../../transfers/providers/transfer_provider.dart';
 import '../../../transfers/domain/services/transfer_engine.dart';
 import '../../../transfers/presentation/pages/transfer_market_page.dart';
 import '../../../../core/providers/database_provider.dart';
+import '../../../../core/models/game_time.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -323,7 +324,7 @@ class HomeContent extends ConsumerWidget {
     );
   }
 
-  Future<void> _handleSimulation(BuildContext context, WidgetRef ref, int currentWeek) async {
+  Future<void> _handleSimulation(BuildContext context, WidgetRef ref, GameTime currentGameTime) async {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -337,9 +338,10 @@ class HomeContent extends ConsumerWidget {
       final simulationService = ref.read(simulationServiceProvider);
       final transferEngine = ref.read(transferEngineProvider);
       
-      final nextWeek = currentWeek + 1;
+      final currentWeek = currentGameTime.week;
+      final currentSeason = currentGameTime.season;
       
-      print('[Simulation] currentWeek=$currentWeek, nextWeek=$nextWeek');
+      print('[Simulation] Season=$currentSeason, Week=$currentWeek');
       print('[Simulation] isTransferWindow=${TransferEngine.isTransferWindow(currentWeek)}');
 
       // --- TRANSFER WINDOW LOGIC ---
@@ -354,8 +356,8 @@ class HomeContent extends ConsumerWidget {
         }
         
         // Process offers
-        await transferEngine.processOfferCreation(currentWeek);
-        await transferEngine.evaluateOffers(currentWeek);
+        await transferEngine.processOfferCreation(currentSeason, currentWeek);
+        await transferEngine.evaluateOffers(currentSeason, currentWeek);
       }
       
       // 2. If exiting transfer window, clear needs
@@ -364,7 +366,7 @@ class HomeContent extends ConsumerWidget {
       }
 
       // --- MATCH SIMULATION ---
-      await simulationService.simulateWeek(1, currentWeek);
+      await simulationService.simulateWeek(currentSeason, currentWeek);
       await ref.read(gameDateProvider.notifier).advanceWeek();
 
       // Invalidate Providers
@@ -450,7 +452,7 @@ class _ManagerProfileHeader extends ConsumerWidget {
                      ),
                      const SizedBox(height: 2),
                      Text(
-                       "WEEK $currentWeek",
+                       "SEASON ${currentWeek.season} | WEEK ${currentWeek.week}",
                         style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 12, fontWeight: FontWeight.w500),
                      ),
                    ],

@@ -104,9 +104,9 @@ class TransferEngine {
   /// Optimized: Fetches all buy needs, shuffles them, and processes max 50 per day.
   /// Process offer creation.
   /// optimized: Fetches all data upfront (Batch Processing) to minimize DB I/O.
-  Future<void> processOfferCreation(int currentWeek) async {
+  Future<void> processOfferCreation(int season, int currentWeek) async {
     final startTime = DateTime.now();
-    print('[TransferEngine] processOfferCreation started');
+    print('[TransferEngine] processOfferCreation started for Season $season Week $currentWeek');
 
     // 1. Fetch ALL unfulfilled Buy Needs
     final allBuyNeeds = await (database.select(database.transferNeeds)
@@ -160,6 +160,7 @@ class TransferEngine {
     
     final recentlyTransferredOffers = await (database.select(database.transferOffers)
       ..where((t) => t.status.equals('accepted'))
+      ..where((t) => t.season.equals(season)) // Filter by current season
       ..where((t) => t.createdAtWeek.isBiggerOrEqualValue(windowStartWeek)))
       .get();
       
@@ -232,6 +233,7 @@ class TransferEngine {
               proposedSalary: Value(proposedSalary),
               contractYears: Value(2 + _random.nextInt(3)),
               // 2-4 years
+              season: Value(season),
               createdAtWeek: Value(currentWeek),
               status: const Value('pending'),
             ));
@@ -297,6 +299,7 @@ class TransferEngine {
                     offerAmount: Value(estimatedFee),
                     proposedSalary: Value(proposedSalary),
                     contractYears: Value(2 + _random.nextInt(3)),
+                    season: Value(season),
                     createdAtWeek: Value(currentWeek),
                     status: const Value('pending'),
                   ));
@@ -319,12 +322,22 @@ class TransferEngine {
   /// Evaluate pending offers from previous day.
   /// Evaluate pending offers from previous day.
   /// Refactored: Groups offers by player, picks best offer, and auto-rejects others.
-  Future<void> evaluateOffers(int currentWeek) async {
-    // Get offers created last week (or earlier) that are still pending
+  Future<void> evaluateOffers(int season, int currentWeek) async {
+    // Get offers created earlier than today (previous weeks/days)
+    // Complex logic for season transition:
+    // If season > offer.season -> Process it (it's from old season)
+    // If season == offer.season AND currentWeek > offer.createdAtWeek -> Process it
+    
     final pendingOffers = await (database.select(database.transferOffers)
-      ..where((t) => t.status.equals('pending'))
-      ..where((t) => t.createdAtWeek.isSmallerThanValue(currentWeek)))
+      ..where((t) => t.status.equals('pending')))
       .get();
+      
+    // Filter in Dart for complex date logic
+    final offersToProcess = pendingOffers.where((o) {
+       if (o.season < season) return true;
+       if (o.season == season && o.createdAtWeek < currentWeek) return true;
+       return false;
+    }).toList();
     
     // Group by Player ID
     final offersByPlayer = <int, List<TransferOffer>>{};
@@ -383,7 +396,7 @@ class TransferEngine {
       
       if (accepted) {
         // 1. Accept Best Offer
-        await _finalizeTransfer(bestOffer);
+        await _finalizeTransfer(bestOffer, season, currentWeek);
         print('[TransferEngine] ACCEPTED best offer for Player $playerId: €${bestOffer.offerAmount}');
         
         // 2. Auto-Reject all other offers for this player
@@ -409,7 +422,7 @@ class TransferEngine {
 
 
   /// Complete a transfer: update player, create contracts, log transfer.
-  Future<void> _finalizeTransfer(TransferOffer offer) async {
+  Future<void> _finalizeTransfer(TransferOffer offer, int season, int week) async {
     final now = DateTime.now();
     
     // 1. Update offer status
@@ -424,6 +437,8 @@ class TransferEngine {
       date: Value(now),
       feeAmount: Value(offer.offerAmount.toDouble()),
       type: const Value('Permanent'),
+      season: Value(season),
+      week: Value(week),
     ));
     
     // 3. Update player's club
@@ -442,11 +457,22 @@ class TransferEngine {
       status: const Value('active'),
     ));
     
-    // 5. Mark buy need as fulfilled
+    // 5. Update Budgets
+    // Selling Club (toClubId) -> Gains Transfer Fee
+    final sellingClub = await (database.select(database.clubs)..where((t) => t.id.equals(offer.toClubId))).getSingle();
+    await (database.update(database.clubs)..where((t) => t.id.equals(offer.toClubId)))
+      .write(ClubsCompanion(transferBudget: Value(sellingClub.transferBudget + offer.offerAmount)));
+      
+    // Buying Club (fromClubId) -> Loses Transfer Fee
+    final buyingClub = await (database.select(database.clubs)..where((t) => t.id.equals(offer.fromClubId))).getSingle();
+    await (database.update(database.clubs)..where((t) => t.id.equals(offer.fromClubId)))
+      .write(ClubsCompanion(transferBudget: Value(buyingClub.transferBudget - offer.offerAmount)));
+
+    // 6. Mark buy need as fulfilled
     await (database.update(database.transferNeeds)..where((t) => t.id.equals(offer.needId)))
       .write(const TransferNeedsCompanion(isFulfilled: Value(true)));
     
-    // 6. Mark sell need as fulfilled (if exists)
+    // 7. Mark sell need as fulfilled (if exists)
     await (database.update(database.transferNeeds)
       ..where((t) => t.type.equals('sell'))
       ..where((t) => t.playerToSellId.equals(offer.playerId)))

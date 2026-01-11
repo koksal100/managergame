@@ -45,6 +45,7 @@ class PerformanceRepositoryImpl implements PerformanceRepository {
       assists: row.assists,
       yellowCards: row.yellowCards,
       redCards: row.redCards,
+      season: row.season,
       rating: row.rating,
     )).toList();
   }
@@ -65,6 +66,7 @@ class PerformanceRepositoryImpl implements PerformanceRepository {
       assists: row.assists,
       yellowCards: row.yellowCards,
       redCards: row.redCards,
+      season: row.season,
       rating: row.rating,
     )).toList();
   }

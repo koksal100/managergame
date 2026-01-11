@@ -14,6 +14,7 @@ class TransferOffers extends Table {
   IntColumn get proposedSalary => integer()();
   IntColumn get contractYears => integer()();
   
+  IntColumn get season => integer().withDefault(const Constant(1))();
   IntColumn get createdAtWeek => integer()();
   TextColumn get status => text().withDefault(const Constant('pending'))(); // pending, accepted, rejected
 }

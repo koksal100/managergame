@@ -9,6 +9,7 @@ class Performance extends Equatable {
   final int assists;
   final int yellowCards;
   final int redCards;
+  final int season;
   final double rating;
 
   const Performance({
@@ -20,9 +21,10 @@ class Performance extends Equatable {
     required this.assists,
     required this.yellowCards,
     required this.redCards,
+    required this.season,
     required this.rating,
   });
 
   @override
-  List<Object?> get props => [id, matchId, playerId, minutesPlayed, goals, assists, yellowCards, redCards, rating];
+  List<Object?> get props => [id, matchId, playerId, minutesPlayed, goals, assists, yellowCards, redCards, season, rating];
 }

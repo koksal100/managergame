@@ -10,4 +10,6 @@ class Transfers extends Table {
   DateTimeColumn get date => dateTime()();
   RealColumn get feeAmount => real()();
   TextColumn get type => text()(); // Loan, Permanent
+  IntColumn get season => integer().withDefault(const Constant(1))();
+  IntColumn get week => integer().withDefault(const Constant(1))();
 }

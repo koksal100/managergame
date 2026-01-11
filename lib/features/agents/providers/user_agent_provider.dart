@@ -115,7 +115,8 @@ class UserAgentNotifier extends AsyncNotifier<Agent?> {
   String _getOfferKey(int week) => 'weekly_offers_used_week_$week';
 
   Future<int> getWeeklyOffersUsed() async {
-    final currentWeek = ref.read(gameDateProvider);
+    final currentGameTime = ref.read(gameDateProvider);
+    final currentWeek = currentGameTime.week;
     final prefs = await SharedPreferences.getInstance();
     return prefs.getInt(_getOfferKey(currentWeek)) ?? 0;
   }
@@ -126,7 +127,8 @@ class UserAgentNotifier extends AsyncNotifier<Agent?> {
   }
 
   Future<void> incrementOfferCount() async {
-    final currentWeek = ref.read(gameDateProvider);
+    final currentGameTime = ref.read(gameDateProvider);
+    final currentWeek = currentGameTime.week;
     final prefs = await SharedPreferences.getInstance();
     final key = _getOfferKey(currentWeek);
     final current = prefs.getInt(key) ?? 0;

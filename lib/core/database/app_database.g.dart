@@ -2930,6 +2930,26 @@ class $TransfersTable extends Transfers
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _seasonMeta = const VerificationMeta('season');
+  @override
+  late final GeneratedColumn<int> season = GeneratedColumn<int>(
+    'season',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  static const VerificationMeta _weekMeta = const VerificationMeta('week');
+  @override
+  late final GeneratedColumn<int> week = GeneratedColumn<int>(
+    'week',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -2939,6 +2959,8 @@ class $TransfersTable extends Transfers
     date,
     feeAmount,
     type,
+    season,
+    week,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -3006,6 +3028,18 @@ class $TransfersTable extends Transfers
     } else if (isInserting) {
       context.missing(_typeMeta);
     }
+    if (data.containsKey('season')) {
+      context.handle(
+        _seasonMeta,
+        season.isAcceptableOrUnknown(data['season']!, _seasonMeta),
+      );
+    }
+    if (data.containsKey('week')) {
+      context.handle(
+        _weekMeta,
+        week.isAcceptableOrUnknown(data['week']!, _weekMeta),
+      );
+    }
     return context;
   }
 
@@ -3043,6 +3077,14 @@ class $TransfersTable extends Transfers
         DriftSqlType.string,
         data['${effectivePrefix}type'],
       )!,
+      season: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}season'],
+      )!,
+      week: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}week'],
+      )!,
     );
   }
 
@@ -3060,6 +3102,8 @@ class Transfer extends DataClass implements Insertable<Transfer> {
   final DateTime date;
   final double feeAmount;
   final String type;
+  final int season;
+  final int week;
   const Transfer({
     required this.id,
     required this.playerId,
@@ -3068,6 +3112,8 @@ class Transfer extends DataClass implements Insertable<Transfer> {
     required this.date,
     required this.feeAmount,
     required this.type,
+    required this.season,
+    required this.week,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -3079,6 +3125,8 @@ class Transfer extends DataClass implements Insertable<Transfer> {
     map['date'] = Variable<DateTime>(date);
     map['fee_amount'] = Variable<double>(feeAmount);
     map['type'] = Variable<String>(type);
+    map['season'] = Variable<int>(season);
+    map['week'] = Variable<int>(week);
     return map;
   }
 
@@ -3091,6 +3139,8 @@ class Transfer extends DataClass implements Insertable<Transfer> {
       date: Value(date),
       feeAmount: Value(feeAmount),
       type: Value(type),
+      season: Value(season),
+      week: Value(week),
     );
   }
 
@@ -3107,6 +3157,8 @@ class Transfer extends DataClass implements Insertable<Transfer> {
       date: serializer.fromJson<DateTime>(json['date']),
       feeAmount: serializer.fromJson<double>(json['feeAmount']),
       type: serializer.fromJson<String>(json['type']),
+      season: serializer.fromJson<int>(json['season']),
+      week: serializer.fromJson<int>(json['week']),
     );
   }
   @override
@@ -3120,6 +3172,8 @@ class Transfer extends DataClass implements Insertable<Transfer> {
       'date': serializer.toJson<DateTime>(date),
       'feeAmount': serializer.toJson<double>(feeAmount),
       'type': serializer.toJson<String>(type),
+      'season': serializer.toJson<int>(season),
+      'week': serializer.toJson<int>(week),
     };
   }
 
@@ -3131,6 +3185,8 @@ class Transfer extends DataClass implements Insertable<Transfer> {
     DateTime? date,
     double? feeAmount,
     String? type,
+    int? season,
+    int? week,
   }) => Transfer(
     id: id ?? this.id,
     playerId: playerId ?? this.playerId,
@@ -3139,6 +3195,8 @@ class Transfer extends DataClass implements Insertable<Transfer> {
     date: date ?? this.date,
     feeAmount: feeAmount ?? this.feeAmount,
     type: type ?? this.type,
+    season: season ?? this.season,
+    week: week ?? this.week,
   );
   Transfer copyWithCompanion(TransfersCompanion data) {
     return Transfer(
@@ -3151,6 +3209,8 @@ class Transfer extends DataClass implements Insertable<Transfer> {
       date: data.date.present ? data.date.value : this.date,
       feeAmount: data.feeAmount.present ? data.feeAmount.value : this.feeAmount,
       type: data.type.present ? data.type.value : this.type,
+      season: data.season.present ? data.season.value : this.season,
+      week: data.week.present ? data.week.value : this.week,
     );
   }
 
@@ -3163,14 +3223,25 @@ class Transfer extends DataClass implements Insertable<Transfer> {
           ..write('toClubId: $toClubId, ')
           ..write('date: $date, ')
           ..write('feeAmount: $feeAmount, ')
-          ..write('type: $type')
+          ..write('type: $type, ')
+          ..write('season: $season, ')
+          ..write('week: $week')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, playerId, fromClubId, toClubId, date, feeAmount, type);
+  int get hashCode => Object.hash(
+    id,
+    playerId,
+    fromClubId,
+    toClubId,
+    date,
+    feeAmount,
+    type,
+    season,
+    week,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -3181,7 +3252,9 @@ class Transfer extends DataClass implements Insertable<Transfer> {
           other.toClubId == this.toClubId &&
           other.date == this.date &&
           other.feeAmount == this.feeAmount &&
-          other.type == this.type);
+          other.type == this.type &&
+          other.season == this.season &&
+          other.week == this.week);
 }
 
 class TransfersCompanion extends UpdateCompanion<Transfer> {
@@ -3192,6 +3265,8 @@ class TransfersCompanion extends UpdateCompanion<Transfer> {
   final Value<DateTime> date;
   final Value<double> feeAmount;
   final Value<String> type;
+  final Value<int> season;
+  final Value<int> week;
   const TransfersCompanion({
     this.id = const Value.absent(),
     this.playerId = const Value.absent(),
@@ -3200,6 +3275,8 @@ class TransfersCompanion extends UpdateCompanion<Transfer> {
     this.date = const Value.absent(),
     this.feeAmount = const Value.absent(),
     this.type = const Value.absent(),
+    this.season = const Value.absent(),
+    this.week = const Value.absent(),
   });
   TransfersCompanion.insert({
     this.id = const Value.absent(),
@@ -3209,6 +3286,8 @@ class TransfersCompanion extends UpdateCompanion<Transfer> {
     required DateTime date,
     required double feeAmount,
     required String type,
+    this.season = const Value.absent(),
+    this.week = const Value.absent(),
   }) : playerId = Value(playerId),
        fromClubId = Value(fromClubId),
        toClubId = Value(toClubId),
@@ -3223,6 +3302,8 @@ class TransfersCompanion extends UpdateCompanion<Transfer> {
     Expression<DateTime>? date,
     Expression<double>? feeAmount,
     Expression<String>? type,
+    Expression<int>? season,
+    Expression<int>? week,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -3232,6 +3313,8 @@ class TransfersCompanion extends UpdateCompanion<Transfer> {
       if (date != null) 'date': date,
       if (feeAmount != null) 'fee_amount': feeAmount,
       if (type != null) 'type': type,
+      if (season != null) 'season': season,
+      if (week != null) 'week': week,
     });
   }
 
@@ -3243,6 +3326,8 @@ class TransfersCompanion extends UpdateCompanion<Transfer> {
     Value<DateTime>? date,
     Value<double>? feeAmount,
     Value<String>? type,
+    Value<int>? season,
+    Value<int>? week,
   }) {
     return TransfersCompanion(
       id: id ?? this.id,
@@ -3252,6 +3337,8 @@ class TransfersCompanion extends UpdateCompanion<Transfer> {
       date: date ?? this.date,
       feeAmount: feeAmount ?? this.feeAmount,
       type: type ?? this.type,
+      season: season ?? this.season,
+      week: week ?? this.week,
     );
   }
 
@@ -3279,6 +3366,12 @@ class TransfersCompanion extends UpdateCompanion<Transfer> {
     if (type.present) {
       map['type'] = Variable<String>(type.value);
     }
+    if (season.present) {
+      map['season'] = Variable<int>(season.value);
+    }
+    if (week.present) {
+      map['week'] = Variable<int>(week.value);
+    }
     return map;
   }
 
@@ -3291,7 +3384,9 @@ class TransfersCompanion extends UpdateCompanion<Transfer> {
           ..write('toClubId: $toClubId, ')
           ..write('date: $date, ')
           ..write('feeAmount: $feeAmount, ')
-          ..write('type: $type')
+          ..write('type: $type, ')
+          ..write('season: $season, ')
+          ..write('week: $week')
           ..write(')'))
         .toString();
   }
@@ -4137,6 +4232,16 @@ class $TransferOffersTable extends TransferOffers
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _seasonMeta = const VerificationMeta('season');
+  @override
+  late final GeneratedColumn<int> season = GeneratedColumn<int>(
+    'season',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
   static const VerificationMeta _createdAtWeekMeta = const VerificationMeta(
     'createdAtWeek',
   );
@@ -4168,6 +4273,7 @@ class $TransferOffersTable extends TransferOffers
     offerAmount,
     proposedSalary,
     contractYears,
+    season,
     createdAtWeek,
     status,
   ];
@@ -4254,6 +4360,12 @@ class $TransferOffersTable extends TransferOffers
     } else if (isInserting) {
       context.missing(_contractYearsMeta);
     }
+    if (data.containsKey('season')) {
+      context.handle(
+        _seasonMeta,
+        season.isAcceptableOrUnknown(data['season']!, _seasonMeta),
+      );
+    }
     if (data.containsKey('created_at_week')) {
       context.handle(
         _createdAtWeekMeta,
@@ -4312,6 +4424,10 @@ class $TransferOffersTable extends TransferOffers
         DriftSqlType.int,
         data['${effectivePrefix}contract_years'],
       )!,
+      season: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}season'],
+      )!,
       createdAtWeek: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}created_at_week'],
@@ -4338,6 +4454,7 @@ class TransferOffer extends DataClass implements Insertable<TransferOffer> {
   final int offerAmount;
   final int proposedSalary;
   final int contractYears;
+  final int season;
   final int createdAtWeek;
   final String status;
   const TransferOffer({
@@ -4349,6 +4466,7 @@ class TransferOffer extends DataClass implements Insertable<TransferOffer> {
     required this.offerAmount,
     required this.proposedSalary,
     required this.contractYears,
+    required this.season,
     required this.createdAtWeek,
     required this.status,
   });
@@ -4363,6 +4481,7 @@ class TransferOffer extends DataClass implements Insertable<TransferOffer> {
     map['offer_amount'] = Variable<int>(offerAmount);
     map['proposed_salary'] = Variable<int>(proposedSalary);
     map['contract_years'] = Variable<int>(contractYears);
+    map['season'] = Variable<int>(season);
     map['created_at_week'] = Variable<int>(createdAtWeek);
     map['status'] = Variable<String>(status);
     return map;
@@ -4378,6 +4497,7 @@ class TransferOffer extends DataClass implements Insertable<TransferOffer> {
       offerAmount: Value(offerAmount),
       proposedSalary: Value(proposedSalary),
       contractYears: Value(contractYears),
+      season: Value(season),
       createdAtWeek: Value(createdAtWeek),
       status: Value(status),
     );
@@ -4397,6 +4517,7 @@ class TransferOffer extends DataClass implements Insertable<TransferOffer> {
       offerAmount: serializer.fromJson<int>(json['offerAmount']),
       proposedSalary: serializer.fromJson<int>(json['proposedSalary']),
       contractYears: serializer.fromJson<int>(json['contractYears']),
+      season: serializer.fromJson<int>(json['season']),
       createdAtWeek: serializer.fromJson<int>(json['createdAtWeek']),
       status: serializer.fromJson<String>(json['status']),
     );
@@ -4413,6 +4534,7 @@ class TransferOffer extends DataClass implements Insertable<TransferOffer> {
       'offerAmount': serializer.toJson<int>(offerAmount),
       'proposedSalary': serializer.toJson<int>(proposedSalary),
       'contractYears': serializer.toJson<int>(contractYears),
+      'season': serializer.toJson<int>(season),
       'createdAtWeek': serializer.toJson<int>(createdAtWeek),
       'status': serializer.toJson<String>(status),
     };
@@ -4427,6 +4549,7 @@ class TransferOffer extends DataClass implements Insertable<TransferOffer> {
     int? offerAmount,
     int? proposedSalary,
     int? contractYears,
+    int? season,
     int? createdAtWeek,
     String? status,
   }) => TransferOffer(
@@ -4438,6 +4561,7 @@ class TransferOffer extends DataClass implements Insertable<TransferOffer> {
     offerAmount: offerAmount ?? this.offerAmount,
     proposedSalary: proposedSalary ?? this.proposedSalary,
     contractYears: contractYears ?? this.contractYears,
+    season: season ?? this.season,
     createdAtWeek: createdAtWeek ?? this.createdAtWeek,
     status: status ?? this.status,
   );
@@ -4459,6 +4583,7 @@ class TransferOffer extends DataClass implements Insertable<TransferOffer> {
       contractYears: data.contractYears.present
           ? data.contractYears.value
           : this.contractYears,
+      season: data.season.present ? data.season.value : this.season,
       createdAtWeek: data.createdAtWeek.present
           ? data.createdAtWeek.value
           : this.createdAtWeek,
@@ -4477,6 +4602,7 @@ class TransferOffer extends DataClass implements Insertable<TransferOffer> {
           ..write('offerAmount: $offerAmount, ')
           ..write('proposedSalary: $proposedSalary, ')
           ..write('contractYears: $contractYears, ')
+          ..write('season: $season, ')
           ..write('createdAtWeek: $createdAtWeek, ')
           ..write('status: $status')
           ..write(')'))
@@ -4493,6 +4619,7 @@ class TransferOffer extends DataClass implements Insertable<TransferOffer> {
     offerAmount,
     proposedSalary,
     contractYears,
+    season,
     createdAtWeek,
     status,
   );
@@ -4508,6 +4635,7 @@ class TransferOffer extends DataClass implements Insertable<TransferOffer> {
           other.offerAmount == this.offerAmount &&
           other.proposedSalary == this.proposedSalary &&
           other.contractYears == this.contractYears &&
+          other.season == this.season &&
           other.createdAtWeek == this.createdAtWeek &&
           other.status == this.status);
 }
@@ -4521,6 +4649,7 @@ class TransferOffersCompanion extends UpdateCompanion<TransferOffer> {
   final Value<int> offerAmount;
   final Value<int> proposedSalary;
   final Value<int> contractYears;
+  final Value<int> season;
   final Value<int> createdAtWeek;
   final Value<String> status;
   const TransferOffersCompanion({
@@ -4532,6 +4661,7 @@ class TransferOffersCompanion extends UpdateCompanion<TransferOffer> {
     this.offerAmount = const Value.absent(),
     this.proposedSalary = const Value.absent(),
     this.contractYears = const Value.absent(),
+    this.season = const Value.absent(),
     this.createdAtWeek = const Value.absent(),
     this.status = const Value.absent(),
   });
@@ -4544,6 +4674,7 @@ class TransferOffersCompanion extends UpdateCompanion<TransferOffer> {
     required int offerAmount,
     required int proposedSalary,
     required int contractYears,
+    this.season = const Value.absent(),
     required int createdAtWeek,
     this.status = const Value.absent(),
   }) : fromClubId = Value(fromClubId),
@@ -4563,6 +4694,7 @@ class TransferOffersCompanion extends UpdateCompanion<TransferOffer> {
     Expression<int>? offerAmount,
     Expression<int>? proposedSalary,
     Expression<int>? contractYears,
+    Expression<int>? season,
     Expression<int>? createdAtWeek,
     Expression<String>? status,
   }) {
@@ -4575,6 +4707,7 @@ class TransferOffersCompanion extends UpdateCompanion<TransferOffer> {
       if (offerAmount != null) 'offer_amount': offerAmount,
       if (proposedSalary != null) 'proposed_salary': proposedSalary,
       if (contractYears != null) 'contract_years': contractYears,
+      if (season != null) 'season': season,
       if (createdAtWeek != null) 'created_at_week': createdAtWeek,
       if (status != null) 'status': status,
     });
@@ -4589,6 +4722,7 @@ class TransferOffersCompanion extends UpdateCompanion<TransferOffer> {
     Value<int>? offerAmount,
     Value<int>? proposedSalary,
     Value<int>? contractYears,
+    Value<int>? season,
     Value<int>? createdAtWeek,
     Value<String>? status,
   }) {
@@ -4601,6 +4735,7 @@ class TransferOffersCompanion extends UpdateCompanion<TransferOffer> {
       offerAmount: offerAmount ?? this.offerAmount,
       proposedSalary: proposedSalary ?? this.proposedSalary,
       contractYears: contractYears ?? this.contractYears,
+      season: season ?? this.season,
       createdAtWeek: createdAtWeek ?? this.createdAtWeek,
       status: status ?? this.status,
     );
@@ -4633,6 +4768,9 @@ class TransferOffersCompanion extends UpdateCompanion<TransferOffer> {
     if (contractYears.present) {
       map['contract_years'] = Variable<int>(contractYears.value);
     }
+    if (season.present) {
+      map['season'] = Variable<int>(season.value);
+    }
     if (createdAtWeek.present) {
       map['created_at_week'] = Variable<int>(createdAtWeek.value);
     }
@@ -4653,6 +4791,7 @@ class TransferOffersCompanion extends UpdateCompanion<TransferOffer> {
           ..write('offerAmount: $offerAmount, ')
           ..write('proposedSalary: $proposedSalary, ')
           ..write('contractYears: $contractYears, ')
+          ..write('season: $season, ')
           ..write('createdAtWeek: $createdAtWeek, ')
           ..write('status: $status')
           ..write(')'))
@@ -6265,6 +6404,16 @@ class $PerformancesTable extends Performances
     requiredDuringInsert: false,
     defaultValue: const Constant(0),
   );
+  static const VerificationMeta _seasonMeta = const VerificationMeta('season');
+  @override
+  late final GeneratedColumn<int> season = GeneratedColumn<int>(
+    'season',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
   static const VerificationMeta _ratingMeta = const VerificationMeta('rating');
   @override
   late final GeneratedColumn<double> rating = GeneratedColumn<double>(
@@ -6285,6 +6434,7 @@ class $PerformancesTable extends Performances
     assists,
     yellowCards,
     redCards,
+    season,
     rating,
   ];
   @override
@@ -6354,6 +6504,12 @@ class $PerformancesTable extends Performances
         redCards.isAcceptableOrUnknown(data['red_cards']!, _redCardsMeta),
       );
     }
+    if (data.containsKey('season')) {
+      context.handle(
+        _seasonMeta,
+        season.isAcceptableOrUnknown(data['season']!, _seasonMeta),
+      );
+    }
     if (data.containsKey('rating')) {
       context.handle(
         _ratingMeta,
@@ -6401,6 +6557,10 @@ class $PerformancesTable extends Performances
         DriftSqlType.int,
         data['${effectivePrefix}red_cards'],
       )!,
+      season: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}season'],
+      )!,
       rating: attachedDatabase.typeMapping.read(
         DriftSqlType.double,
         data['${effectivePrefix}rating'],
@@ -6423,6 +6583,7 @@ class Performance extends DataClass implements Insertable<Performance> {
   final int assists;
   final int yellowCards;
   final int redCards;
+  final int season;
   final double rating;
   const Performance({
     required this.id,
@@ -6433,6 +6594,7 @@ class Performance extends DataClass implements Insertable<Performance> {
     required this.assists,
     required this.yellowCards,
     required this.redCards,
+    required this.season,
     required this.rating,
   });
   @override
@@ -6446,6 +6608,7 @@ class Performance extends DataClass implements Insertable<Performance> {
     map['assists'] = Variable<int>(assists);
     map['yellow_cards'] = Variable<int>(yellowCards);
     map['red_cards'] = Variable<int>(redCards);
+    map['season'] = Variable<int>(season);
     map['rating'] = Variable<double>(rating);
     return map;
   }
@@ -6460,6 +6623,7 @@ class Performance extends DataClass implements Insertable<Performance> {
       assists: Value(assists),
       yellowCards: Value(yellowCards),
       redCards: Value(redCards),
+      season: Value(season),
       rating: Value(rating),
     );
   }
@@ -6478,6 +6642,7 @@ class Performance extends DataClass implements Insertable<Performance> {
       assists: serializer.fromJson<int>(json['assists']),
       yellowCards: serializer.fromJson<int>(json['yellowCards']),
       redCards: serializer.fromJson<int>(json['redCards']),
+      season: serializer.fromJson<int>(json['season']),
       rating: serializer.fromJson<double>(json['rating']),
     );
   }
@@ -6493,6 +6658,7 @@ class Performance extends DataClass implements Insertable<Performance> {
       'assists': serializer.toJson<int>(assists),
       'yellowCards': serializer.toJson<int>(yellowCards),
       'redCards': serializer.toJson<int>(redCards),
+      'season': serializer.toJson<int>(season),
       'rating': serializer.toJson<double>(rating),
     };
   }
@@ -6506,6 +6672,7 @@ class Performance extends DataClass implements Insertable<Performance> {
     int? assists,
     int? yellowCards,
     int? redCards,
+    int? season,
     double? rating,
   }) => Performance(
     id: id ?? this.id,
@@ -6516,6 +6683,7 @@ class Performance extends DataClass implements Insertable<Performance> {
     assists: assists ?? this.assists,
     yellowCards: yellowCards ?? this.yellowCards,
     redCards: redCards ?? this.redCards,
+    season: season ?? this.season,
     rating: rating ?? this.rating,
   );
   Performance copyWithCompanion(PerformancesCompanion data) {
@@ -6532,6 +6700,7 @@ class Performance extends DataClass implements Insertable<Performance> {
           ? data.yellowCards.value
           : this.yellowCards,
       redCards: data.redCards.present ? data.redCards.value : this.redCards,
+      season: data.season.present ? data.season.value : this.season,
       rating: data.rating.present ? data.rating.value : this.rating,
     );
   }
@@ -6547,6 +6716,7 @@ class Performance extends DataClass implements Insertable<Performance> {
           ..write('assists: $assists, ')
           ..write('yellowCards: $yellowCards, ')
           ..write('redCards: $redCards, ')
+          ..write('season: $season, ')
           ..write('rating: $rating')
           ..write(')'))
         .toString();
@@ -6562,6 +6732,7 @@ class Performance extends DataClass implements Insertable<Performance> {
     assists,
     yellowCards,
     redCards,
+    season,
     rating,
   );
   @override
@@ -6576,6 +6747,7 @@ class Performance extends DataClass implements Insertable<Performance> {
           other.assists == this.assists &&
           other.yellowCards == this.yellowCards &&
           other.redCards == this.redCards &&
+          other.season == this.season &&
           other.rating == this.rating);
 }
 
@@ -6588,6 +6760,7 @@ class PerformancesCompanion extends UpdateCompanion<Performance> {
   final Value<int> assists;
   final Value<int> yellowCards;
   final Value<int> redCards;
+  final Value<int> season;
   final Value<double> rating;
   const PerformancesCompanion({
     this.id = const Value.absent(),
@@ -6598,6 +6771,7 @@ class PerformancesCompanion extends UpdateCompanion<Performance> {
     this.assists = const Value.absent(),
     this.yellowCards = const Value.absent(),
     this.redCards = const Value.absent(),
+    this.season = const Value.absent(),
     this.rating = const Value.absent(),
   });
   PerformancesCompanion.insert({
@@ -6609,6 +6783,7 @@ class PerformancesCompanion extends UpdateCompanion<Performance> {
     this.assists = const Value.absent(),
     this.yellowCards = const Value.absent(),
     this.redCards = const Value.absent(),
+    this.season = const Value.absent(),
     this.rating = const Value.absent(),
   }) : matchId = Value(matchId),
        playerId = Value(playerId);
@@ -6621,6 +6796,7 @@ class PerformancesCompanion extends UpdateCompanion<Performance> {
     Expression<int>? assists,
     Expression<int>? yellowCards,
     Expression<int>? redCards,
+    Expression<int>? season,
     Expression<double>? rating,
   }) {
     return RawValuesInsertable({
@@ -6632,6 +6808,7 @@ class PerformancesCompanion extends UpdateCompanion<Performance> {
       if (assists != null) 'assists': assists,
       if (yellowCards != null) 'yellow_cards': yellowCards,
       if (redCards != null) 'red_cards': redCards,
+      if (season != null) 'season': season,
       if (rating != null) 'rating': rating,
     });
   }
@@ -6645,6 +6822,7 @@ class PerformancesCompanion extends UpdateCompanion<Performance> {
     Value<int>? assists,
     Value<int>? yellowCards,
     Value<int>? redCards,
+    Value<int>? season,
     Value<double>? rating,
   }) {
     return PerformancesCompanion(
@@ -6656,6 +6834,7 @@ class PerformancesCompanion extends UpdateCompanion<Performance> {
       assists: assists ?? this.assists,
       yellowCards: yellowCards ?? this.yellowCards,
       redCards: redCards ?? this.redCards,
+      season: season ?? this.season,
       rating: rating ?? this.rating,
     );
   }
@@ -6687,6 +6866,9 @@ class PerformancesCompanion extends UpdateCompanion<Performance> {
     if (redCards.present) {
       map['red_cards'] = Variable<int>(redCards.value);
     }
+    if (season.present) {
+      map['season'] = Variable<int>(season.value);
+    }
     if (rating.present) {
       map['rating'] = Variable<double>(rating.value);
     }
@@ -6704,6 +6886,7 @@ class PerformancesCompanion extends UpdateCompanion<Performance> {
           ..write('assists: $assists, ')
           ..write('yellowCards: $yellowCards, ')
           ..write('redCards: $redCards, ')
+          ..write('season: $season, ')
           ..write('rating: $rating')
           ..write(')'))
         .toString();
@@ -10190,6 +10373,8 @@ typedef $$TransfersTableCreateCompanionBuilder =
       required DateTime date,
       required double feeAmount,
       required String type,
+      Value<int> season,
+      Value<int> week,
     });
 typedef $$TransfersTableUpdateCompanionBuilder =
     TransfersCompanion Function({
@@ -10200,6 +10385,8 @@ typedef $$TransfersTableUpdateCompanionBuilder =
       Value<DateTime> date,
       Value<double> feeAmount,
       Value<String> type,
+      Value<int> season,
+      Value<int> week,
     });
 
 final class $$TransfersTableReferences
@@ -10286,6 +10473,16 @@ class $$TransfersTableFilterComposer
 
   ColumnFilters<String> get type => $composableBuilder(
     column: $table.type,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get season => $composableBuilder(
+    column: $table.season,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get week => $composableBuilder(
+    column: $table.week,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -10388,6 +10585,16 @@ class $$TransfersTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get season => $composableBuilder(
+    column: $table.season,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get week => $composableBuilder(
+    column: $table.week,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$PlayersTableOrderingComposer get playerId {
     final $$PlayersTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -10478,6 +10685,12 @@ class $$TransfersTableAnnotationComposer
 
   GeneratedColumn<String> get type =>
       $composableBuilder(column: $table.type, builder: (column) => column);
+
+  GeneratedColumn<int> get season =>
+      $composableBuilder(column: $table.season, builder: (column) => column);
+
+  GeneratedColumn<int> get week =>
+      $composableBuilder(column: $table.week, builder: (column) => column);
 
   $$PlayersTableAnnotationComposer get playerId {
     final $$PlayersTableAnnotationComposer composer = $composerBuilder(
@@ -10588,6 +10801,8 @@ class $$TransfersTableTableManager
                 Value<DateTime> date = const Value.absent(),
                 Value<double> feeAmount = const Value.absent(),
                 Value<String> type = const Value.absent(),
+                Value<int> season = const Value.absent(),
+                Value<int> week = const Value.absent(),
               }) => TransfersCompanion(
                 id: id,
                 playerId: playerId,
@@ -10596,6 +10811,8 @@ class $$TransfersTableTableManager
                 date: date,
                 feeAmount: feeAmount,
                 type: type,
+                season: season,
+                week: week,
               ),
           createCompanionCallback:
               ({
@@ -10606,6 +10823,8 @@ class $$TransfersTableTableManager
                 required DateTime date,
                 required double feeAmount,
                 required String type,
+                Value<int> season = const Value.absent(),
+                Value<int> week = const Value.absent(),
               }) => TransfersCompanion.insert(
                 id: id,
                 playerId: playerId,
@@ -10614,6 +10833,8 @@ class $$TransfersTableTableManager
                 date: date,
                 feeAmount: feeAmount,
                 type: type,
+                season: season,
+                week: week,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -11378,6 +11599,7 @@ typedef $$TransferOffersTableCreateCompanionBuilder =
       required int offerAmount,
       required int proposedSalary,
       required int contractYears,
+      Value<int> season,
       required int createdAtWeek,
       Value<String> status,
     });
@@ -11391,6 +11613,7 @@ typedef $$TransferOffersTableUpdateCompanionBuilder =
       Value<int> offerAmount,
       Value<int> proposedSalary,
       Value<int> contractYears,
+      Value<int> season,
       Value<int> createdAtWeek,
       Value<String> status,
     });
@@ -11504,6 +11727,11 @@ class $$TransferOffersTableFilterComposer
 
   ColumnFilters<int> get contractYears => $composableBuilder(
     column: $table.contractYears,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get season => $composableBuilder(
+    column: $table.season,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -11639,6 +11867,11 @@ class $$TransferOffersTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get season => $composableBuilder(
+    column: $table.season,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get createdAtWeek => $composableBuilder(
     column: $table.createdAtWeek,
     builder: (column) => ColumnOrderings(column),
@@ -11768,6 +12001,9 @@ class $$TransferOffersTableAnnotationComposer
     column: $table.contractYears,
     builder: (column) => column,
   );
+
+  GeneratedColumn<int> get season =>
+      $composableBuilder(column: $table.season, builder: (column) => column);
 
   GeneratedColumn<int> get createdAtWeek => $composableBuilder(
     column: $table.createdAtWeek,
@@ -11913,6 +12149,7 @@ class $$TransferOffersTableTableManager
                 Value<int> offerAmount = const Value.absent(),
                 Value<int> proposedSalary = const Value.absent(),
                 Value<int> contractYears = const Value.absent(),
+                Value<int> season = const Value.absent(),
                 Value<int> createdAtWeek = const Value.absent(),
                 Value<String> status = const Value.absent(),
               }) => TransferOffersCompanion(
@@ -11924,6 +12161,7 @@ class $$TransferOffersTableTableManager
                 offerAmount: offerAmount,
                 proposedSalary: proposedSalary,
                 contractYears: contractYears,
+                season: season,
                 createdAtWeek: createdAtWeek,
                 status: status,
               ),
@@ -11937,6 +12175,7 @@ class $$TransferOffersTableTableManager
                 required int offerAmount,
                 required int proposedSalary,
                 required int contractYears,
+                Value<int> season = const Value.absent(),
                 required int createdAtWeek,
                 Value<String> status = const Value.absent(),
               }) => TransferOffersCompanion.insert(
@@ -11948,6 +12187,7 @@ class $$TransferOffersTableTableManager
                 offerAmount: offerAmount,
                 proposedSalary: proposedSalary,
                 contractYears: contractYears,
+                season: season,
                 createdAtWeek: createdAtWeek,
                 status: status,
               ),
@@ -13332,6 +13572,7 @@ typedef $$PerformancesTableCreateCompanionBuilder =
       Value<int> assists,
       Value<int> yellowCards,
       Value<int> redCards,
+      Value<int> season,
       Value<double> rating,
     });
 typedef $$PerformancesTableUpdateCompanionBuilder =
@@ -13344,6 +13585,7 @@ typedef $$PerformancesTableUpdateCompanionBuilder =
       Value<int> assists,
       Value<int> yellowCards,
       Value<int> redCards,
+      Value<int> season,
       Value<double> rating,
     });
 
@@ -13426,6 +13668,11 @@ class $$PerformancesTableFilterComposer
 
   ColumnFilters<int> get redCards => $composableBuilder(
     column: $table.redCards,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get season => $composableBuilder(
+    column: $table.season,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -13520,6 +13767,11 @@ class $$PerformancesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get season => $composableBuilder(
+    column: $table.season,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<double> get rating => $composableBuilder(
     column: $table.rating,
     builder: (column) => ColumnOrderings(column),
@@ -13602,6 +13854,9 @@ class $$PerformancesTableAnnotationComposer
 
   GeneratedColumn<int> get redCards =>
       $composableBuilder(column: $table.redCards, builder: (column) => column);
+
+  GeneratedColumn<int> get season =>
+      $composableBuilder(column: $table.season, builder: (column) => column);
 
   GeneratedColumn<double> get rating =>
       $composableBuilder(column: $table.rating, builder: (column) => column);
@@ -13689,6 +13944,7 @@ class $$PerformancesTableTableManager
                 Value<int> assists = const Value.absent(),
                 Value<int> yellowCards = const Value.absent(),
                 Value<int> redCards = const Value.absent(),
+                Value<int> season = const Value.absent(),
                 Value<double> rating = const Value.absent(),
               }) => PerformancesCompanion(
                 id: id,
@@ -13699,6 +13955,7 @@ class $$PerformancesTableTableManager
                 assists: assists,
                 yellowCards: yellowCards,
                 redCards: redCards,
+                season: season,
                 rating: rating,
               ),
           createCompanionCallback:
@@ -13711,6 +13968,7 @@ class $$PerformancesTableTableManager
                 Value<int> assists = const Value.absent(),
                 Value<int> yellowCards = const Value.absent(),
                 Value<int> redCards = const Value.absent(),
+                Value<int> season = const Value.absent(),
                 Value<double> rating = const Value.absent(),
               }) => PerformancesCompanion.insert(
                 id: id,
@@ -13721,6 +13979,7 @@ class $$PerformancesTableTableManager
                 assists: assists,
                 yellowCards: yellowCards,
                 redCards: redCards,
+                season: season,
                 rating: rating,
               ),
           withReferenceMapper: (p0) => p0

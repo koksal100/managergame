@@ -52,3 +52,12 @@ final clubsByLeagueProvider = FutureProvider.family<List<Club>, int>((ref, leagu
     (clubs) => clubs,
   );
 });
+
+final clubByIdProvider = FutureProvider.family<Club, int>((ref, clubId) async {
+  final repository = ref.watch(clubRepositoryProvider);
+  final result = await repository.getClubById(clubId);
+  return result.fold(
+    (failure) => throw Exception(failure),
+    (club) => club,
+  );
+});

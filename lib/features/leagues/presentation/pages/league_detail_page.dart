@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../clubs/domain/entities/club.dart';
-// import '../../../clubs/providers/club_provider.dart'; // Unused now
-import '../../../clubs/presentation/pages/club_squad_page.dart';
+import '../../../clubs/presentation/pages/club_detail_page.dart';
 import '../../domain/entities/league.dart';
 import '../widgets/league_colors.dart';
 import '../providers/standings_provider.dart';
@@ -28,7 +26,8 @@ class _LeagueDetailPageState extends ConsumerState<LeagueDetailPage> {
   void initState() {
     super.initState();
     // Initialize with current week, but handle if week 0 (not started?)
-    final currentWeek = ref.read(gameDateProvider);
+    final currentGameTime = ref.read(gameDateProvider);
+    final currentWeek = currentGameTime.week;
     _selectedWeek = currentWeek > 1 ? currentWeek - 1 : (currentWeek > 0 ? currentWeek : 1); 
   }
 
@@ -352,7 +351,7 @@ class _LeagueDetailPageState extends ConsumerState<LeagueDetailPage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ClubSquadPage(clubId: standing.club.id, clubName: standing.club.name),
+            builder: (context) => ClubDetailPage(clubId: standing.club.id, clubName: standing.club.name),
           ),
         );
       },

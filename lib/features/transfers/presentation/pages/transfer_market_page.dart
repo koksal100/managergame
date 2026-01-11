@@ -62,7 +62,7 @@ class TransferMarketPage extends ConsumerWidget {
             ),
             // Completed Transfers Tab
             completedTransfersAsync.when(
-              data: (transfers) => _buildCompletedTransfersList(transfers),
+              data: (transfers) => _buildCompletedTransfersList(ref, transfers),
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (e, _) => Center(child: Text('Error: $e', style: const TextStyle(color: Colors.red))),
             ),
@@ -122,26 +122,82 @@ class TransferMarketPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildCompletedTransfersList(List<Transfer> transfers) {
-    if (transfers.isEmpty) {
-      return const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.history_toggle_off, size: 64, color: Colors.white24),
-            SizedBox(height: 16),
-            Text('No transfers completed yet', style: TextStyle(color: Colors.white54, fontSize: 16)),
-          ],
-        ),
-      );
-    }
+  Widget _buildCompletedTransfersList(WidgetRef ref, List<Transfer> transfers) {
+    final currentSort = ref.watch(completedTransfersSortProvider);
 
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: transfers.length,
-      itemBuilder: (context, index) {
-        return _CompletedTransferCard(transfer: transfers[index]);
+    return Column(
+      children: [
+        // Sort Header
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: const BoxDecoration(
+            color: Colors.black12,
+            border: Border(bottom: BorderSide(color: Colors.white10)),
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.sort, color: Colors.white54, size: 16),
+              const SizedBox(width: 8),
+              const Text('Sort by:', style: TextStyle(color: Colors.white54, fontSize: 13)),
+              const SizedBox(width: 12),
+              _buildSortChip(ref, currentSort, 'Date', TransferSort.dateDesc),
+              const SizedBox(width: 8),
+              _buildSortChip(ref, currentSort, 'Fee', TransferSort.feeDesc),
+            ],
+          ),
+        ),
+
+        // List Content
+        Expanded(
+          child: transfers.isEmpty
+              ? const Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.history_toggle_off, size: 64, color: Colors.white24),
+                      SizedBox(height: 16),
+                      Text('No transfers completed yet', style: TextStyle(color: Colors.white54, fontSize: 16)),
+                    ],
+                  ),
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: transfers.length,
+                  itemBuilder: (context, index) {
+                    return _CompletedTransferCard(transfer: transfers[index]);
+                  },
+                ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSortChip(WidgetRef ref, TransferSort currentSort, String label, TransferSort sortValue) {
+    final isSelected = currentSort == sortValue;
+    return GestureDetector(
+      onTap: () {
+        ref.read(completedTransfersSortProvider.notifier).state = sortValue;
       },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.tealAccent.withOpacity(0.2) : Colors.white.withOpacity(0.05),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected ? Colors.tealAccent : Colors.white12,
+            width: 1,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: isSelected ? Colors.tealAccent : Colors.white70,
+            fontSize: 12,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
+      ),
     );
   }
 }
@@ -450,7 +506,7 @@ class _CompletedTransferCard extends ConsumerWidget {
                     children: [
                       Text(
                         // Date
-                        '${transfer.date.day}/${transfer.date.month}/${transfer.date.year}',
+                        'Season ${transfer.season} | Week ${transfer.week}',
                         style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12),
                       ),
                       // Fee
