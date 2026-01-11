@@ -11,6 +11,8 @@ import '../../features/leagues/data/datasources/tables/leagues_table.dart';
 import '../../features/contracts/data/datasources/tables/agent_contracts_table.dart';
 import '../../features/contracts/data/datasources/tables/club_contracts_table.dart';
 import '../../features/transfers/data/datasources/tables/transfers_table.dart';
+import '../../features/transfers/data/datasources/tables/transfer_needs_table.dart';
+import '../../features/transfers/data/datasources/tables/transfer_offers_table.dart';
 import '../../features/players/data/datasources/tables/value_histories_table.dart';
 import '../../features/relationships/data/datasources/tables/relationships_table.dart';
 import '../../features/countries/data/datasources/tables/countries_table.dart';
@@ -29,6 +31,8 @@ part 'app_database.g.dart';
   AgentContracts,
   ClubContracts,
   Transfers,
+  TransferNeeds,
+  TransferOffers,
   ValueHistories,
   Relationships,
   Countries,

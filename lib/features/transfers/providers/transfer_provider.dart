@@ -1,39 +1,52 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/providers/database_provider.dart';
-import '../data/repositories/transfer_repository_impl.dart';
-import '../domain/entities/transfer.dart';
-import '../domain/repositories/transfer_repository.dart';
+import '../domain/services/transfer_engine.dart';
+import 'package:drift/drift.dart';
 
-final transferRepositoryProvider = Provider<TransferRepository>((ref) {
+final transferEngineProvider = Provider<TransferEngine>((ref) {
   final database = ref.watch(appDatabaseProvider);
-  return TransferRepositoryImpl(database);
+  return TransferEngine(database);
 });
 
-final transfersProvider = AsyncNotifierProvider<TransfersNotifier, List<Transfer>>(() {
-  return TransfersNotifier();
+// Provider to get all transfer needs
+final transferNeedsProvider = FutureProvider((ref) async {
+  final db = ref.watch(appDatabaseProvider);
+  return db.select(db.transferNeeds).get();
 });
 
-class TransfersNotifier extends AsyncNotifier<List<Transfer>> {
-  @override
-  Future<List<Transfer>> build() async {
-    final repository = ref.read(transferRepositoryProvider);
-    final result = await repository.getTransfers();
-    return result.fold(
-      (failure) => throw Exception(failure.message),
-      (transfers) => transfers,
-    );
-  }
+// Provider to get buy needs only (Sorted by Budget DESC)
+final buyNeedsProvider = FutureProvider((ref) async {
+  final db = ref.watch(appDatabaseProvider);
+  return (db.select(db.transferNeeds)
+    ..where((t) => t.type.equals('buy'))
+    ..where((t) => t.isFulfilled.equals(false))
+    ..orderBy([(t) => OrderingTerm(expression: t.maxTransferBudget, mode: OrderingMode.desc)]))
+    .get();
+});
 
-  Future<void> addTransfer(Transfer transfer) async {
-    final repository = ref.read(transferRepositoryProvider);
-    final result = await repository.createTransfer(transfer);
-    
-    result.fold(
-      (failure) => state = AsyncValue.error(failure.message, StackTrace.current),
-      (id) async {
-         state = const AsyncValue.loading();
-         ref.invalidateSelf(); 
-      },
-    );
-  }
-}
+// Provider to get sell needs only (Sorted by Fee DESC)
+final sellNeedsProvider = FutureProvider((ref) async {
+  final db = ref.watch(appDatabaseProvider);
+  return (db.select(db.transferNeeds)
+    ..where((t) => t.type.equals('sell'))
+    ..where((t) => t.isFulfilled.equals(false))
+    ..orderBy([(t) => OrderingTerm(expression: t.minimumFee, mode: OrderingMode.desc)]))
+    .get();
+});
+
+// Provider to get completed transfers (Sorted by Fee DESC)
+final completedTransfersProvider = FutureProvider((ref) async {
+  final db = ref.watch(appDatabaseProvider);
+  return (db.select(db.transfers)
+    ..orderBy([(t) => OrderingTerm(expression: t.feeAmount, mode: OrderingMode.desc)]))
+    .get();
+});
+
+// Provider to get active (pending) offers (Sorted by Amount DESC)
+final activeOffersProvider = FutureProvider((ref) async {
+  final db = ref.watch(appDatabaseProvider);
+  return (db.select(db.transferOffers)
+    ..where((t) => t.status.equals('pending'))
+    ..orderBy([(t) => OrderingTerm(expression: t.offerAmount, mode: OrderingMode.desc)]))
+    .get();
+});

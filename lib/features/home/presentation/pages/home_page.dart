@@ -11,9 +11,12 @@ import '../../../../core/providers/seeder_provider.dart';
 import '../../../../core/providers/game_date_provider.dart';
 import '../../../simulation/presentation/providers/simulation_provider.dart';
 import '../../../leagues/presentation/providers/standings_provider.dart';
-import '../../../leagues/presentation/providers/standings_provider.dart';
 import '../../../../core/presentation/widgets/glass_container.dart';
 import '../../../agents/presentation/pages/agents_page.dart';
+import '../../../transfers/providers/transfer_provider.dart';
+import '../../../transfers/domain/services/transfer_engine.dart';
+import '../../../transfers/presentation/pages/transfer_market_page.dart';
+import '../../../../core/providers/database_provider.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -258,6 +261,21 @@ class HomeContent extends ConsumerWidget {
                         const SizedBox(width: 15),
                         */
 
+                        // Transfer Market Button
+                        GestureDetector(
+                          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TransferMarketPage())),
+                          child: Container(
+                            padding: const EdgeInsets.all(5),
+                            decoration: BoxDecoration(
+                              color: Colors.cyan.withOpacity(0.2),
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.cyanAccent.withOpacity(0.5)),
+                            ),
+                            child: const Icon(Icons.swap_horiz_rounded, color: Colors.cyanAccent, size: 20),
+                          ),
+                        ),
+                        SizedBox(width: 10,),
+
                         // Next Week Button
                         GestureDetector(
                           onTap: () async {
@@ -317,6 +335,35 @@ class HomeContent extends ConsumerWidget {
 
     try {
       final simulationService = ref.read(simulationServiceProvider);
+      final transferEngine = ref.read(transferEngineProvider);
+      
+      final nextWeek = currentWeek + 1;
+      
+      print('[Simulation] currentWeek=$currentWeek, nextWeek=$nextWeek');
+      print('[Simulation] isTransferWindow=${TransferEngine.isTransferWindow(currentWeek)}');
+
+      // --- TRANSFER WINDOW LOGIC ---
+      // 1. If inside transfer window AND no needs exist, generate them
+      if (TransferEngine.isTransferWindow(currentWeek)) {
+        final existingNeeds = await ref.read(appDatabaseProvider).select(ref.read(appDatabaseProvider).transferNeeds).get();
+        print('[Simulation] Existing needs count: ${existingNeeds.length}');
+        
+        if (existingNeeds.isEmpty) {
+          print('[Simulation] Generating transfer needs...');
+          await transferEngine.generateAllClubNeeds();
+        }
+        
+        // Process offers
+        await transferEngine.processOfferCreation(currentWeek);
+        await transferEngine.evaluateOffers(currentWeek);
+      }
+      
+      // 2. If exiting transfer window, clear needs
+      if (TransferEngine.isTransferWindowEnding(currentWeek)) {
+        await transferEngine.clearTransferNeeds();
+      }
+
+      // --- MATCH SIMULATION ---
       await simulationService.simulateWeek(1, currentWeek);
       await ref.read(gameDateProvider.notifier).advanceWeek();
 
@@ -327,6 +374,11 @@ class HomeContent extends ConsumerWidget {
       ref.invalidate(topAssistersProvider);
       ref.invalidate(topRatedProvider);
       ref.invalidate(fixtureProvider);
+      ref.invalidate(transferNeedsProvider);
+      ref.invalidate(buyNeedsProvider);
+      ref.invalidate(sellNeedsProvider);
+      ref.invalidate(completedTransfersProvider);
+      ref.invalidate(activeOffersProvider);
       
       // Refresh User Agent to update weekly offers limit if needed (though it uses SP directly)
       ref.invalidate(userAgentProvider);

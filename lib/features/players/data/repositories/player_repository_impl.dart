@@ -86,7 +86,7 @@ class PlayerRepositoryImpl implements PlayerRepository {
         pa: row.pa,
         reputation: row.reputation,
         marketValue: row.marketValue,
-        currentContractId: row.currentContractId,
+
       )).toList();
       return Right(players);
     } catch (e) {
@@ -115,7 +115,7 @@ class PlayerRepositoryImpl implements PlayerRepository {
         pa: row.pa,
         reputation: row.reputation,
         marketValue: row.marketValue,
-        currentContractId: row.currentContractId,
+
       )).toList();
 
       // Define position weights
@@ -168,7 +168,7 @@ class PlayerRepositoryImpl implements PlayerRepository {
         pa: row.pa,
         reputation: row.reputation,
         marketValue: row.marketValue,
-        currentContractId: row.currentContractId,
+
       )).toList();
 
       return Right(players);
@@ -198,7 +198,7 @@ class PlayerRepositoryImpl implements PlayerRepository {
         pa: row.pa,
         reputation: row.reputation,
         marketValue: row.marketValue,
-        currentContractId: row.currentContractId,
+
       ));
     } catch (e) {
       return Left(CacheFailure(e.toString()));
@@ -218,7 +218,7 @@ class PlayerRepositoryImpl implements PlayerRepository {
         pa: Value(player.pa),
         reputation: Value(player.reputation),
         marketValue: Value(player.marketValue),
-        currentContractId: Value(player.currentContractId),
+
       );
       final id = await database.into(database.players).insert(companion);
       return Right(id);
@@ -241,7 +241,7 @@ class PlayerRepositoryImpl implements PlayerRepository {
         pa: Value(player.pa),
         reputation: Value(player.reputation),
         marketValue: Value(player.marketValue),
-        currentContractId: Value(player.currentContractId),
+
       );
       await database.update(database.players).replace(companion);
       return const Right(null);

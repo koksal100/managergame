@@ -35,7 +35,16 @@ class GameSeeder {
     await seedUserAgent();
 
     // 4. Seed Leagues and Clubs (and Players)
-    await _seedLeaguesAndClubs(leagueDTOs, teamDTOs, namesDTO, countryDTOs);
+    // 4. Seed Leagues and Clubs (and Players)
+    // Optimization: Wrap in transaction to speed up thousands of inserts
+    print('[GameSeeder] Starting Transaction for Leagues/Clubs/Players...');
+    final startTime = DateTime.now();
+    
+    await database.transaction(() async {
+      await _seedLeaguesAndClubs(leagueDTOs, teamDTOs, namesDTO, countryDTOs);
+    });
+    
+    print('[GameSeeder] Transaction completed in ${DateTime.now().difference(startTime).inSeconds}s');
   }
 
   Future<void> _seedAgents() async {
@@ -113,15 +122,16 @@ class GameSeeder {
   }
 
   Future<void> _seedCountries(List<CountryDTO> dtos) async {
-    for (var dto in dtos) {
-      await database.into(database.countries).insert(
-        CountriesCompanion(
+    await database.batch((batch) {
+      batch.insertAll(
+        database.countries,
+        dtos.map((dto) => CountriesCompanion(
           name: Value(dto.name),
           code: Value(dto.code),
           reputation: Value(dto.reputation),
-        ),
+        )).toList(),
       );
-    }
+    });
   }
 
   Future<void> _seedLeaguesAndClubs(

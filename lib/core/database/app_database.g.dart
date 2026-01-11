@@ -1282,17 +1282,6 @@ class $PlayersTable extends Players with TableInfo<$PlayersTable, Player> {
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _currentContractIdMeta = const VerificationMeta(
-    'currentContractId',
-  );
-  @override
-  late final GeneratedColumn<int> currentContractId = GeneratedColumn<int>(
-    'current_contract_id',
-    aliasedName,
-    true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -1305,7 +1294,6 @@ class $PlayersTable extends Players with TableInfo<$PlayersTable, Player> {
     pa,
     reputation,
     marketValue,
-    currentContractId,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1387,15 +1375,6 @@ class $PlayersTable extends Players with TableInfo<$PlayersTable, Player> {
     } else if (isInserting) {
       context.missing(_marketValueMeta);
     }
-    if (data.containsKey('current_contract_id')) {
-      context.handle(
-        _currentContractIdMeta,
-        currentContractId.isAcceptableOrUnknown(
-          data['current_contract_id']!,
-          _currentContractIdMeta,
-        ),
-      );
-    }
     return context;
   }
 
@@ -1445,10 +1424,6 @@ class $PlayersTable extends Players with TableInfo<$PlayersTable, Player> {
         DriftSqlType.int,
         data['${effectivePrefix}market_value'],
       )!,
-      currentContractId: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}current_contract_id'],
-      ),
     );
   }
 
@@ -1469,7 +1444,6 @@ class Player extends DataClass implements Insertable<Player> {
   final int pa;
   final int reputation;
   final int marketValue;
-  final int? currentContractId;
   const Player({
     required this.id,
     required this.name,
@@ -1481,7 +1455,6 @@ class Player extends DataClass implements Insertable<Player> {
     required this.pa,
     required this.reputation,
     required this.marketValue,
-    this.currentContractId,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1500,9 +1473,6 @@ class Player extends DataClass implements Insertable<Player> {
     map['pa'] = Variable<int>(pa);
     map['reputation'] = Variable<int>(reputation);
     map['market_value'] = Variable<int>(marketValue);
-    if (!nullToAbsent || currentContractId != null) {
-      map['current_contract_id'] = Variable<int>(currentContractId);
-    }
     return map;
   }
 
@@ -1522,9 +1492,6 @@ class Player extends DataClass implements Insertable<Player> {
       pa: Value(pa),
       reputation: Value(reputation),
       marketValue: Value(marketValue),
-      currentContractId: currentContractId == null && nullToAbsent
-          ? const Value.absent()
-          : Value(currentContractId),
     );
   }
 
@@ -1544,7 +1511,6 @@ class Player extends DataClass implements Insertable<Player> {
       pa: serializer.fromJson<int>(json['pa']),
       reputation: serializer.fromJson<int>(json['reputation']),
       marketValue: serializer.fromJson<int>(json['marketValue']),
-      currentContractId: serializer.fromJson<int?>(json['currentContractId']),
     );
   }
   @override
@@ -1561,7 +1527,6 @@ class Player extends DataClass implements Insertable<Player> {
       'pa': serializer.toJson<int>(pa),
       'reputation': serializer.toJson<int>(reputation),
       'marketValue': serializer.toJson<int>(marketValue),
-      'currentContractId': serializer.toJson<int?>(currentContractId),
     };
   }
 
@@ -1576,7 +1541,6 @@ class Player extends DataClass implements Insertable<Player> {
     int? pa,
     int? reputation,
     int? marketValue,
-    Value<int?> currentContractId = const Value.absent(),
   }) => Player(
     id: id ?? this.id,
     name: name ?? this.name,
@@ -1588,9 +1552,6 @@ class Player extends DataClass implements Insertable<Player> {
     pa: pa ?? this.pa,
     reputation: reputation ?? this.reputation,
     marketValue: marketValue ?? this.marketValue,
-    currentContractId: currentContractId.present
-        ? currentContractId.value
-        : this.currentContractId,
   );
   Player copyWithCompanion(PlayersCompanion data) {
     return Player(
@@ -1608,9 +1569,6 @@ class Player extends DataClass implements Insertable<Player> {
       marketValue: data.marketValue.present
           ? data.marketValue.value
           : this.marketValue,
-      currentContractId: data.currentContractId.present
-          ? data.currentContractId.value
-          : this.currentContractId,
     );
   }
 
@@ -1626,8 +1584,7 @@ class Player extends DataClass implements Insertable<Player> {
           ..write('ca: $ca, ')
           ..write('pa: $pa, ')
           ..write('reputation: $reputation, ')
-          ..write('marketValue: $marketValue, ')
-          ..write('currentContractId: $currentContractId')
+          ..write('marketValue: $marketValue')
           ..write(')'))
         .toString();
   }
@@ -1644,7 +1601,6 @@ class Player extends DataClass implements Insertable<Player> {
     pa,
     reputation,
     marketValue,
-    currentContractId,
   );
   @override
   bool operator ==(Object other) =>
@@ -1659,8 +1615,7 @@ class Player extends DataClass implements Insertable<Player> {
           other.ca == this.ca &&
           other.pa == this.pa &&
           other.reputation == this.reputation &&
-          other.marketValue == this.marketValue &&
-          other.currentContractId == this.currentContractId);
+          other.marketValue == this.marketValue);
 }
 
 class PlayersCompanion extends UpdateCompanion<Player> {
@@ -1674,7 +1629,6 @@ class PlayersCompanion extends UpdateCompanion<Player> {
   final Value<int> pa;
   final Value<int> reputation;
   final Value<int> marketValue;
-  final Value<int?> currentContractId;
   const PlayersCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
@@ -1686,7 +1640,6 @@ class PlayersCompanion extends UpdateCompanion<Player> {
     this.pa = const Value.absent(),
     this.reputation = const Value.absent(),
     this.marketValue = const Value.absent(),
-    this.currentContractId = const Value.absent(),
   });
   PlayersCompanion.insert({
     this.id = const Value.absent(),
@@ -1699,7 +1652,6 @@ class PlayersCompanion extends UpdateCompanion<Player> {
     required int pa,
     required int reputation,
     required int marketValue,
-    this.currentContractId = const Value.absent(),
   }) : name = Value(name),
        age = Value(age),
        position = Value(position),
@@ -1718,7 +1670,6 @@ class PlayersCompanion extends UpdateCompanion<Player> {
     Expression<int>? pa,
     Expression<int>? reputation,
     Expression<int>? marketValue,
-    Expression<int>? currentContractId,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -1731,7 +1682,6 @@ class PlayersCompanion extends UpdateCompanion<Player> {
       if (pa != null) 'pa': pa,
       if (reputation != null) 'reputation': reputation,
       if (marketValue != null) 'market_value': marketValue,
-      if (currentContractId != null) 'current_contract_id': currentContractId,
     });
   }
 
@@ -1746,7 +1696,6 @@ class PlayersCompanion extends UpdateCompanion<Player> {
     Value<int>? pa,
     Value<int>? reputation,
     Value<int>? marketValue,
-    Value<int?>? currentContractId,
   }) {
     return PlayersCompanion(
       id: id ?? this.id,
@@ -1759,7 +1708,6 @@ class PlayersCompanion extends UpdateCompanion<Player> {
       pa: pa ?? this.pa,
       reputation: reputation ?? this.reputation,
       marketValue: marketValue ?? this.marketValue,
-      currentContractId: currentContractId ?? this.currentContractId,
     );
   }
 
@@ -1796,9 +1744,6 @@ class PlayersCompanion extends UpdateCompanion<Player> {
     if (marketValue.present) {
       map['market_value'] = Variable<int>(marketValue.value);
     }
-    if (currentContractId.present) {
-      map['current_contract_id'] = Variable<int>(currentContractId.value);
-    }
     return map;
   }
 
@@ -1814,8 +1759,7 @@ class PlayersCompanion extends UpdateCompanion<Player> {
           ..write('ca: $ca, ')
           ..write('pa: $pa, ')
           ..write('reputation: $reputation, ')
-          ..write('marketValue: $marketValue, ')
-          ..write('currentContractId: $currentContractId')
+          ..write('marketValue: $marketValue')
           ..write(')'))
         .toString();
   }
@@ -3348,6 +3292,1369 @@ class TransfersCompanion extends UpdateCompanion<Transfer> {
           ..write('date: $date, ')
           ..write('feeAmount: $feeAmount, ')
           ..write('type: $type')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $TransferNeedsTable extends TransferNeeds
+    with TableInfo<$TransferNeedsTable, TransferNeed> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $TransferNeedsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _clubIdMeta = const VerificationMeta('clubId');
+  @override
+  late final GeneratedColumn<int> clubId = GeneratedColumn<int>(
+    'club_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES clubs (id)',
+    ),
+  );
+  static const VerificationMeta _typeMeta = const VerificationMeta('type');
+  @override
+  late final GeneratedColumn<String> type = GeneratedColumn<String>(
+    'type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _targetPositionMeta = const VerificationMeta(
+    'targetPosition',
+  );
+  @override
+  late final GeneratedColumn<String> targetPosition = GeneratedColumn<String>(
+    'target_position',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _minAgeMeta = const VerificationMeta('minAge');
+  @override
+  late final GeneratedColumn<int> minAge = GeneratedColumn<int>(
+    'min_age',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _maxAgeMeta = const VerificationMeta('maxAge');
+  @override
+  late final GeneratedColumn<int> maxAge = GeneratedColumn<int>(
+    'max_age',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _minCaMeta = const VerificationMeta('minCa');
+  @override
+  late final GeneratedColumn<int> minCa = GeneratedColumn<int>(
+    'min_ca',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _maxTransferBudgetMeta = const VerificationMeta(
+    'maxTransferBudget',
+  );
+  @override
+  late final GeneratedColumn<int> maxTransferBudget = GeneratedColumn<int>(
+    'max_transfer_budget',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _maxWeeklySalaryMeta = const VerificationMeta(
+    'maxWeeklySalary',
+  );
+  @override
+  late final GeneratedColumn<int> maxWeeklySalary = GeneratedColumn<int>(
+    'max_weekly_salary',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _playerToSellIdMeta = const VerificationMeta(
+    'playerToSellId',
+  );
+  @override
+  late final GeneratedColumn<int> playerToSellId = GeneratedColumn<int>(
+    'player_to_sell_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES players (id)',
+    ),
+  );
+  static const VerificationMeta _minimumFeeMeta = const VerificationMeta(
+    'minimumFee',
+  );
+  @override
+  late final GeneratedColumn<int> minimumFee = GeneratedColumn<int>(
+    'minimum_fee',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _isFulfilledMeta = const VerificationMeta(
+    'isFulfilled',
+  );
+  @override
+  late final GeneratedColumn<bool> isFulfilled = GeneratedColumn<bool>(
+    'is_fulfilled',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_fulfilled" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    clubId,
+    type,
+    targetPosition,
+    minAge,
+    maxAge,
+    minCa,
+    maxTransferBudget,
+    maxWeeklySalary,
+    playerToSellId,
+    minimumFee,
+    isFulfilled,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'transfer_needs';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<TransferNeed> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('club_id')) {
+      context.handle(
+        _clubIdMeta,
+        clubId.isAcceptableOrUnknown(data['club_id']!, _clubIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_clubIdMeta);
+    }
+    if (data.containsKey('type')) {
+      context.handle(
+        _typeMeta,
+        type.isAcceptableOrUnknown(data['type']!, _typeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_typeMeta);
+    }
+    if (data.containsKey('target_position')) {
+      context.handle(
+        _targetPositionMeta,
+        targetPosition.isAcceptableOrUnknown(
+          data['target_position']!,
+          _targetPositionMeta,
+        ),
+      );
+    }
+    if (data.containsKey('min_age')) {
+      context.handle(
+        _minAgeMeta,
+        minAge.isAcceptableOrUnknown(data['min_age']!, _minAgeMeta),
+      );
+    }
+    if (data.containsKey('max_age')) {
+      context.handle(
+        _maxAgeMeta,
+        maxAge.isAcceptableOrUnknown(data['max_age']!, _maxAgeMeta),
+      );
+    }
+    if (data.containsKey('min_ca')) {
+      context.handle(
+        _minCaMeta,
+        minCa.isAcceptableOrUnknown(data['min_ca']!, _minCaMeta),
+      );
+    }
+    if (data.containsKey('max_transfer_budget')) {
+      context.handle(
+        _maxTransferBudgetMeta,
+        maxTransferBudget.isAcceptableOrUnknown(
+          data['max_transfer_budget']!,
+          _maxTransferBudgetMeta,
+        ),
+      );
+    }
+    if (data.containsKey('max_weekly_salary')) {
+      context.handle(
+        _maxWeeklySalaryMeta,
+        maxWeeklySalary.isAcceptableOrUnknown(
+          data['max_weekly_salary']!,
+          _maxWeeklySalaryMeta,
+        ),
+      );
+    }
+    if (data.containsKey('player_to_sell_id')) {
+      context.handle(
+        _playerToSellIdMeta,
+        playerToSellId.isAcceptableOrUnknown(
+          data['player_to_sell_id']!,
+          _playerToSellIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('minimum_fee')) {
+      context.handle(
+        _minimumFeeMeta,
+        minimumFee.isAcceptableOrUnknown(data['minimum_fee']!, _minimumFeeMeta),
+      );
+    }
+    if (data.containsKey('is_fulfilled')) {
+      context.handle(
+        _isFulfilledMeta,
+        isFulfilled.isAcceptableOrUnknown(
+          data['is_fulfilled']!,
+          _isFulfilledMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  TransferNeed map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return TransferNeed(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      clubId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}club_id'],
+      )!,
+      type: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}type'],
+      )!,
+      targetPosition: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}target_position'],
+      ),
+      minAge: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}min_age'],
+      ),
+      maxAge: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}max_age'],
+      ),
+      minCa: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}min_ca'],
+      ),
+      maxTransferBudget: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}max_transfer_budget'],
+      ),
+      maxWeeklySalary: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}max_weekly_salary'],
+      ),
+      playerToSellId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}player_to_sell_id'],
+      ),
+      minimumFee: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}minimum_fee'],
+      ),
+      isFulfilled: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_fulfilled'],
+      )!,
+    );
+  }
+
+  @override
+  $TransferNeedsTable createAlias(String alias) {
+    return $TransferNeedsTable(attachedDatabase, alias);
+  }
+}
+
+class TransferNeed extends DataClass implements Insertable<TransferNeed> {
+  final int id;
+  final int clubId;
+  final String type;
+  final String? targetPosition;
+  final int? minAge;
+  final int? maxAge;
+  final int? minCa;
+  final int? maxTransferBudget;
+  final int? maxWeeklySalary;
+  final int? playerToSellId;
+  final int? minimumFee;
+  final bool isFulfilled;
+  const TransferNeed({
+    required this.id,
+    required this.clubId,
+    required this.type,
+    this.targetPosition,
+    this.minAge,
+    this.maxAge,
+    this.minCa,
+    this.maxTransferBudget,
+    this.maxWeeklySalary,
+    this.playerToSellId,
+    this.minimumFee,
+    required this.isFulfilled,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['club_id'] = Variable<int>(clubId);
+    map['type'] = Variable<String>(type);
+    if (!nullToAbsent || targetPosition != null) {
+      map['target_position'] = Variable<String>(targetPosition);
+    }
+    if (!nullToAbsent || minAge != null) {
+      map['min_age'] = Variable<int>(minAge);
+    }
+    if (!nullToAbsent || maxAge != null) {
+      map['max_age'] = Variable<int>(maxAge);
+    }
+    if (!nullToAbsent || minCa != null) {
+      map['min_ca'] = Variable<int>(minCa);
+    }
+    if (!nullToAbsent || maxTransferBudget != null) {
+      map['max_transfer_budget'] = Variable<int>(maxTransferBudget);
+    }
+    if (!nullToAbsent || maxWeeklySalary != null) {
+      map['max_weekly_salary'] = Variable<int>(maxWeeklySalary);
+    }
+    if (!nullToAbsent || playerToSellId != null) {
+      map['player_to_sell_id'] = Variable<int>(playerToSellId);
+    }
+    if (!nullToAbsent || minimumFee != null) {
+      map['minimum_fee'] = Variable<int>(minimumFee);
+    }
+    map['is_fulfilled'] = Variable<bool>(isFulfilled);
+    return map;
+  }
+
+  TransferNeedsCompanion toCompanion(bool nullToAbsent) {
+    return TransferNeedsCompanion(
+      id: Value(id),
+      clubId: Value(clubId),
+      type: Value(type),
+      targetPosition: targetPosition == null && nullToAbsent
+          ? const Value.absent()
+          : Value(targetPosition),
+      minAge: minAge == null && nullToAbsent
+          ? const Value.absent()
+          : Value(minAge),
+      maxAge: maxAge == null && nullToAbsent
+          ? const Value.absent()
+          : Value(maxAge),
+      minCa: minCa == null && nullToAbsent
+          ? const Value.absent()
+          : Value(minCa),
+      maxTransferBudget: maxTransferBudget == null && nullToAbsent
+          ? const Value.absent()
+          : Value(maxTransferBudget),
+      maxWeeklySalary: maxWeeklySalary == null && nullToAbsent
+          ? const Value.absent()
+          : Value(maxWeeklySalary),
+      playerToSellId: playerToSellId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(playerToSellId),
+      minimumFee: minimumFee == null && nullToAbsent
+          ? const Value.absent()
+          : Value(minimumFee),
+      isFulfilled: Value(isFulfilled),
+    );
+  }
+
+  factory TransferNeed.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return TransferNeed(
+      id: serializer.fromJson<int>(json['id']),
+      clubId: serializer.fromJson<int>(json['clubId']),
+      type: serializer.fromJson<String>(json['type']),
+      targetPosition: serializer.fromJson<String?>(json['targetPosition']),
+      minAge: serializer.fromJson<int?>(json['minAge']),
+      maxAge: serializer.fromJson<int?>(json['maxAge']),
+      minCa: serializer.fromJson<int?>(json['minCa']),
+      maxTransferBudget: serializer.fromJson<int?>(json['maxTransferBudget']),
+      maxWeeklySalary: serializer.fromJson<int?>(json['maxWeeklySalary']),
+      playerToSellId: serializer.fromJson<int?>(json['playerToSellId']),
+      minimumFee: serializer.fromJson<int?>(json['minimumFee']),
+      isFulfilled: serializer.fromJson<bool>(json['isFulfilled']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'clubId': serializer.toJson<int>(clubId),
+      'type': serializer.toJson<String>(type),
+      'targetPosition': serializer.toJson<String?>(targetPosition),
+      'minAge': serializer.toJson<int?>(minAge),
+      'maxAge': serializer.toJson<int?>(maxAge),
+      'minCa': serializer.toJson<int?>(minCa),
+      'maxTransferBudget': serializer.toJson<int?>(maxTransferBudget),
+      'maxWeeklySalary': serializer.toJson<int?>(maxWeeklySalary),
+      'playerToSellId': serializer.toJson<int?>(playerToSellId),
+      'minimumFee': serializer.toJson<int?>(minimumFee),
+      'isFulfilled': serializer.toJson<bool>(isFulfilled),
+    };
+  }
+
+  TransferNeed copyWith({
+    int? id,
+    int? clubId,
+    String? type,
+    Value<String?> targetPosition = const Value.absent(),
+    Value<int?> minAge = const Value.absent(),
+    Value<int?> maxAge = const Value.absent(),
+    Value<int?> minCa = const Value.absent(),
+    Value<int?> maxTransferBudget = const Value.absent(),
+    Value<int?> maxWeeklySalary = const Value.absent(),
+    Value<int?> playerToSellId = const Value.absent(),
+    Value<int?> minimumFee = const Value.absent(),
+    bool? isFulfilled,
+  }) => TransferNeed(
+    id: id ?? this.id,
+    clubId: clubId ?? this.clubId,
+    type: type ?? this.type,
+    targetPosition: targetPosition.present
+        ? targetPosition.value
+        : this.targetPosition,
+    minAge: minAge.present ? minAge.value : this.minAge,
+    maxAge: maxAge.present ? maxAge.value : this.maxAge,
+    minCa: minCa.present ? minCa.value : this.minCa,
+    maxTransferBudget: maxTransferBudget.present
+        ? maxTransferBudget.value
+        : this.maxTransferBudget,
+    maxWeeklySalary: maxWeeklySalary.present
+        ? maxWeeklySalary.value
+        : this.maxWeeklySalary,
+    playerToSellId: playerToSellId.present
+        ? playerToSellId.value
+        : this.playerToSellId,
+    minimumFee: minimumFee.present ? minimumFee.value : this.minimumFee,
+    isFulfilled: isFulfilled ?? this.isFulfilled,
+  );
+  TransferNeed copyWithCompanion(TransferNeedsCompanion data) {
+    return TransferNeed(
+      id: data.id.present ? data.id.value : this.id,
+      clubId: data.clubId.present ? data.clubId.value : this.clubId,
+      type: data.type.present ? data.type.value : this.type,
+      targetPosition: data.targetPosition.present
+          ? data.targetPosition.value
+          : this.targetPosition,
+      minAge: data.minAge.present ? data.minAge.value : this.minAge,
+      maxAge: data.maxAge.present ? data.maxAge.value : this.maxAge,
+      minCa: data.minCa.present ? data.minCa.value : this.minCa,
+      maxTransferBudget: data.maxTransferBudget.present
+          ? data.maxTransferBudget.value
+          : this.maxTransferBudget,
+      maxWeeklySalary: data.maxWeeklySalary.present
+          ? data.maxWeeklySalary.value
+          : this.maxWeeklySalary,
+      playerToSellId: data.playerToSellId.present
+          ? data.playerToSellId.value
+          : this.playerToSellId,
+      minimumFee: data.minimumFee.present
+          ? data.minimumFee.value
+          : this.minimumFee,
+      isFulfilled: data.isFulfilled.present
+          ? data.isFulfilled.value
+          : this.isFulfilled,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TransferNeed(')
+          ..write('id: $id, ')
+          ..write('clubId: $clubId, ')
+          ..write('type: $type, ')
+          ..write('targetPosition: $targetPosition, ')
+          ..write('minAge: $minAge, ')
+          ..write('maxAge: $maxAge, ')
+          ..write('minCa: $minCa, ')
+          ..write('maxTransferBudget: $maxTransferBudget, ')
+          ..write('maxWeeklySalary: $maxWeeklySalary, ')
+          ..write('playerToSellId: $playerToSellId, ')
+          ..write('minimumFee: $minimumFee, ')
+          ..write('isFulfilled: $isFulfilled')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    clubId,
+    type,
+    targetPosition,
+    minAge,
+    maxAge,
+    minCa,
+    maxTransferBudget,
+    maxWeeklySalary,
+    playerToSellId,
+    minimumFee,
+    isFulfilled,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is TransferNeed &&
+          other.id == this.id &&
+          other.clubId == this.clubId &&
+          other.type == this.type &&
+          other.targetPosition == this.targetPosition &&
+          other.minAge == this.minAge &&
+          other.maxAge == this.maxAge &&
+          other.minCa == this.minCa &&
+          other.maxTransferBudget == this.maxTransferBudget &&
+          other.maxWeeklySalary == this.maxWeeklySalary &&
+          other.playerToSellId == this.playerToSellId &&
+          other.minimumFee == this.minimumFee &&
+          other.isFulfilled == this.isFulfilled);
+}
+
+class TransferNeedsCompanion extends UpdateCompanion<TransferNeed> {
+  final Value<int> id;
+  final Value<int> clubId;
+  final Value<String> type;
+  final Value<String?> targetPosition;
+  final Value<int?> minAge;
+  final Value<int?> maxAge;
+  final Value<int?> minCa;
+  final Value<int?> maxTransferBudget;
+  final Value<int?> maxWeeklySalary;
+  final Value<int?> playerToSellId;
+  final Value<int?> minimumFee;
+  final Value<bool> isFulfilled;
+  const TransferNeedsCompanion({
+    this.id = const Value.absent(),
+    this.clubId = const Value.absent(),
+    this.type = const Value.absent(),
+    this.targetPosition = const Value.absent(),
+    this.minAge = const Value.absent(),
+    this.maxAge = const Value.absent(),
+    this.minCa = const Value.absent(),
+    this.maxTransferBudget = const Value.absent(),
+    this.maxWeeklySalary = const Value.absent(),
+    this.playerToSellId = const Value.absent(),
+    this.minimumFee = const Value.absent(),
+    this.isFulfilled = const Value.absent(),
+  });
+  TransferNeedsCompanion.insert({
+    this.id = const Value.absent(),
+    required int clubId,
+    required String type,
+    this.targetPosition = const Value.absent(),
+    this.minAge = const Value.absent(),
+    this.maxAge = const Value.absent(),
+    this.minCa = const Value.absent(),
+    this.maxTransferBudget = const Value.absent(),
+    this.maxWeeklySalary = const Value.absent(),
+    this.playerToSellId = const Value.absent(),
+    this.minimumFee = const Value.absent(),
+    this.isFulfilled = const Value.absent(),
+  }) : clubId = Value(clubId),
+       type = Value(type);
+  static Insertable<TransferNeed> custom({
+    Expression<int>? id,
+    Expression<int>? clubId,
+    Expression<String>? type,
+    Expression<String>? targetPosition,
+    Expression<int>? minAge,
+    Expression<int>? maxAge,
+    Expression<int>? minCa,
+    Expression<int>? maxTransferBudget,
+    Expression<int>? maxWeeklySalary,
+    Expression<int>? playerToSellId,
+    Expression<int>? minimumFee,
+    Expression<bool>? isFulfilled,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (clubId != null) 'club_id': clubId,
+      if (type != null) 'type': type,
+      if (targetPosition != null) 'target_position': targetPosition,
+      if (minAge != null) 'min_age': minAge,
+      if (maxAge != null) 'max_age': maxAge,
+      if (minCa != null) 'min_ca': minCa,
+      if (maxTransferBudget != null) 'max_transfer_budget': maxTransferBudget,
+      if (maxWeeklySalary != null) 'max_weekly_salary': maxWeeklySalary,
+      if (playerToSellId != null) 'player_to_sell_id': playerToSellId,
+      if (minimumFee != null) 'minimum_fee': minimumFee,
+      if (isFulfilled != null) 'is_fulfilled': isFulfilled,
+    });
+  }
+
+  TransferNeedsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? clubId,
+    Value<String>? type,
+    Value<String?>? targetPosition,
+    Value<int?>? minAge,
+    Value<int?>? maxAge,
+    Value<int?>? minCa,
+    Value<int?>? maxTransferBudget,
+    Value<int?>? maxWeeklySalary,
+    Value<int?>? playerToSellId,
+    Value<int?>? minimumFee,
+    Value<bool>? isFulfilled,
+  }) {
+    return TransferNeedsCompanion(
+      id: id ?? this.id,
+      clubId: clubId ?? this.clubId,
+      type: type ?? this.type,
+      targetPosition: targetPosition ?? this.targetPosition,
+      minAge: minAge ?? this.minAge,
+      maxAge: maxAge ?? this.maxAge,
+      minCa: minCa ?? this.minCa,
+      maxTransferBudget: maxTransferBudget ?? this.maxTransferBudget,
+      maxWeeklySalary: maxWeeklySalary ?? this.maxWeeklySalary,
+      playerToSellId: playerToSellId ?? this.playerToSellId,
+      minimumFee: minimumFee ?? this.minimumFee,
+      isFulfilled: isFulfilled ?? this.isFulfilled,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (clubId.present) {
+      map['club_id'] = Variable<int>(clubId.value);
+    }
+    if (type.present) {
+      map['type'] = Variable<String>(type.value);
+    }
+    if (targetPosition.present) {
+      map['target_position'] = Variable<String>(targetPosition.value);
+    }
+    if (minAge.present) {
+      map['min_age'] = Variable<int>(minAge.value);
+    }
+    if (maxAge.present) {
+      map['max_age'] = Variable<int>(maxAge.value);
+    }
+    if (minCa.present) {
+      map['min_ca'] = Variable<int>(minCa.value);
+    }
+    if (maxTransferBudget.present) {
+      map['max_transfer_budget'] = Variable<int>(maxTransferBudget.value);
+    }
+    if (maxWeeklySalary.present) {
+      map['max_weekly_salary'] = Variable<int>(maxWeeklySalary.value);
+    }
+    if (playerToSellId.present) {
+      map['player_to_sell_id'] = Variable<int>(playerToSellId.value);
+    }
+    if (minimumFee.present) {
+      map['minimum_fee'] = Variable<int>(minimumFee.value);
+    }
+    if (isFulfilled.present) {
+      map['is_fulfilled'] = Variable<bool>(isFulfilled.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TransferNeedsCompanion(')
+          ..write('id: $id, ')
+          ..write('clubId: $clubId, ')
+          ..write('type: $type, ')
+          ..write('targetPosition: $targetPosition, ')
+          ..write('minAge: $minAge, ')
+          ..write('maxAge: $maxAge, ')
+          ..write('minCa: $minCa, ')
+          ..write('maxTransferBudget: $maxTransferBudget, ')
+          ..write('maxWeeklySalary: $maxWeeklySalary, ')
+          ..write('playerToSellId: $playerToSellId, ')
+          ..write('minimumFee: $minimumFee, ')
+          ..write('isFulfilled: $isFulfilled')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $TransferOffersTable extends TransferOffers
+    with TableInfo<$TransferOffersTable, TransferOffer> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $TransferOffersTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _fromClubIdMeta = const VerificationMeta(
+    'fromClubId',
+  );
+  @override
+  late final GeneratedColumn<int> fromClubId = GeneratedColumn<int>(
+    'from_club_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES clubs (id)',
+    ),
+  );
+  static const VerificationMeta _toClubIdMeta = const VerificationMeta(
+    'toClubId',
+  );
+  @override
+  late final GeneratedColumn<int> toClubId = GeneratedColumn<int>(
+    'to_club_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES clubs (id)',
+    ),
+  );
+  static const VerificationMeta _playerIdMeta = const VerificationMeta(
+    'playerId',
+  );
+  @override
+  late final GeneratedColumn<int> playerId = GeneratedColumn<int>(
+    'player_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES players (id)',
+    ),
+  );
+  static const VerificationMeta _needIdMeta = const VerificationMeta('needId');
+  @override
+  late final GeneratedColumn<int> needId = GeneratedColumn<int>(
+    'need_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES transfer_needs (id)',
+    ),
+  );
+  static const VerificationMeta _offerAmountMeta = const VerificationMeta(
+    'offerAmount',
+  );
+  @override
+  late final GeneratedColumn<int> offerAmount = GeneratedColumn<int>(
+    'offer_amount',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _proposedSalaryMeta = const VerificationMeta(
+    'proposedSalary',
+  );
+  @override
+  late final GeneratedColumn<int> proposedSalary = GeneratedColumn<int>(
+    'proposed_salary',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _contractYearsMeta = const VerificationMeta(
+    'contractYears',
+  );
+  @override
+  late final GeneratedColumn<int> contractYears = GeneratedColumn<int>(
+    'contract_years',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtWeekMeta = const VerificationMeta(
+    'createdAtWeek',
+  );
+  @override
+  late final GeneratedColumn<int> createdAtWeek = GeneratedColumn<int>(
+    'created_at_week',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('pending'),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    fromClubId,
+    toClubId,
+    playerId,
+    needId,
+    offerAmount,
+    proposedSalary,
+    contractYears,
+    createdAtWeek,
+    status,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'transfer_offers';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<TransferOffer> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('from_club_id')) {
+      context.handle(
+        _fromClubIdMeta,
+        fromClubId.isAcceptableOrUnknown(
+          data['from_club_id']!,
+          _fromClubIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_fromClubIdMeta);
+    }
+    if (data.containsKey('to_club_id')) {
+      context.handle(
+        _toClubIdMeta,
+        toClubId.isAcceptableOrUnknown(data['to_club_id']!, _toClubIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_toClubIdMeta);
+    }
+    if (data.containsKey('player_id')) {
+      context.handle(
+        _playerIdMeta,
+        playerId.isAcceptableOrUnknown(data['player_id']!, _playerIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_playerIdMeta);
+    }
+    if (data.containsKey('need_id')) {
+      context.handle(
+        _needIdMeta,
+        needId.isAcceptableOrUnknown(data['need_id']!, _needIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_needIdMeta);
+    }
+    if (data.containsKey('offer_amount')) {
+      context.handle(
+        _offerAmountMeta,
+        offerAmount.isAcceptableOrUnknown(
+          data['offer_amount']!,
+          _offerAmountMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_offerAmountMeta);
+    }
+    if (data.containsKey('proposed_salary')) {
+      context.handle(
+        _proposedSalaryMeta,
+        proposedSalary.isAcceptableOrUnknown(
+          data['proposed_salary']!,
+          _proposedSalaryMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_proposedSalaryMeta);
+    }
+    if (data.containsKey('contract_years')) {
+      context.handle(
+        _contractYearsMeta,
+        contractYears.isAcceptableOrUnknown(
+          data['contract_years']!,
+          _contractYearsMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_contractYearsMeta);
+    }
+    if (data.containsKey('created_at_week')) {
+      context.handle(
+        _createdAtWeekMeta,
+        createdAtWeek.isAcceptableOrUnknown(
+          data['created_at_week']!,
+          _createdAtWeekMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtWeekMeta);
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  TransferOffer map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return TransferOffer(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      fromClubId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}from_club_id'],
+      )!,
+      toClubId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}to_club_id'],
+      )!,
+      playerId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}player_id'],
+      )!,
+      needId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}need_id'],
+      )!,
+      offerAmount: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}offer_amount'],
+      )!,
+      proposedSalary: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}proposed_salary'],
+      )!,
+      contractYears: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}contract_years'],
+      )!,
+      createdAtWeek: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at_week'],
+      )!,
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
+    );
+  }
+
+  @override
+  $TransferOffersTable createAlias(String alias) {
+    return $TransferOffersTable(attachedDatabase, alias);
+  }
+}
+
+class TransferOffer extends DataClass implements Insertable<TransferOffer> {
+  final int id;
+  final int fromClubId;
+  final int toClubId;
+  final int playerId;
+  final int needId;
+  final int offerAmount;
+  final int proposedSalary;
+  final int contractYears;
+  final int createdAtWeek;
+  final String status;
+  const TransferOffer({
+    required this.id,
+    required this.fromClubId,
+    required this.toClubId,
+    required this.playerId,
+    required this.needId,
+    required this.offerAmount,
+    required this.proposedSalary,
+    required this.contractYears,
+    required this.createdAtWeek,
+    required this.status,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['from_club_id'] = Variable<int>(fromClubId);
+    map['to_club_id'] = Variable<int>(toClubId);
+    map['player_id'] = Variable<int>(playerId);
+    map['need_id'] = Variable<int>(needId);
+    map['offer_amount'] = Variable<int>(offerAmount);
+    map['proposed_salary'] = Variable<int>(proposedSalary);
+    map['contract_years'] = Variable<int>(contractYears);
+    map['created_at_week'] = Variable<int>(createdAtWeek);
+    map['status'] = Variable<String>(status);
+    return map;
+  }
+
+  TransferOffersCompanion toCompanion(bool nullToAbsent) {
+    return TransferOffersCompanion(
+      id: Value(id),
+      fromClubId: Value(fromClubId),
+      toClubId: Value(toClubId),
+      playerId: Value(playerId),
+      needId: Value(needId),
+      offerAmount: Value(offerAmount),
+      proposedSalary: Value(proposedSalary),
+      contractYears: Value(contractYears),
+      createdAtWeek: Value(createdAtWeek),
+      status: Value(status),
+    );
+  }
+
+  factory TransferOffer.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return TransferOffer(
+      id: serializer.fromJson<int>(json['id']),
+      fromClubId: serializer.fromJson<int>(json['fromClubId']),
+      toClubId: serializer.fromJson<int>(json['toClubId']),
+      playerId: serializer.fromJson<int>(json['playerId']),
+      needId: serializer.fromJson<int>(json['needId']),
+      offerAmount: serializer.fromJson<int>(json['offerAmount']),
+      proposedSalary: serializer.fromJson<int>(json['proposedSalary']),
+      contractYears: serializer.fromJson<int>(json['contractYears']),
+      createdAtWeek: serializer.fromJson<int>(json['createdAtWeek']),
+      status: serializer.fromJson<String>(json['status']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'fromClubId': serializer.toJson<int>(fromClubId),
+      'toClubId': serializer.toJson<int>(toClubId),
+      'playerId': serializer.toJson<int>(playerId),
+      'needId': serializer.toJson<int>(needId),
+      'offerAmount': serializer.toJson<int>(offerAmount),
+      'proposedSalary': serializer.toJson<int>(proposedSalary),
+      'contractYears': serializer.toJson<int>(contractYears),
+      'createdAtWeek': serializer.toJson<int>(createdAtWeek),
+      'status': serializer.toJson<String>(status),
+    };
+  }
+
+  TransferOffer copyWith({
+    int? id,
+    int? fromClubId,
+    int? toClubId,
+    int? playerId,
+    int? needId,
+    int? offerAmount,
+    int? proposedSalary,
+    int? contractYears,
+    int? createdAtWeek,
+    String? status,
+  }) => TransferOffer(
+    id: id ?? this.id,
+    fromClubId: fromClubId ?? this.fromClubId,
+    toClubId: toClubId ?? this.toClubId,
+    playerId: playerId ?? this.playerId,
+    needId: needId ?? this.needId,
+    offerAmount: offerAmount ?? this.offerAmount,
+    proposedSalary: proposedSalary ?? this.proposedSalary,
+    contractYears: contractYears ?? this.contractYears,
+    createdAtWeek: createdAtWeek ?? this.createdAtWeek,
+    status: status ?? this.status,
+  );
+  TransferOffer copyWithCompanion(TransferOffersCompanion data) {
+    return TransferOffer(
+      id: data.id.present ? data.id.value : this.id,
+      fromClubId: data.fromClubId.present
+          ? data.fromClubId.value
+          : this.fromClubId,
+      toClubId: data.toClubId.present ? data.toClubId.value : this.toClubId,
+      playerId: data.playerId.present ? data.playerId.value : this.playerId,
+      needId: data.needId.present ? data.needId.value : this.needId,
+      offerAmount: data.offerAmount.present
+          ? data.offerAmount.value
+          : this.offerAmount,
+      proposedSalary: data.proposedSalary.present
+          ? data.proposedSalary.value
+          : this.proposedSalary,
+      contractYears: data.contractYears.present
+          ? data.contractYears.value
+          : this.contractYears,
+      createdAtWeek: data.createdAtWeek.present
+          ? data.createdAtWeek.value
+          : this.createdAtWeek,
+      status: data.status.present ? data.status.value : this.status,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TransferOffer(')
+          ..write('id: $id, ')
+          ..write('fromClubId: $fromClubId, ')
+          ..write('toClubId: $toClubId, ')
+          ..write('playerId: $playerId, ')
+          ..write('needId: $needId, ')
+          ..write('offerAmount: $offerAmount, ')
+          ..write('proposedSalary: $proposedSalary, ')
+          ..write('contractYears: $contractYears, ')
+          ..write('createdAtWeek: $createdAtWeek, ')
+          ..write('status: $status')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    fromClubId,
+    toClubId,
+    playerId,
+    needId,
+    offerAmount,
+    proposedSalary,
+    contractYears,
+    createdAtWeek,
+    status,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is TransferOffer &&
+          other.id == this.id &&
+          other.fromClubId == this.fromClubId &&
+          other.toClubId == this.toClubId &&
+          other.playerId == this.playerId &&
+          other.needId == this.needId &&
+          other.offerAmount == this.offerAmount &&
+          other.proposedSalary == this.proposedSalary &&
+          other.contractYears == this.contractYears &&
+          other.createdAtWeek == this.createdAtWeek &&
+          other.status == this.status);
+}
+
+class TransferOffersCompanion extends UpdateCompanion<TransferOffer> {
+  final Value<int> id;
+  final Value<int> fromClubId;
+  final Value<int> toClubId;
+  final Value<int> playerId;
+  final Value<int> needId;
+  final Value<int> offerAmount;
+  final Value<int> proposedSalary;
+  final Value<int> contractYears;
+  final Value<int> createdAtWeek;
+  final Value<String> status;
+  const TransferOffersCompanion({
+    this.id = const Value.absent(),
+    this.fromClubId = const Value.absent(),
+    this.toClubId = const Value.absent(),
+    this.playerId = const Value.absent(),
+    this.needId = const Value.absent(),
+    this.offerAmount = const Value.absent(),
+    this.proposedSalary = const Value.absent(),
+    this.contractYears = const Value.absent(),
+    this.createdAtWeek = const Value.absent(),
+    this.status = const Value.absent(),
+  });
+  TransferOffersCompanion.insert({
+    this.id = const Value.absent(),
+    required int fromClubId,
+    required int toClubId,
+    required int playerId,
+    required int needId,
+    required int offerAmount,
+    required int proposedSalary,
+    required int contractYears,
+    required int createdAtWeek,
+    this.status = const Value.absent(),
+  }) : fromClubId = Value(fromClubId),
+       toClubId = Value(toClubId),
+       playerId = Value(playerId),
+       needId = Value(needId),
+       offerAmount = Value(offerAmount),
+       proposedSalary = Value(proposedSalary),
+       contractYears = Value(contractYears),
+       createdAtWeek = Value(createdAtWeek);
+  static Insertable<TransferOffer> custom({
+    Expression<int>? id,
+    Expression<int>? fromClubId,
+    Expression<int>? toClubId,
+    Expression<int>? playerId,
+    Expression<int>? needId,
+    Expression<int>? offerAmount,
+    Expression<int>? proposedSalary,
+    Expression<int>? contractYears,
+    Expression<int>? createdAtWeek,
+    Expression<String>? status,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (fromClubId != null) 'from_club_id': fromClubId,
+      if (toClubId != null) 'to_club_id': toClubId,
+      if (playerId != null) 'player_id': playerId,
+      if (needId != null) 'need_id': needId,
+      if (offerAmount != null) 'offer_amount': offerAmount,
+      if (proposedSalary != null) 'proposed_salary': proposedSalary,
+      if (contractYears != null) 'contract_years': contractYears,
+      if (createdAtWeek != null) 'created_at_week': createdAtWeek,
+      if (status != null) 'status': status,
+    });
+  }
+
+  TransferOffersCompanion copyWith({
+    Value<int>? id,
+    Value<int>? fromClubId,
+    Value<int>? toClubId,
+    Value<int>? playerId,
+    Value<int>? needId,
+    Value<int>? offerAmount,
+    Value<int>? proposedSalary,
+    Value<int>? contractYears,
+    Value<int>? createdAtWeek,
+    Value<String>? status,
+  }) {
+    return TransferOffersCompanion(
+      id: id ?? this.id,
+      fromClubId: fromClubId ?? this.fromClubId,
+      toClubId: toClubId ?? this.toClubId,
+      playerId: playerId ?? this.playerId,
+      needId: needId ?? this.needId,
+      offerAmount: offerAmount ?? this.offerAmount,
+      proposedSalary: proposedSalary ?? this.proposedSalary,
+      contractYears: contractYears ?? this.contractYears,
+      createdAtWeek: createdAtWeek ?? this.createdAtWeek,
+      status: status ?? this.status,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (fromClubId.present) {
+      map['from_club_id'] = Variable<int>(fromClubId.value);
+    }
+    if (toClubId.present) {
+      map['to_club_id'] = Variable<int>(toClubId.value);
+    }
+    if (playerId.present) {
+      map['player_id'] = Variable<int>(playerId.value);
+    }
+    if (needId.present) {
+      map['need_id'] = Variable<int>(needId.value);
+    }
+    if (offerAmount.present) {
+      map['offer_amount'] = Variable<int>(offerAmount.value);
+    }
+    if (proposedSalary.present) {
+      map['proposed_salary'] = Variable<int>(proposedSalary.value);
+    }
+    if (contractYears.present) {
+      map['contract_years'] = Variable<int>(contractYears.value);
+    }
+    if (createdAtWeek.present) {
+      map['created_at_week'] = Variable<int>(createdAtWeek.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TransferOffersCompanion(')
+          ..write('id: $id, ')
+          ..write('fromClubId: $fromClubId, ')
+          ..write('toClubId: $toClubId, ')
+          ..write('playerId: $playerId, ')
+          ..write('needId: $needId, ')
+          ..write('offerAmount: $offerAmount, ')
+          ..write('proposedSalary: $proposedSalary, ')
+          ..write('contractYears: $contractYears, ')
+          ..write('createdAtWeek: $createdAtWeek, ')
+          ..write('status: $status')
           ..write(')'))
         .toString();
   }
@@ -5413,6 +6720,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $AgentContractsTable agentContracts = $AgentContractsTable(this);
   late final $ClubContractsTable clubContracts = $ClubContractsTable(this);
   late final $TransfersTable transfers = $TransfersTable(this);
+  late final $TransferNeedsTable transferNeeds = $TransferNeedsTable(this);
+  late final $TransferOffersTable transferOffers = $TransferOffersTable(this);
   late final $ValueHistoriesTable valueHistories = $ValueHistoriesTable(this);
   late final $RelationshipsTable relationships = $RelationshipsTable(this);
   late final $CountriesTable countries = $CountriesTable(this);
@@ -5430,6 +6739,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     agentContracts,
     clubContracts,
     transfers,
+    transferNeeds,
+    transferOffers,
     valueHistories,
     relationships,
     countries,
@@ -5786,6 +7097,24 @@ final class $$ClubsTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<$TransferNeedsTable, List<TransferNeed>>
+  _transferNeedsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.transferNeeds,
+    aliasName: $_aliasNameGenerator(db.clubs.id, db.transferNeeds.clubId),
+  );
+
+  $$TransferNeedsTableProcessedTableManager get transferNeedsRefs {
+    final manager = $$TransferNeedsTableTableManager(
+      $_db,
+      $_db.transferNeeds,
+    ).filter((f) => f.clubId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_transferNeedsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$ClubsTableFilterComposer extends Composer<_$AppDatabase, $ClubsTable> {
@@ -5885,6 +7214,31 @@ class $$ClubsTableFilterComposer extends Composer<_$AppDatabase, $ClubsTable> {
           }) => $$ClubContractsTableFilterComposer(
             $db: $db,
             $table: $db.clubContracts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> transferNeedsRefs(
+    Expression<bool> Function($$TransferNeedsTableFilterComposer f) f,
+  ) {
+    final $$TransferNeedsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.transferNeeds,
+      getReferencedColumn: (t) => t.clubId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TransferNeedsTableFilterComposer(
+            $db: $db,
+            $table: $db.transferNeeds,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -6055,6 +7409,31 @@ class $$ClubsTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> transferNeedsRefs<T extends Object>(
+    Expression<T> Function($$TransferNeedsTableAnnotationComposer a) f,
+  ) {
+    final $$TransferNeedsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.transferNeeds,
+      getReferencedColumn: (t) => t.clubId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TransferNeedsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.transferNeeds,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$ClubsTableTableManager
@@ -6074,6 +7453,7 @@ class $$ClubsTableTableManager
             bool leagueId,
             bool playersRefs,
             bool clubContractsRefs,
+            bool transferNeedsRefs,
           })
         > {
   $$ClubsTableTableManager(_$AppDatabase db, $ClubsTable table)
@@ -6130,12 +7510,14 @@ class $$ClubsTableTableManager
                 leagueId = false,
                 playersRefs = false,
                 clubContractsRefs = false,
+                transferNeedsRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
                     if (playersRefs) db.players,
                     if (clubContractsRefs) db.clubContracts,
+                    if (transferNeedsRefs) db.transferNeeds,
                   ],
                   addJoins:
                       <
@@ -6205,6 +7587,27 @@ class $$ClubsTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (transferNeedsRefs)
+                        await $_getPrefetchedData<
+                          Club,
+                          $ClubsTable,
+                          TransferNeed
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ClubsTableReferences
+                              ._transferNeedsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ClubsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).transferNeedsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.clubId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -6229,6 +7632,7 @@ typedef $$ClubsTableProcessedTableManager =
         bool leagueId,
         bool playersRefs,
         bool clubContractsRefs,
+        bool transferNeedsRefs,
       })
     >;
 typedef $$AgentsTableCreateCompanionBuilder =
@@ -6672,7 +8076,6 @@ typedef $$PlayersTableCreateCompanionBuilder =
       required int pa,
       required int reputation,
       required int marketValue,
-      Value<int?> currentContractId,
     });
 typedef $$PlayersTableUpdateCompanionBuilder =
     PlayersCompanion Function({
@@ -6686,7 +8089,6 @@ typedef $$PlayersTableUpdateCompanionBuilder =
       Value<int> pa,
       Value<int> reputation,
       Value<int> marketValue,
-      Value<int?> currentContractId,
     });
 
 final class $$PlayersTableReferences
@@ -6783,6 +8185,45 @@ final class $$PlayersTableReferences
     );
   }
 
+  static MultiTypedResultKey<$TransferNeedsTable, List<TransferNeed>>
+  _transferNeedsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.transferNeeds,
+    aliasName: $_aliasNameGenerator(
+      db.players.id,
+      db.transferNeeds.playerToSellId,
+    ),
+  );
+
+  $$TransferNeedsTableProcessedTableManager get transferNeedsRefs {
+    final manager = $$TransferNeedsTableTableManager(
+      $_db,
+      $_db.transferNeeds,
+    ).filter((f) => f.playerToSellId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_transferNeedsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$TransferOffersTable, List<TransferOffer>>
+  _transferOffersRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.transferOffers,
+    aliasName: $_aliasNameGenerator(db.players.id, db.transferOffers.playerId),
+  );
+
+  $$TransferOffersTableProcessedTableManager get transferOffersRefs {
+    final manager = $$TransferOffersTableTableManager(
+      $_db,
+      $_db.transferOffers,
+    ).filter((f) => f.playerId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_transferOffersRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
   static MultiTypedResultKey<$ValueHistoriesTable, List<ValueHistory>>
   _valueHistoriesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
     db.valueHistories,
@@ -6866,11 +8307,6 @@ class $$PlayersTableFilterComposer
 
   ColumnFilters<int> get marketValue => $composableBuilder(
     column: $table.marketValue,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<int> get currentContractId => $composableBuilder(
-    column: $table.currentContractId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -6995,6 +8431,56 @@ class $$PlayersTableFilterComposer
     return f(composer);
   }
 
+  Expression<bool> transferNeedsRefs(
+    Expression<bool> Function($$TransferNeedsTableFilterComposer f) f,
+  ) {
+    final $$TransferNeedsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.transferNeeds,
+      getReferencedColumn: (t) => t.playerToSellId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TransferNeedsTableFilterComposer(
+            $db: $db,
+            $table: $db.transferNeeds,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> transferOffersRefs(
+    Expression<bool> Function($$TransferOffersTableFilterComposer f) f,
+  ) {
+    final $$TransferOffersTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.transferOffers,
+      getReferencedColumn: (t) => t.playerId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TransferOffersTableFilterComposer(
+            $db: $db,
+            $table: $db.transferOffers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
   Expression<bool> valueHistoriesRefs(
     Expression<bool> Function($$ValueHistoriesTableFilterComposer f) f,
   ) {
@@ -7095,11 +8581,6 @@ class $$PlayersTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get currentContractId => $composableBuilder(
-    column: $table.currentContractId,
-    builder: (column) => ColumnOrderings(column),
-  );
-
   $$ClubsTableOrderingComposer get clubId {
     final $$ClubsTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -7181,11 +8662,6 @@ class $$PlayersTableAnnotationComposer
 
   GeneratedColumn<int> get marketValue => $composableBuilder(
     column: $table.marketValue,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<int> get currentContractId => $composableBuilder(
-    column: $table.currentContractId,
     builder: (column) => column,
   );
 
@@ -7310,6 +8786,56 @@ class $$PlayersTableAnnotationComposer
     return f(composer);
   }
 
+  Expression<T> transferNeedsRefs<T extends Object>(
+    Expression<T> Function($$TransferNeedsTableAnnotationComposer a) f,
+  ) {
+    final $$TransferNeedsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.transferNeeds,
+      getReferencedColumn: (t) => t.playerToSellId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TransferNeedsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.transferNeeds,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> transferOffersRefs<T extends Object>(
+    Expression<T> Function($$TransferOffersTableAnnotationComposer a) f,
+  ) {
+    final $$TransferOffersTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.transferOffers,
+      getReferencedColumn: (t) => t.playerId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TransferOffersTableAnnotationComposer(
+            $db: $db,
+            $table: $db.transferOffers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
   Expression<T> valueHistoriesRefs<T extends Object>(
     Expression<T> Function($$ValueHistoriesTableAnnotationComposer a) f,
   ) {
@@ -7380,6 +8906,8 @@ class $$PlayersTableTableManager
             bool agentContractsRefs,
             bool clubContractsRefs,
             bool transfersRefs,
+            bool transferNeedsRefs,
+            bool transferOffersRefs,
             bool valueHistoriesRefs,
             bool performancesRefs,
           })
@@ -7407,7 +8935,6 @@ class $$PlayersTableTableManager
                 Value<int> pa = const Value.absent(),
                 Value<int> reputation = const Value.absent(),
                 Value<int> marketValue = const Value.absent(),
-                Value<int?> currentContractId = const Value.absent(),
               }) => PlayersCompanion(
                 id: id,
                 name: name,
@@ -7419,7 +8946,6 @@ class $$PlayersTableTableManager
                 pa: pa,
                 reputation: reputation,
                 marketValue: marketValue,
-                currentContractId: currentContractId,
               ),
           createCompanionCallback:
               ({
@@ -7433,7 +8959,6 @@ class $$PlayersTableTableManager
                 required int pa,
                 required int reputation,
                 required int marketValue,
-                Value<int?> currentContractId = const Value.absent(),
               }) => PlayersCompanion.insert(
                 id: id,
                 name: name,
@@ -7445,7 +8970,6 @@ class $$PlayersTableTableManager
                 pa: pa,
                 reputation: reputation,
                 marketValue: marketValue,
-                currentContractId: currentContractId,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -7462,6 +8986,8 @@ class $$PlayersTableTableManager
                 agentContractsRefs = false,
                 clubContractsRefs = false,
                 transfersRefs = false,
+                transferNeedsRefs = false,
+                transferOffersRefs = false,
                 valueHistoriesRefs = false,
                 performancesRefs = false,
               }) {
@@ -7471,6 +8997,8 @@ class $$PlayersTableTableManager
                     if (agentContractsRefs) db.agentContracts,
                     if (clubContractsRefs) db.clubContracts,
                     if (transfersRefs) db.transfers,
+                    if (transferNeedsRefs) db.transferNeeds,
+                    if (transferOffersRefs) db.transferOffers,
                     if (valueHistoriesRefs) db.valueHistories,
                     if (performancesRefs) db.performances,
                   ],
@@ -7584,6 +9112,48 @@ class $$PlayersTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (transferNeedsRefs)
+                        await $_getPrefetchedData<
+                          Player,
+                          $PlayersTable,
+                          TransferNeed
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PlayersTableReferences
+                              ._transferNeedsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PlayersTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).transferNeedsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.playerToSellId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (transferOffersRefs)
+                        await $_getPrefetchedData<
+                          Player,
+                          $PlayersTable,
+                          TransferOffer
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PlayersTableReferences
+                              ._transferOffersRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PlayersTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).transferOffersRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.playerId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                       if (valueHistoriesRefs)
                         await $_getPrefetchedData<
                           Player,
@@ -7652,6 +9222,8 @@ typedef $$PlayersTableProcessedTableManager =
         bool agentContractsRefs,
         bool clubContractsRefs,
         bool transfersRefs,
+        bool transferNeedsRefs,
+        bool transferOffersRefs,
         bool valueHistoriesRefs,
         bool performancesRefs,
       })
@@ -9136,6 +10708,1373 @@ typedef $$TransfersTableProcessedTableManager =
       (Transfer, $$TransfersTableReferences),
       Transfer,
       PrefetchHooks Function({bool playerId, bool fromClubId, bool toClubId})
+    >;
+typedef $$TransferNeedsTableCreateCompanionBuilder =
+    TransferNeedsCompanion Function({
+      Value<int> id,
+      required int clubId,
+      required String type,
+      Value<String?> targetPosition,
+      Value<int?> minAge,
+      Value<int?> maxAge,
+      Value<int?> minCa,
+      Value<int?> maxTransferBudget,
+      Value<int?> maxWeeklySalary,
+      Value<int?> playerToSellId,
+      Value<int?> minimumFee,
+      Value<bool> isFulfilled,
+    });
+typedef $$TransferNeedsTableUpdateCompanionBuilder =
+    TransferNeedsCompanion Function({
+      Value<int> id,
+      Value<int> clubId,
+      Value<String> type,
+      Value<String?> targetPosition,
+      Value<int?> minAge,
+      Value<int?> maxAge,
+      Value<int?> minCa,
+      Value<int?> maxTransferBudget,
+      Value<int?> maxWeeklySalary,
+      Value<int?> playerToSellId,
+      Value<int?> minimumFee,
+      Value<bool> isFulfilled,
+    });
+
+final class $$TransferNeedsTableReferences
+    extends BaseReferences<_$AppDatabase, $TransferNeedsTable, TransferNeed> {
+  $$TransferNeedsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ClubsTable _clubIdTable(_$AppDatabase db) => db.clubs.createAlias(
+    $_aliasNameGenerator(db.transferNeeds.clubId, db.clubs.id),
+  );
+
+  $$ClubsTableProcessedTableManager get clubId {
+    final $_column = $_itemColumn<int>('club_id')!;
+
+    final manager = $$ClubsTableTableManager(
+      $_db,
+      $_db.clubs,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_clubIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $PlayersTable _playerToSellIdTable(_$AppDatabase db) =>
+      db.players.createAlias(
+        $_aliasNameGenerator(db.transferNeeds.playerToSellId, db.players.id),
+      );
+
+  $$PlayersTableProcessedTableManager? get playerToSellId {
+    final $_column = $_itemColumn<int>('player_to_sell_id');
+    if ($_column == null) return null;
+    final manager = $$PlayersTableTableManager(
+      $_db,
+      $_db.players,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_playerToSellIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<$TransferOffersTable, List<TransferOffer>>
+  _transferOffersRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.transferOffers,
+    aliasName: $_aliasNameGenerator(
+      db.transferNeeds.id,
+      db.transferOffers.needId,
+    ),
+  );
+
+  $$TransferOffersTableProcessedTableManager get transferOffersRefs {
+    final manager = $$TransferOffersTableTableManager(
+      $_db,
+      $_db.transferOffers,
+    ).filter((f) => f.needId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_transferOffersRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$TransferNeedsTableFilterComposer
+    extends Composer<_$AppDatabase, $TransferNeedsTable> {
+  $$TransferNeedsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get type => $composableBuilder(
+    column: $table.type,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get targetPosition => $composableBuilder(
+    column: $table.targetPosition,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get minAge => $composableBuilder(
+    column: $table.minAge,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get maxAge => $composableBuilder(
+    column: $table.maxAge,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get minCa => $composableBuilder(
+    column: $table.minCa,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get maxTransferBudget => $composableBuilder(
+    column: $table.maxTransferBudget,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get maxWeeklySalary => $composableBuilder(
+    column: $table.maxWeeklySalary,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get minimumFee => $composableBuilder(
+    column: $table.minimumFee,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isFulfilled => $composableBuilder(
+    column: $table.isFulfilled,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ClubsTableFilterComposer get clubId {
+    final $$ClubsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.clubId,
+      referencedTable: $db.clubs,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ClubsTableFilterComposer(
+            $db: $db,
+            $table: $db.clubs,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PlayersTableFilterComposer get playerToSellId {
+    final $$PlayersTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.playerToSellId,
+      referencedTable: $db.players,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlayersTableFilterComposer(
+            $db: $db,
+            $table: $db.players,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<bool> transferOffersRefs(
+    Expression<bool> Function($$TransferOffersTableFilterComposer f) f,
+  ) {
+    final $$TransferOffersTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.transferOffers,
+      getReferencedColumn: (t) => t.needId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TransferOffersTableFilterComposer(
+            $db: $db,
+            $table: $db.transferOffers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$TransferNeedsTableOrderingComposer
+    extends Composer<_$AppDatabase, $TransferNeedsTable> {
+  $$TransferNeedsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get type => $composableBuilder(
+    column: $table.type,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get targetPosition => $composableBuilder(
+    column: $table.targetPosition,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get minAge => $composableBuilder(
+    column: $table.minAge,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get maxAge => $composableBuilder(
+    column: $table.maxAge,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get minCa => $composableBuilder(
+    column: $table.minCa,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get maxTransferBudget => $composableBuilder(
+    column: $table.maxTransferBudget,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get maxWeeklySalary => $composableBuilder(
+    column: $table.maxWeeklySalary,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get minimumFee => $composableBuilder(
+    column: $table.minimumFee,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isFulfilled => $composableBuilder(
+    column: $table.isFulfilled,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ClubsTableOrderingComposer get clubId {
+    final $$ClubsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.clubId,
+      referencedTable: $db.clubs,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ClubsTableOrderingComposer(
+            $db: $db,
+            $table: $db.clubs,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PlayersTableOrderingComposer get playerToSellId {
+    final $$PlayersTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.playerToSellId,
+      referencedTable: $db.players,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlayersTableOrderingComposer(
+            $db: $db,
+            $table: $db.players,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$TransferNeedsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $TransferNeedsTable> {
+  $$TransferNeedsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get type =>
+      $composableBuilder(column: $table.type, builder: (column) => column);
+
+  GeneratedColumn<String> get targetPosition => $composableBuilder(
+    column: $table.targetPosition,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get minAge =>
+      $composableBuilder(column: $table.minAge, builder: (column) => column);
+
+  GeneratedColumn<int> get maxAge =>
+      $composableBuilder(column: $table.maxAge, builder: (column) => column);
+
+  GeneratedColumn<int> get minCa =>
+      $composableBuilder(column: $table.minCa, builder: (column) => column);
+
+  GeneratedColumn<int> get maxTransferBudget => $composableBuilder(
+    column: $table.maxTransferBudget,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get maxWeeklySalary => $composableBuilder(
+    column: $table.maxWeeklySalary,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get minimumFee => $composableBuilder(
+    column: $table.minimumFee,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get isFulfilled => $composableBuilder(
+    column: $table.isFulfilled,
+    builder: (column) => column,
+  );
+
+  $$ClubsTableAnnotationComposer get clubId {
+    final $$ClubsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.clubId,
+      referencedTable: $db.clubs,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ClubsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.clubs,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PlayersTableAnnotationComposer get playerToSellId {
+    final $$PlayersTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.playerToSellId,
+      referencedTable: $db.players,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlayersTableAnnotationComposer(
+            $db: $db,
+            $table: $db.players,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<T> transferOffersRefs<T extends Object>(
+    Expression<T> Function($$TransferOffersTableAnnotationComposer a) f,
+  ) {
+    final $$TransferOffersTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.transferOffers,
+      getReferencedColumn: (t) => t.needId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TransferOffersTableAnnotationComposer(
+            $db: $db,
+            $table: $db.transferOffers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$TransferNeedsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $TransferNeedsTable,
+          TransferNeed,
+          $$TransferNeedsTableFilterComposer,
+          $$TransferNeedsTableOrderingComposer,
+          $$TransferNeedsTableAnnotationComposer,
+          $$TransferNeedsTableCreateCompanionBuilder,
+          $$TransferNeedsTableUpdateCompanionBuilder,
+          (TransferNeed, $$TransferNeedsTableReferences),
+          TransferNeed,
+          PrefetchHooks Function({
+            bool clubId,
+            bool playerToSellId,
+            bool transferOffersRefs,
+          })
+        > {
+  $$TransferNeedsTableTableManager(_$AppDatabase db, $TransferNeedsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$TransferNeedsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$TransferNeedsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$TransferNeedsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> clubId = const Value.absent(),
+                Value<String> type = const Value.absent(),
+                Value<String?> targetPosition = const Value.absent(),
+                Value<int?> minAge = const Value.absent(),
+                Value<int?> maxAge = const Value.absent(),
+                Value<int?> minCa = const Value.absent(),
+                Value<int?> maxTransferBudget = const Value.absent(),
+                Value<int?> maxWeeklySalary = const Value.absent(),
+                Value<int?> playerToSellId = const Value.absent(),
+                Value<int?> minimumFee = const Value.absent(),
+                Value<bool> isFulfilled = const Value.absent(),
+              }) => TransferNeedsCompanion(
+                id: id,
+                clubId: clubId,
+                type: type,
+                targetPosition: targetPosition,
+                minAge: minAge,
+                maxAge: maxAge,
+                minCa: minCa,
+                maxTransferBudget: maxTransferBudget,
+                maxWeeklySalary: maxWeeklySalary,
+                playerToSellId: playerToSellId,
+                minimumFee: minimumFee,
+                isFulfilled: isFulfilled,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int clubId,
+                required String type,
+                Value<String?> targetPosition = const Value.absent(),
+                Value<int?> minAge = const Value.absent(),
+                Value<int?> maxAge = const Value.absent(),
+                Value<int?> minCa = const Value.absent(),
+                Value<int?> maxTransferBudget = const Value.absent(),
+                Value<int?> maxWeeklySalary = const Value.absent(),
+                Value<int?> playerToSellId = const Value.absent(),
+                Value<int?> minimumFee = const Value.absent(),
+                Value<bool> isFulfilled = const Value.absent(),
+              }) => TransferNeedsCompanion.insert(
+                id: id,
+                clubId: clubId,
+                type: type,
+                targetPosition: targetPosition,
+                minAge: minAge,
+                maxAge: maxAge,
+                minCa: minCa,
+                maxTransferBudget: maxTransferBudget,
+                maxWeeklySalary: maxWeeklySalary,
+                playerToSellId: playerToSellId,
+                minimumFee: minimumFee,
+                isFulfilled: isFulfilled,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$TransferNeedsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({
+                clubId = false,
+                playerToSellId = false,
+                transferOffersRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (transferOffersRefs) db.transferOffers,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (clubId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.clubId,
+                                    referencedTable:
+                                        $$TransferNeedsTableReferences
+                                            ._clubIdTable(db),
+                                    referencedColumn:
+                                        $$TransferNeedsTableReferences
+                                            ._clubIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (playerToSellId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.playerToSellId,
+                                    referencedTable:
+                                        $$TransferNeedsTableReferences
+                                            ._playerToSellIdTable(db),
+                                    referencedColumn:
+                                        $$TransferNeedsTableReferences
+                                            ._playerToSellIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (transferOffersRefs)
+                        await $_getPrefetchedData<
+                          TransferNeed,
+                          $TransferNeedsTable,
+                          TransferOffer
+                        >(
+                          currentTable: table,
+                          referencedTable: $$TransferNeedsTableReferences
+                              ._transferOffersRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$TransferNeedsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).transferOffersRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.needId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$TransferNeedsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $TransferNeedsTable,
+      TransferNeed,
+      $$TransferNeedsTableFilterComposer,
+      $$TransferNeedsTableOrderingComposer,
+      $$TransferNeedsTableAnnotationComposer,
+      $$TransferNeedsTableCreateCompanionBuilder,
+      $$TransferNeedsTableUpdateCompanionBuilder,
+      (TransferNeed, $$TransferNeedsTableReferences),
+      TransferNeed,
+      PrefetchHooks Function({
+        bool clubId,
+        bool playerToSellId,
+        bool transferOffersRefs,
+      })
+    >;
+typedef $$TransferOffersTableCreateCompanionBuilder =
+    TransferOffersCompanion Function({
+      Value<int> id,
+      required int fromClubId,
+      required int toClubId,
+      required int playerId,
+      required int needId,
+      required int offerAmount,
+      required int proposedSalary,
+      required int contractYears,
+      required int createdAtWeek,
+      Value<String> status,
+    });
+typedef $$TransferOffersTableUpdateCompanionBuilder =
+    TransferOffersCompanion Function({
+      Value<int> id,
+      Value<int> fromClubId,
+      Value<int> toClubId,
+      Value<int> playerId,
+      Value<int> needId,
+      Value<int> offerAmount,
+      Value<int> proposedSalary,
+      Value<int> contractYears,
+      Value<int> createdAtWeek,
+      Value<String> status,
+    });
+
+final class $$TransferOffersTableReferences
+    extends BaseReferences<_$AppDatabase, $TransferOffersTable, TransferOffer> {
+  $$TransferOffersTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ClubsTable _fromClubIdTable(_$AppDatabase db) => db.clubs.createAlias(
+    $_aliasNameGenerator(db.transferOffers.fromClubId, db.clubs.id),
+  );
+
+  $$ClubsTableProcessedTableManager get fromClubId {
+    final $_column = $_itemColumn<int>('from_club_id')!;
+
+    final manager = $$ClubsTableTableManager(
+      $_db,
+      $_db.clubs,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_fromClubIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $ClubsTable _toClubIdTable(_$AppDatabase db) => db.clubs.createAlias(
+    $_aliasNameGenerator(db.transferOffers.toClubId, db.clubs.id),
+  );
+
+  $$ClubsTableProcessedTableManager get toClubId {
+    final $_column = $_itemColumn<int>('to_club_id')!;
+
+    final manager = $$ClubsTableTableManager(
+      $_db,
+      $_db.clubs,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_toClubIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $PlayersTable _playerIdTable(_$AppDatabase db) =>
+      db.players.createAlias(
+        $_aliasNameGenerator(db.transferOffers.playerId, db.players.id),
+      );
+
+  $$PlayersTableProcessedTableManager get playerId {
+    final $_column = $_itemColumn<int>('player_id')!;
+
+    final manager = $$PlayersTableTableManager(
+      $_db,
+      $_db.players,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_playerIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $TransferNeedsTable _needIdTable(_$AppDatabase db) =>
+      db.transferNeeds.createAlias(
+        $_aliasNameGenerator(db.transferOffers.needId, db.transferNeeds.id),
+      );
+
+  $$TransferNeedsTableProcessedTableManager get needId {
+    final $_column = $_itemColumn<int>('need_id')!;
+
+    final manager = $$TransferNeedsTableTableManager(
+      $_db,
+      $_db.transferNeeds,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_needIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$TransferOffersTableFilterComposer
+    extends Composer<_$AppDatabase, $TransferOffersTable> {
+  $$TransferOffersTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get offerAmount => $composableBuilder(
+    column: $table.offerAmount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get proposedSalary => $composableBuilder(
+    column: $table.proposedSalary,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get contractYears => $composableBuilder(
+    column: $table.contractYears,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAtWeek => $composableBuilder(
+    column: $table.createdAtWeek,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ClubsTableFilterComposer get fromClubId {
+    final $$ClubsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.fromClubId,
+      referencedTable: $db.clubs,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ClubsTableFilterComposer(
+            $db: $db,
+            $table: $db.clubs,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ClubsTableFilterComposer get toClubId {
+    final $$ClubsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.toClubId,
+      referencedTable: $db.clubs,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ClubsTableFilterComposer(
+            $db: $db,
+            $table: $db.clubs,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PlayersTableFilterComposer get playerId {
+    final $$PlayersTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.playerId,
+      referencedTable: $db.players,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlayersTableFilterComposer(
+            $db: $db,
+            $table: $db.players,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$TransferNeedsTableFilterComposer get needId {
+    final $$TransferNeedsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.needId,
+      referencedTable: $db.transferNeeds,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TransferNeedsTableFilterComposer(
+            $db: $db,
+            $table: $db.transferNeeds,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$TransferOffersTableOrderingComposer
+    extends Composer<_$AppDatabase, $TransferOffersTable> {
+  $$TransferOffersTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get offerAmount => $composableBuilder(
+    column: $table.offerAmount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get proposedSalary => $composableBuilder(
+    column: $table.proposedSalary,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get contractYears => $composableBuilder(
+    column: $table.contractYears,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAtWeek => $composableBuilder(
+    column: $table.createdAtWeek,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ClubsTableOrderingComposer get fromClubId {
+    final $$ClubsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.fromClubId,
+      referencedTable: $db.clubs,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ClubsTableOrderingComposer(
+            $db: $db,
+            $table: $db.clubs,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ClubsTableOrderingComposer get toClubId {
+    final $$ClubsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.toClubId,
+      referencedTable: $db.clubs,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ClubsTableOrderingComposer(
+            $db: $db,
+            $table: $db.clubs,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PlayersTableOrderingComposer get playerId {
+    final $$PlayersTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.playerId,
+      referencedTable: $db.players,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlayersTableOrderingComposer(
+            $db: $db,
+            $table: $db.players,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$TransferNeedsTableOrderingComposer get needId {
+    final $$TransferNeedsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.needId,
+      referencedTable: $db.transferNeeds,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TransferNeedsTableOrderingComposer(
+            $db: $db,
+            $table: $db.transferNeeds,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$TransferOffersTableAnnotationComposer
+    extends Composer<_$AppDatabase, $TransferOffersTable> {
+  $$TransferOffersTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get offerAmount => $composableBuilder(
+    column: $table.offerAmount,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get proposedSalary => $composableBuilder(
+    column: $table.proposedSalary,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get contractYears => $composableBuilder(
+    column: $table.contractYears,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get createdAtWeek => $composableBuilder(
+    column: $table.createdAtWeek,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  $$ClubsTableAnnotationComposer get fromClubId {
+    final $$ClubsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.fromClubId,
+      referencedTable: $db.clubs,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ClubsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.clubs,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ClubsTableAnnotationComposer get toClubId {
+    final $$ClubsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.toClubId,
+      referencedTable: $db.clubs,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ClubsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.clubs,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PlayersTableAnnotationComposer get playerId {
+    final $$PlayersTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.playerId,
+      referencedTable: $db.players,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlayersTableAnnotationComposer(
+            $db: $db,
+            $table: $db.players,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$TransferNeedsTableAnnotationComposer get needId {
+    final $$TransferNeedsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.needId,
+      referencedTable: $db.transferNeeds,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TransferNeedsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.transferNeeds,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$TransferOffersTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $TransferOffersTable,
+          TransferOffer,
+          $$TransferOffersTableFilterComposer,
+          $$TransferOffersTableOrderingComposer,
+          $$TransferOffersTableAnnotationComposer,
+          $$TransferOffersTableCreateCompanionBuilder,
+          $$TransferOffersTableUpdateCompanionBuilder,
+          (TransferOffer, $$TransferOffersTableReferences),
+          TransferOffer,
+          PrefetchHooks Function({
+            bool fromClubId,
+            bool toClubId,
+            bool playerId,
+            bool needId,
+          })
+        > {
+  $$TransferOffersTableTableManager(
+    _$AppDatabase db,
+    $TransferOffersTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$TransferOffersTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$TransferOffersTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$TransferOffersTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> fromClubId = const Value.absent(),
+                Value<int> toClubId = const Value.absent(),
+                Value<int> playerId = const Value.absent(),
+                Value<int> needId = const Value.absent(),
+                Value<int> offerAmount = const Value.absent(),
+                Value<int> proposedSalary = const Value.absent(),
+                Value<int> contractYears = const Value.absent(),
+                Value<int> createdAtWeek = const Value.absent(),
+                Value<String> status = const Value.absent(),
+              }) => TransferOffersCompanion(
+                id: id,
+                fromClubId: fromClubId,
+                toClubId: toClubId,
+                playerId: playerId,
+                needId: needId,
+                offerAmount: offerAmount,
+                proposedSalary: proposedSalary,
+                contractYears: contractYears,
+                createdAtWeek: createdAtWeek,
+                status: status,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int fromClubId,
+                required int toClubId,
+                required int playerId,
+                required int needId,
+                required int offerAmount,
+                required int proposedSalary,
+                required int contractYears,
+                required int createdAtWeek,
+                Value<String> status = const Value.absent(),
+              }) => TransferOffersCompanion.insert(
+                id: id,
+                fromClubId: fromClubId,
+                toClubId: toClubId,
+                playerId: playerId,
+                needId: needId,
+                offerAmount: offerAmount,
+                proposedSalary: proposedSalary,
+                contractYears: contractYears,
+                createdAtWeek: createdAtWeek,
+                status: status,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$TransferOffersTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({
+                fromClubId = false,
+                toClubId = false,
+                playerId = false,
+                needId = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (fromClubId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.fromClubId,
+                                    referencedTable:
+                                        $$TransferOffersTableReferences
+                                            ._fromClubIdTable(db),
+                                    referencedColumn:
+                                        $$TransferOffersTableReferences
+                                            ._fromClubIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (toClubId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.toClubId,
+                                    referencedTable:
+                                        $$TransferOffersTableReferences
+                                            ._toClubIdTable(db),
+                                    referencedColumn:
+                                        $$TransferOffersTableReferences
+                                            ._toClubIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (playerId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.playerId,
+                                    referencedTable:
+                                        $$TransferOffersTableReferences
+                                            ._playerIdTable(db),
+                                    referencedColumn:
+                                        $$TransferOffersTableReferences
+                                            ._playerIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (needId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.needId,
+                                    referencedTable:
+                                        $$TransferOffersTableReferences
+                                            ._needIdTable(db),
+                                    referencedColumn:
+                                        $$TransferOffersTableReferences
+                                            ._needIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$TransferOffersTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $TransferOffersTable,
+      TransferOffer,
+      $$TransferOffersTableFilterComposer,
+      $$TransferOffersTableOrderingComposer,
+      $$TransferOffersTableAnnotationComposer,
+      $$TransferOffersTableCreateCompanionBuilder,
+      $$TransferOffersTableUpdateCompanionBuilder,
+      (TransferOffer, $$TransferOffersTableReferences),
+      TransferOffer,
+      PrefetchHooks Function({
+        bool fromClubId,
+        bool toClubId,
+        bool playerId,
+        bool needId,
+      })
     >;
 typedef $$ValueHistoriesTableCreateCompanionBuilder =
     ValueHistoriesCompanion Function({
@@ -10882,6 +13821,10 @@ class $AppDatabaseManager {
       $$ClubContractsTableTableManager(_db, _db.clubContracts);
   $$TransfersTableTableManager get transfers =>
       $$TransfersTableTableManager(_db, _db.transfers);
+  $$TransferNeedsTableTableManager get transferNeeds =>
+      $$TransferNeedsTableTableManager(_db, _db.transferNeeds);
+  $$TransferOffersTableTableManager get transferOffers =>
+      $$TransferOffersTableTableManager(_db, _db.transferOffers);
   $$ValueHistoriesTableTableManager get valueHistories =>
       $$ValueHistoriesTableTableManager(_db, _db.valueHistories);
   $$RelationshipsTableTableManager get relationships =>
