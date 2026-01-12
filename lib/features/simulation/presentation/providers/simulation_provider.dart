@@ -4,6 +4,8 @@ import '../../../../core/providers/game_date_provider.dart';
 import '../../../../core/providers/repository_providers.dart';
 import '../../../players/domain/services/player_growth_service.dart';
 import '../../domain/services/simulation_service.dart';
+import '../../../office/providers/office_provider.dart';
+import '../../../agents/providers/agent_provider.dart';
 
 final simulationServiceProvider = Provider<SimulationService>((ref) {
   final database = ref.watch(appDatabaseProvider);
@@ -13,6 +15,8 @@ final simulationServiceProvider = Provider<SimulationService>((ref) {
     clubRepository: ref.watch(clubRepositoryProvider),
     playerRepository: ref.watch(playerRepositoryProvider),
     playerGrowthService: PlayerGrowthService(database),
+    officeRepository: ref.watch(officeRepositoryProvider),
+    agentRepository: ref.watch(agentRepositoryProvider),
   );
 });
 

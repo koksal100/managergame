@@ -2,13 +2,19 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/services.dart';
 
+import '../../../../core/database/app_database.dart' hide Performance;
 import '../../../matches/domain/entities/match.dart';
 import '../../../matches/domain/repositories/match_repository.dart';
 import '../../../performances/domain/entities/performance.dart';
 import '../../../performances/domain/repositories/performance_repository.dart';
 import '../../../clubs/domain/repositories/club_repository.dart';
 import '../../../players/domain/repositories/player_repository.dart';
+import '../../../players/domain/repositories/player_repository.dart';
 import '../../../players/domain/services/player_growth_service.dart';
+import '../../../office/domain/repositories/office_repository.dart';
+import '../../../agents/domain/repositories/agent_repository.dart';
+import '../../../agents/data/datasources/tables/agents_table.dart';
+import 'package:drift/drift.dart' as drift;
 
 class SimulationService {
   final MatchRepository _matchRepository;
@@ -16,6 +22,8 @@ class SimulationService {
   final ClubRepository _clubRepository; // Need to fetch clubs to map Name -> ID
   final PlayerRepository _playerRepository; // Need to fetch players for stats
   final PlayerGrowthService _playerGrowthService;
+  final OfficeRepository _officeRepository;
+  final AgentRepository _agentRepository;
 
   Map<String, dynamic>? _fixtureData;
   Map<String, int>? _clubIdCache;
@@ -26,11 +34,15 @@ class SimulationService {
     required ClubRepository clubRepository,
     required PlayerRepository playerRepository,
     required PlayerGrowthService playerGrowthService,
+    required OfficeRepository officeRepository,
+    required AgentRepository agentRepository,
   })  : _matchRepository = matchRepository,
         _performanceRepository = performanceRepository,
         _clubRepository = clubRepository,
         _playerRepository = playerRepository,
-        _playerGrowthService = playerGrowthService;
+        _playerGrowthService = playerGrowthService,
+        _officeRepository = officeRepository,
+        _agentRepository = agentRepository;
 
   Future<void> _loadFixtureIfNeeded() async {
     if (_fixtureData != null) return;
@@ -94,6 +106,33 @@ class SimulationService {
 
     if (type == "Match Week" || type == "League Match") {
         await _simulateMatches(season, week, weekData['matches']);
+        
+        // --- STAFF COST DEDUCTION (User Agent ID 1) ---
+        // Calculate total cost
+        final staffResult = await _officeRepository.getStaff(1);
+        staffResult.fold(
+          (l) => print("Error fetching staff for deduction: $l"),
+          (staffList) async {
+            int totalCost = staffList.fold(0, (sum, s) => sum + s.totalWeeklyCost);
+            if (totalCost > 0) {
+              print("Deducting Staff Cost: $totalCost");
+              // Fetch agent to get current balance
+              final agentResult = await _agentRepository.getAgentById(1);
+              agentResult.fold(
+                (l) => null,
+                (agent) async {
+                   if (agent != null) {
+                     final newBalance = agent.balance - totalCost;
+                     await _agentRepository.updateAgent(
+                       agent.copyWith(balance: newBalance),
+                     );
+                   }
+                }
+              );
+            }
+          }
+        );
+
     } else {
         print("Week $week is $type. Skipping simulation.");
     }

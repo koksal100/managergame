@@ -19,6 +19,26 @@ class Agent extends Equatable {
     required this.level,
   });
 
+  Agent copyWith({
+    int? id,
+    String? name,
+    double? balance,
+    int? reputation,
+    int? negotiationSkill,
+    int? scoutingSkill,
+    int? level,
+  }) {
+    return Agent(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      balance: balance ?? this.balance,
+      reputation: reputation ?? this.reputation,
+      negotiationSkill: negotiationSkill ?? this.negotiationSkill,
+      scoutingSkill: scoutingSkill ?? this.scoutingSkill,
+      level: level ?? this.level,
+    );
+  }
+
   @override
   List<Object?> get props => [
     id, name, balance, reputation, negotiationSkill, scoutingSkill, level

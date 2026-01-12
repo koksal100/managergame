@@ -32,25 +32,25 @@ class PlayerHistoryTab extends ConsumerWidget {
 
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildSectionTitle('Development Progress (CA)'),
-          const SizedBox(height: 16),
+          const SizedBox(height: 8),
           SizedBox(
-            height: 200,
+            height: 140,
             child: caHistory.when(
               data: (data) => _buildCaChart(data),
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (err, stack) => Center(child: Text('Error: $err', style: const TextStyle(color: Colors.white))),
             ),
           ),
-          const SizedBox(height: 32),
-          _buildSectionTitle('Market Value History'),
           const SizedBox(height: 16),
+          _buildSectionTitle('Market Value History'),
+          const SizedBox(height: 8),
           SizedBox(
-            height: 200,
+            height: 140,
             child: valueHistory.when(
               data: (data) => _buildValueChart(data),
               loading: () => const Center(child: CircularProgressIndicator()),

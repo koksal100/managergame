@@ -4,6 +4,7 @@ import 'package:drift/native.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 // Import tables
+import '../../features/office/domain/entities/office_staff.dart';
 import '../../features/players/data/datasources/tables/players_table.dart';
 import '../../features/clubs/data/datasources/tables/clubs_table.dart';
 import '../../features/agents/data/datasources/tables/agents_table.dart';
@@ -21,6 +22,7 @@ import '../../features/home/domain/entities/home_entity.dart';
 
 import '../../features/matches/data/datasources/tables/matches_table.dart';
 import '../../features/performances/data/datasources/tables/performances_table.dart';
+import '../../features/office/data/datasources/tables/agent_staffs_table.dart';
 
 part 'app_database.g.dart';
 
@@ -31,6 +33,7 @@ part 'app_database.g.dart';
   Leagues,
   AgentContracts,
   ClubContracts,
+  AgentStaffs,
   Transfers,
   TransferNeeds,
   TransferOffers,

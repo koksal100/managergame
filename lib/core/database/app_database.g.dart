@@ -2840,6 +2840,351 @@ class ClubContractsCompanion extends UpdateCompanion<ClubContract> {
   }
 }
 
+class $AgentStaffsTable extends AgentStaffs
+    with TableInfo<$AgentStaffsTable, AgentStaff> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AgentStaffsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _agentIdMeta = const VerificationMeta(
+    'agentId',
+  );
+  @override
+  late final GeneratedColumn<int> agentId = GeneratedColumn<int>(
+    'agent_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<StaffType, int> staffType =
+      GeneratedColumn<int>(
+        'staff_type',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: true,
+      ).withConverter<StaffType>($AgentStaffsTable.$converterstaffType);
+  static const VerificationMeta _levelMeta = const VerificationMeta('level');
+  @override
+  late final GeneratedColumn<int> level = GeneratedColumn<int>(
+    'level',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _countMeta = const VerificationMeta('count');
+  @override
+  late final GeneratedColumn<int> count = GeneratedColumn<int>(
+    'count',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, agentId, staffType, level, count];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'agent_staffs';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AgentStaff> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('agent_id')) {
+      context.handle(
+        _agentIdMeta,
+        agentId.isAcceptableOrUnknown(data['agent_id']!, _agentIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_agentIdMeta);
+    }
+    if (data.containsKey('level')) {
+      context.handle(
+        _levelMeta,
+        level.isAcceptableOrUnknown(data['level']!, _levelMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_levelMeta);
+    }
+    if (data.containsKey('count')) {
+      context.handle(
+        _countMeta,
+        count.isAcceptableOrUnknown(data['count']!, _countMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  AgentStaff map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AgentStaff(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      agentId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}agent_id'],
+      )!,
+      staffType: $AgentStaffsTable.$converterstaffType.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.int,
+          data['${effectivePrefix}staff_type'],
+        )!,
+      ),
+      level: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}level'],
+      )!,
+      count: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}count'],
+      )!,
+    );
+  }
+
+  @override
+  $AgentStaffsTable createAlias(String alias) {
+    return $AgentStaffsTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<StaffType, int, int> $converterstaffType =
+      const EnumIndexConverter<StaffType>(StaffType.values);
+}
+
+class AgentStaff extends DataClass implements Insertable<AgentStaff> {
+  final int id;
+  final int agentId;
+  final StaffType staffType;
+  final int level;
+  final int count;
+  const AgentStaff({
+    required this.id,
+    required this.agentId,
+    required this.staffType,
+    required this.level,
+    required this.count,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['agent_id'] = Variable<int>(agentId);
+    {
+      map['staff_type'] = Variable<int>(
+        $AgentStaffsTable.$converterstaffType.toSql(staffType),
+      );
+    }
+    map['level'] = Variable<int>(level);
+    map['count'] = Variable<int>(count);
+    return map;
+  }
+
+  AgentStaffsCompanion toCompanion(bool nullToAbsent) {
+    return AgentStaffsCompanion(
+      id: Value(id),
+      agentId: Value(agentId),
+      staffType: Value(staffType),
+      level: Value(level),
+      count: Value(count),
+    );
+  }
+
+  factory AgentStaff.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AgentStaff(
+      id: serializer.fromJson<int>(json['id']),
+      agentId: serializer.fromJson<int>(json['agentId']),
+      staffType: $AgentStaffsTable.$converterstaffType.fromJson(
+        serializer.fromJson<int>(json['staffType']),
+      ),
+      level: serializer.fromJson<int>(json['level']),
+      count: serializer.fromJson<int>(json['count']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'agentId': serializer.toJson<int>(agentId),
+      'staffType': serializer.toJson<int>(
+        $AgentStaffsTable.$converterstaffType.toJson(staffType),
+      ),
+      'level': serializer.toJson<int>(level),
+      'count': serializer.toJson<int>(count),
+    };
+  }
+
+  AgentStaff copyWith({
+    int? id,
+    int? agentId,
+    StaffType? staffType,
+    int? level,
+    int? count,
+  }) => AgentStaff(
+    id: id ?? this.id,
+    agentId: agentId ?? this.agentId,
+    staffType: staffType ?? this.staffType,
+    level: level ?? this.level,
+    count: count ?? this.count,
+  );
+  AgentStaff copyWithCompanion(AgentStaffsCompanion data) {
+    return AgentStaff(
+      id: data.id.present ? data.id.value : this.id,
+      agentId: data.agentId.present ? data.agentId.value : this.agentId,
+      staffType: data.staffType.present ? data.staffType.value : this.staffType,
+      level: data.level.present ? data.level.value : this.level,
+      count: data.count.present ? data.count.value : this.count,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AgentStaff(')
+          ..write('id: $id, ')
+          ..write('agentId: $agentId, ')
+          ..write('staffType: $staffType, ')
+          ..write('level: $level, ')
+          ..write('count: $count')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, agentId, staffType, level, count);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AgentStaff &&
+          other.id == this.id &&
+          other.agentId == this.agentId &&
+          other.staffType == this.staffType &&
+          other.level == this.level &&
+          other.count == this.count);
+}
+
+class AgentStaffsCompanion extends UpdateCompanion<AgentStaff> {
+  final Value<int> id;
+  final Value<int> agentId;
+  final Value<StaffType> staffType;
+  final Value<int> level;
+  final Value<int> count;
+  const AgentStaffsCompanion({
+    this.id = const Value.absent(),
+    this.agentId = const Value.absent(),
+    this.staffType = const Value.absent(),
+    this.level = const Value.absent(),
+    this.count = const Value.absent(),
+  });
+  AgentStaffsCompanion.insert({
+    this.id = const Value.absent(),
+    required int agentId,
+    required StaffType staffType,
+    required int level,
+    this.count = const Value.absent(),
+  }) : agentId = Value(agentId),
+       staffType = Value(staffType),
+       level = Value(level);
+  static Insertable<AgentStaff> custom({
+    Expression<int>? id,
+    Expression<int>? agentId,
+    Expression<int>? staffType,
+    Expression<int>? level,
+    Expression<int>? count,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (agentId != null) 'agent_id': agentId,
+      if (staffType != null) 'staff_type': staffType,
+      if (level != null) 'level': level,
+      if (count != null) 'count': count,
+    });
+  }
+
+  AgentStaffsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? agentId,
+    Value<StaffType>? staffType,
+    Value<int>? level,
+    Value<int>? count,
+  }) {
+    return AgentStaffsCompanion(
+      id: id ?? this.id,
+      agentId: agentId ?? this.agentId,
+      staffType: staffType ?? this.staffType,
+      level: level ?? this.level,
+      count: count ?? this.count,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (agentId.present) {
+      map['agent_id'] = Variable<int>(agentId.value);
+    }
+    if (staffType.present) {
+      map['staff_type'] = Variable<int>(
+        $AgentStaffsTable.$converterstaffType.toSql(staffType.value),
+      );
+    }
+    if (level.present) {
+      map['level'] = Variable<int>(level.value);
+    }
+    if (count.present) {
+      map['count'] = Variable<int>(count.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AgentStaffsCompanion(')
+          ..write('id: $id, ')
+          ..write('agentId: $agentId, ')
+          ..write('staffType: $staffType, ')
+          ..write('level: $level, ')
+          ..write('count: $count')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $TransfersTable extends Transfers
     with TableInfo<$TransfersTable, Transfer> {
   @override
@@ -7334,6 +7679,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $PlayersTable players = $PlayersTable(this);
   late final $AgentContractsTable agentContracts = $AgentContractsTable(this);
   late final $ClubContractsTable clubContracts = $ClubContractsTable(this);
+  late final $AgentStaffsTable agentStaffs = $AgentStaffsTable(this);
   late final $TransfersTable transfers = $TransfersTable(this);
   late final $TransferNeedsTable transferNeeds = $TransferNeedsTable(this);
   late final $TransferOffersTable transferOffers = $TransferOffersTable(this);
@@ -7355,6 +7701,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     players,
     agentContracts,
     clubContracts,
+    agentStaffs,
     transfers,
     transferNeeds,
     transferOffers,
@@ -10904,6 +11251,201 @@ typedef $$ClubContractsTableProcessedTableManager =
       (ClubContract, $$ClubContractsTableReferences),
       ClubContract,
       PrefetchHooks Function({bool clubId, bool playerId})
+    >;
+typedef $$AgentStaffsTableCreateCompanionBuilder =
+    AgentStaffsCompanion Function({
+      Value<int> id,
+      required int agentId,
+      required StaffType staffType,
+      required int level,
+      Value<int> count,
+    });
+typedef $$AgentStaffsTableUpdateCompanionBuilder =
+    AgentStaffsCompanion Function({
+      Value<int> id,
+      Value<int> agentId,
+      Value<StaffType> staffType,
+      Value<int> level,
+      Value<int> count,
+    });
+
+class $$AgentStaffsTableFilterComposer
+    extends Composer<_$AppDatabase, $AgentStaffsTable> {
+  $$AgentStaffsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get agentId => $composableBuilder(
+    column: $table.agentId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<StaffType, StaffType, int> get staffType =>
+      $composableBuilder(
+        column: $table.staffType,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnFilters<int> get level => $composableBuilder(
+    column: $table.level,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get count => $composableBuilder(
+    column: $table.count,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$AgentStaffsTableOrderingComposer
+    extends Composer<_$AppDatabase, $AgentStaffsTable> {
+  $$AgentStaffsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get agentId => $composableBuilder(
+    column: $table.agentId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get staffType => $composableBuilder(
+    column: $table.staffType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get level => $composableBuilder(
+    column: $table.level,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get count => $composableBuilder(
+    column: $table.count,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$AgentStaffsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AgentStaffsTable> {
+  $$AgentStaffsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get agentId =>
+      $composableBuilder(column: $table.agentId, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<StaffType, int> get staffType =>
+      $composableBuilder(column: $table.staffType, builder: (column) => column);
+
+  GeneratedColumn<int> get level =>
+      $composableBuilder(column: $table.level, builder: (column) => column);
+
+  GeneratedColumn<int> get count =>
+      $composableBuilder(column: $table.count, builder: (column) => column);
+}
+
+class $$AgentStaffsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AgentStaffsTable,
+          AgentStaff,
+          $$AgentStaffsTableFilterComposer,
+          $$AgentStaffsTableOrderingComposer,
+          $$AgentStaffsTableAnnotationComposer,
+          $$AgentStaffsTableCreateCompanionBuilder,
+          $$AgentStaffsTableUpdateCompanionBuilder,
+          (
+            AgentStaff,
+            BaseReferences<_$AppDatabase, $AgentStaffsTable, AgentStaff>,
+          ),
+          AgentStaff,
+          PrefetchHooks Function()
+        > {
+  $$AgentStaffsTableTableManager(_$AppDatabase db, $AgentStaffsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AgentStaffsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AgentStaffsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$AgentStaffsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> agentId = const Value.absent(),
+                Value<StaffType> staffType = const Value.absent(),
+                Value<int> level = const Value.absent(),
+                Value<int> count = const Value.absent(),
+              }) => AgentStaffsCompanion(
+                id: id,
+                agentId: agentId,
+                staffType: staffType,
+                level: level,
+                count: count,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int agentId,
+                required StaffType staffType,
+                required int level,
+                Value<int> count = const Value.absent(),
+              }) => AgentStaffsCompanion.insert(
+                id: id,
+                agentId: agentId,
+                staffType: staffType,
+                level: level,
+                count: count,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$AgentStaffsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AgentStaffsTable,
+      AgentStaff,
+      $$AgentStaffsTableFilterComposer,
+      $$AgentStaffsTableOrderingComposer,
+      $$AgentStaffsTableAnnotationComposer,
+      $$AgentStaffsTableCreateCompanionBuilder,
+      $$AgentStaffsTableUpdateCompanionBuilder,
+      (
+        AgentStaff,
+        BaseReferences<_$AppDatabase, $AgentStaffsTable, AgentStaff>,
+      ),
+      AgentStaff,
+      PrefetchHooks Function()
     >;
 typedef $$TransfersTableCreateCompanionBuilder =
     TransfersCompanion Function({
@@ -14995,6 +15537,8 @@ class $AppDatabaseManager {
       $$AgentContractsTableTableManager(_db, _db.agentContracts);
   $$ClubContractsTableTableManager get clubContracts =>
       $$ClubContractsTableTableManager(_db, _db.clubContracts);
+  $$AgentStaffsTableTableManager get agentStaffs =>
+      $$AgentStaffsTableTableManager(_db, _db.agentStaffs);
   $$TransfersTableTableManager get transfers =>
       $$TransfersTableTableManager(_db, _db.transfers);
   $$TransferNeedsTableTableManager get transferNeeds =>
