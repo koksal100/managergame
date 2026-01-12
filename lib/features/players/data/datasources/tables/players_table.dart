@@ -10,7 +10,7 @@ class Players extends Table {
   IntColumn get clubId => integer().nullable().references(Clubs, #id)();
   IntColumn get agentId => integer().nullable().references(Agents, #id)();
   TextColumn get position => text()();
-  IntColumn get ca => integer()(); // Current Ability
+  RealColumn get ca => real()(); // Current Ability
   IntColumn get pa => integer()(); // Potential Ability
   IntColumn get reputation => integer()();
   IntColumn get marketValue => integer()();

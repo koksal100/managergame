@@ -7,6 +7,7 @@ import '../../../clubs/domain/entities/club.dart';
 import '../../../clubs/providers/club_provider.dart';
 import '../../../contracts/providers/contract_provider.dart';
 import 'negotiation_game_dialog.dart';
+import 'player_history_tab.dart';
 
 class PlayerDetailDialog extends ConsumerWidget {
   final Player player;
@@ -36,55 +37,79 @@ class PlayerDetailDialog extends ConsumerWidget {
                 BoxShadow(color: Colors.black.withOpacity(0.5), blurRadius: 30, spreadRadius: 5),
               ],
             ),
-            child: Column(
-              children: [
-                // 1. Header Area
-                _buildHeader(player),
+            child: DefaultTabController(
+              length: 2,
+              child: Column(
+                children: [
+                  // 1. Header Area
+                  _buildHeader(player),
+                  
+                  // Tab Bar
+                  const TabBar(
+                    indicatorColor: _accentColor,
+                    labelColor: Colors.white,
+                    unselectedLabelColor: Colors.white54,
+                    indicatorSize: TabBarIndicatorSize.label,
+                    tabs: [
+                      Tab(text: "Overview"),
+                      Tab(text: "History"),
+                    ],
+                  ),
 
-                // 2. Scrollable Content
-                Expanded(
-                  child: SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  // 2. Tab Content
+                  Expanded(
+                    child: TabBarView(
                       children: [
-                        // Temel Bilgiler Kartı
-                        _buildInfoCard([
-                          _buildStatRow('Age', '${player.age}', icon: Icons.cake),
-                          _buildStatRow('Position', player.position, icon: Icons.sports_soccer),
-                          _buildStatRow('Market Value', _formatCurrency(player.marketValue), icon: Icons.monetization_on, valueColor: _accentColor),
-                          _buildStatRow('Reputation', '${player.reputation} / 100', icon: Icons.trending_up),
-                        ]),
-
-                        const SizedBox(height: 20),
-                        _buildSectionTitle('Scout Report'),
-                        const SizedBox(height: 10),
-
-                        // Yetenek Barları (FM Style)
-                        _buildAbilityBar('Current Ability', player.ca),
-                        const SizedBox(height: 8),
-                        _buildAbilityBar('Potential Ability', player.pa, isPotential: true),
-
-                        const SizedBox(height: 20),
-                        _buildSectionTitle('Career Info'),
-                        const SizedBox(height: 10),
-
-                        // Kulüp ve Menajer Bilgisi
-                        _buildClubRow(ref),
-                        const SizedBox(height: 8),
-                        _buildAgentRow(ref),
+                        _buildOverviewTab(ref),
+                        PlayerHistoryTab(player: player),
                       ],
                     ),
                   ),
-                ),
 
-                // 3. Bottom Actions
-                _buildActionButtons(context, ref),
-              ],
+                  // 3. Bottom Actions
+                  _buildActionButtons(context, ref),
+                ],
+              ),
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildOverviewTab(WidgetRef ref) {
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Temel Bilgiler Kartı
+          _buildInfoCard([
+            _buildStatRow('Age', '${player.age}', icon: Icons.cake),
+            _buildStatRow('Position', player.position, icon: Icons.sports_soccer),
+            _buildStatRow('Market Value', _formatCurrency(player.marketValue), icon: Icons.monetization_on, valueColor: _accentColor),
+            _buildStatRow('Reputation', '${player.reputation} / 100', icon: Icons.trending_up),
+          ]),
+
+          const SizedBox(height: 20),
+          _buildSectionTitle('Scout Report'),
+          const SizedBox(height: 10),
+
+          // Yetenek Barları (FM Style)
+          _buildAbilityBar('Current Ability', player.ca),
+          const SizedBox(height: 8),
+          _buildAbilityBar('Potential Ability', player.pa.toDouble(), isPotential: true),
+
+          const SizedBox(height: 20),
+          _buildSectionTitle('Career Info'),
+          const SizedBox(height: 10),
+
+          // Kulüp ve Menajer Bilgisi
+          _buildClubRow(ref),
+          const SizedBox(height: 8),
+          _buildAgentRow(ref),
+        ],
       ),
     );
   }
@@ -190,7 +215,7 @@ class PlayerDetailDialog extends ConsumerWidget {
     );
   }
 
-  Widget _buildAbilityBar(String label, int value, {bool isPotential = false}) {
+  Widget _buildAbilityBar(String label, double value, {bool isPotential = false}) {
     final double percentage = (value / 100).clamp(0.0, 1.0);
     final Color barColor = isPotential ? Colors.amber : (value > 80 ? Colors.greenAccent : (value > 50 ? Colors.blueAccent : Colors.orangeAccent));
 
@@ -201,7 +226,7 @@ class PlayerDetailDialog extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(label, style: const TextStyle(color: Colors.white70, fontSize: 12)),
-            Text("$value/100", style: TextStyle(color: barColor, fontWeight: FontWeight.bold, fontSize: 12)),
+            Text("${value.toStringAsFixed(1)}/100", style: TextStyle(color: barColor, fontWeight: FontWeight.bold, fontSize: 12)),
           ],
         ),
         const SizedBox(height: 6),

@@ -4,6 +4,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:drift/drift.dart';
 import '../database/app_database.dart';
 import '../../features/players/domain/enums/player_position.dart';
+import '../../features/players/domain/services/player_value_calculator.dart';
 import 'dtos.dart';
 
 class GameSeeder {
@@ -272,7 +273,7 @@ class GameSeeder {
       // --- MODEL SONU ---
 
       // G. PİYASA DEĞERİ HESAPLAMA
-      int marketValue = _calculateMarketValue(ca, age, position.shortName);
+      int marketValue = PlayerValueCalculator.calculateMarketValue(ca.toDouble(), age, position.shortName);
 
       // --- NEW AGENT ASSIGNMENT LOGIC (Weighted Random) ---
       int? assignedAgentId;
@@ -330,7 +331,7 @@ class GameSeeder {
           age: Value(age),
           position: Value(position.shortName),
           clubId: Value(clubId),
-          ca: Value(ca),
+          ca: Value(ca.toDouble()),
           pa: Value(pa),
           reputation: Value(ca),
           marketValue: Value(marketValue),
@@ -342,8 +343,19 @@ class GameSeeder {
       await database.into(database.valueHistories).insert(
         ValueHistoriesCompanion(
           playerId: Value(playerId),
-          date: Value(DateTime.now()),
+          season: const Value(1),
+          week: const Value(1),
           value: Value(marketValue.toDouble()),
+        ),
+      );
+
+      // CA History (Initial)
+      await database.into(database.currentAbilityHistories).insert(
+        CurrentAbilityHistoriesCompanion(
+          playerId: Value(playerId),
+          season: const Value(1),
+          week: const Value(1),
+          ca: Value(ca.toDouble()),
         ),
       );
 
@@ -390,56 +402,7 @@ class GameSeeder {
     }
   }
 
-  int _calculateMarketValue(int ca, int age, String position) {
-    // Base Values for key CA milestones (approximate)
-    // CA 60 -> 50k
-    // CA 70 -> 500k
-    // CA 80 -> 5M
-    // CA 90 -> 30M
-    // CA 100 -> 100M+
 
-    double baseValue = 0;
-    if (ca < 60) {
-      baseValue = 10000.0 * pow(1.05, (ca - 40));
-    } else if (ca < 70) {
-      baseValue = 50000.0 * pow(1.25, (ca - 60));
-    } else if (ca < 80) {
-      baseValue = 500000.0 * pow(1.25, (ca - 70));
-    } else if (ca < 90) {
-      baseValue = 5000000.0 * pow(1.20, (ca - 80));
-    } else {
-      baseValue = 30000000.0 * pow(1.15, (ca - 90));
-    }
-
-    // Age Multiplier (Young players worth more)
-    double ageMultiplier = 1.0;
-    if (age <= 21) {
-      ageMultiplier = 1.5;
-    } else if (age <= 24) {
-      ageMultiplier = 1.2;
-    } else if (age >= 30) {
-      ageMultiplier = 0.7;
-    } else if (age >= 33) {
-      ageMultiplier = 0.4;
-    }
-
-    // Position Multiplier (Attackers usually worth more)
-    double posMultiplier = 1.0;
-    if (['ST', 'FWD', 'AML', 'AMR', 'AMC'].contains(position)) {
-      posMultiplier = 1.2; // Forward/Attacker premium
-    } else if (['GK'].contains(position)) {
-      posMultiplier = 0.8; // GK discount
-    }
-
-    double finalValue = baseValue * ageMultiplier * posMultiplier;
-
-    // Rounding logic for cleaner numbers
-    if (finalValue < 1000000) {
-      return (finalValue / 1000).round() * 1000;
-    } else {
-      return (finalValue / 10000).round() * 10000;
-    }
-  }
 
   Future<void> seedFixtures() async {
     final fixtureJson = await _loadJson('assets/data/fixture.json');

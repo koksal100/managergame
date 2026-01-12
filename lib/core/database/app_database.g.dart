@@ -1244,11 +1244,11 @@ class $PlayersTable extends Players with TableInfo<$PlayersTable, Player> {
   );
   static const VerificationMeta _caMeta = const VerificationMeta('ca');
   @override
-  late final GeneratedColumn<int> ca = GeneratedColumn<int>(
+  late final GeneratedColumn<double> ca = GeneratedColumn<double>(
     'ca',
     aliasedName,
     false,
-    type: DriftSqlType.int,
+    type: DriftSqlType.double,
     requiredDuringInsert: true,
   );
   static const VerificationMeta _paMeta = const VerificationMeta('pa');
@@ -1409,7 +1409,7 @@ class $PlayersTable extends Players with TableInfo<$PlayersTable, Player> {
         data['${effectivePrefix}position'],
       )!,
       ca: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.double,
         data['${effectivePrefix}ca'],
       )!,
       pa: attachedDatabase.typeMapping.read(
@@ -1440,7 +1440,7 @@ class Player extends DataClass implements Insertable<Player> {
   final int? clubId;
   final int? agentId;
   final String position;
-  final int ca;
+  final double ca;
   final int pa;
   final int reputation;
   final int marketValue;
@@ -1469,7 +1469,7 @@ class Player extends DataClass implements Insertable<Player> {
       map['agent_id'] = Variable<int>(agentId);
     }
     map['position'] = Variable<String>(position);
-    map['ca'] = Variable<int>(ca);
+    map['ca'] = Variable<double>(ca);
     map['pa'] = Variable<int>(pa);
     map['reputation'] = Variable<int>(reputation);
     map['market_value'] = Variable<int>(marketValue);
@@ -1507,7 +1507,7 @@ class Player extends DataClass implements Insertable<Player> {
       clubId: serializer.fromJson<int?>(json['clubId']),
       agentId: serializer.fromJson<int?>(json['agentId']),
       position: serializer.fromJson<String>(json['position']),
-      ca: serializer.fromJson<int>(json['ca']),
+      ca: serializer.fromJson<double>(json['ca']),
       pa: serializer.fromJson<int>(json['pa']),
       reputation: serializer.fromJson<int>(json['reputation']),
       marketValue: serializer.fromJson<int>(json['marketValue']),
@@ -1523,7 +1523,7 @@ class Player extends DataClass implements Insertable<Player> {
       'clubId': serializer.toJson<int?>(clubId),
       'agentId': serializer.toJson<int?>(agentId),
       'position': serializer.toJson<String>(position),
-      'ca': serializer.toJson<int>(ca),
+      'ca': serializer.toJson<double>(ca),
       'pa': serializer.toJson<int>(pa),
       'reputation': serializer.toJson<int>(reputation),
       'marketValue': serializer.toJson<int>(marketValue),
@@ -1537,7 +1537,7 @@ class Player extends DataClass implements Insertable<Player> {
     Value<int?> clubId = const Value.absent(),
     Value<int?> agentId = const Value.absent(),
     String? position,
-    int? ca,
+    double? ca,
     int? pa,
     int? reputation,
     int? marketValue,
@@ -1625,7 +1625,7 @@ class PlayersCompanion extends UpdateCompanion<Player> {
   final Value<int?> clubId;
   final Value<int?> agentId;
   final Value<String> position;
-  final Value<int> ca;
+  final Value<double> ca;
   final Value<int> pa;
   final Value<int> reputation;
   final Value<int> marketValue;
@@ -1648,7 +1648,7 @@ class PlayersCompanion extends UpdateCompanion<Player> {
     this.clubId = const Value.absent(),
     this.agentId = const Value.absent(),
     required String position,
-    required int ca,
+    required double ca,
     required int pa,
     required int reputation,
     required int marketValue,
@@ -1666,7 +1666,7 @@ class PlayersCompanion extends UpdateCompanion<Player> {
     Expression<int>? clubId,
     Expression<int>? agentId,
     Expression<String>? position,
-    Expression<int>? ca,
+    Expression<double>? ca,
     Expression<int>? pa,
     Expression<int>? reputation,
     Expression<int>? marketValue,
@@ -1692,7 +1692,7 @@ class PlayersCompanion extends UpdateCompanion<Player> {
     Value<int?>? clubId,
     Value<int?>? agentId,
     Value<String>? position,
-    Value<int>? ca,
+    Value<double>? ca,
     Value<int>? pa,
     Value<int>? reputation,
     Value<int>? marketValue,
@@ -1733,7 +1733,7 @@ class PlayersCompanion extends UpdateCompanion<Player> {
       map['position'] = Variable<String>(position.value);
     }
     if (ca.present) {
-      map['ca'] = Variable<int>(ca.value);
+      map['ca'] = Variable<double>(ca.value);
     }
     if (pa.present) {
       map['pa'] = Variable<int>(pa.value);
@@ -4832,13 +4832,22 @@ class $ValueHistoriesTable extends ValueHistories
       'REFERENCES players (id)',
     ),
   );
-  static const VerificationMeta _dateMeta = const VerificationMeta('date');
+  static const VerificationMeta _seasonMeta = const VerificationMeta('season');
   @override
-  late final GeneratedColumn<DateTime> date = GeneratedColumn<DateTime>(
-    'date',
+  late final GeneratedColumn<int> season = GeneratedColumn<int>(
+    'season',
     aliasedName,
     false,
-    type: DriftSqlType.dateTime,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _weekMeta = const VerificationMeta('week');
+  @override
+  late final GeneratedColumn<int> week = GeneratedColumn<int>(
+    'week',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
   static const VerificationMeta _valueMeta = const VerificationMeta('value');
@@ -4851,7 +4860,7 @@ class $ValueHistoriesTable extends ValueHistories
     requiredDuringInsert: true,
   );
   @override
-  List<GeneratedColumn> get $columns => [id, playerId, date, value];
+  List<GeneratedColumn> get $columns => [id, playerId, season, week, value];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -4875,13 +4884,21 @@ class $ValueHistoriesTable extends ValueHistories
     } else if (isInserting) {
       context.missing(_playerIdMeta);
     }
-    if (data.containsKey('date')) {
+    if (data.containsKey('season')) {
       context.handle(
-        _dateMeta,
-        date.isAcceptableOrUnknown(data['date']!, _dateMeta),
+        _seasonMeta,
+        season.isAcceptableOrUnknown(data['season']!, _seasonMeta),
       );
     } else if (isInserting) {
-      context.missing(_dateMeta);
+      context.missing(_seasonMeta);
+    }
+    if (data.containsKey('week')) {
+      context.handle(
+        _weekMeta,
+        week.isAcceptableOrUnknown(data['week']!, _weekMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_weekMeta);
     }
     if (data.containsKey('value')) {
       context.handle(
@@ -4908,9 +4925,13 @@ class $ValueHistoriesTable extends ValueHistories
         DriftSqlType.int,
         data['${effectivePrefix}player_id'],
       )!,
-      date: attachedDatabase.typeMapping.read(
-        DriftSqlType.dateTime,
-        data['${effectivePrefix}date'],
+      season: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}season'],
+      )!,
+      week: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}week'],
       )!,
       value: attachedDatabase.typeMapping.read(
         DriftSqlType.double,
@@ -4928,12 +4949,14 @@ class $ValueHistoriesTable extends ValueHistories
 class ValueHistory extends DataClass implements Insertable<ValueHistory> {
   final int id;
   final int playerId;
-  final DateTime date;
+  final int season;
+  final int week;
   final double value;
   const ValueHistory({
     required this.id,
     required this.playerId,
-    required this.date,
+    required this.season,
+    required this.week,
     required this.value,
   });
   @override
@@ -4941,7 +4964,8 @@ class ValueHistory extends DataClass implements Insertable<ValueHistory> {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['player_id'] = Variable<int>(playerId);
-    map['date'] = Variable<DateTime>(date);
+    map['season'] = Variable<int>(season);
+    map['week'] = Variable<int>(week);
     map['value'] = Variable<double>(value);
     return map;
   }
@@ -4950,7 +4974,8 @@ class ValueHistory extends DataClass implements Insertable<ValueHistory> {
     return ValueHistoriesCompanion(
       id: Value(id),
       playerId: Value(playerId),
-      date: Value(date),
+      season: Value(season),
+      week: Value(week),
       value: Value(value),
     );
   }
@@ -4963,7 +4988,8 @@ class ValueHistory extends DataClass implements Insertable<ValueHistory> {
     return ValueHistory(
       id: serializer.fromJson<int>(json['id']),
       playerId: serializer.fromJson<int>(json['playerId']),
-      date: serializer.fromJson<DateTime>(json['date']),
+      season: serializer.fromJson<int>(json['season']),
+      week: serializer.fromJson<int>(json['week']),
       value: serializer.fromJson<double>(json['value']),
     );
   }
@@ -4973,7 +4999,8 @@ class ValueHistory extends DataClass implements Insertable<ValueHistory> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'playerId': serializer.toJson<int>(playerId),
-      'date': serializer.toJson<DateTime>(date),
+      'season': serializer.toJson<int>(season),
+      'week': serializer.toJson<int>(week),
       'value': serializer.toJson<double>(value),
     };
   }
@@ -4981,19 +5008,22 @@ class ValueHistory extends DataClass implements Insertable<ValueHistory> {
   ValueHistory copyWith({
     int? id,
     int? playerId,
-    DateTime? date,
+    int? season,
+    int? week,
     double? value,
   }) => ValueHistory(
     id: id ?? this.id,
     playerId: playerId ?? this.playerId,
-    date: date ?? this.date,
+    season: season ?? this.season,
+    week: week ?? this.week,
     value: value ?? this.value,
   );
   ValueHistory copyWithCompanion(ValueHistoriesCompanion data) {
     return ValueHistory(
       id: data.id.present ? data.id.value : this.id,
       playerId: data.playerId.present ? data.playerId.value : this.playerId,
-      date: data.date.present ? data.date.value : this.date,
+      season: data.season.present ? data.season.value : this.season,
+      week: data.week.present ? data.week.value : this.week,
       value: data.value.present ? data.value.value : this.value,
     );
   }
@@ -5003,53 +5033,61 @@ class ValueHistory extends DataClass implements Insertable<ValueHistory> {
     return (StringBuffer('ValueHistory(')
           ..write('id: $id, ')
           ..write('playerId: $playerId, ')
-          ..write('date: $date, ')
+          ..write('season: $season, ')
+          ..write('week: $week, ')
           ..write('value: $value')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, playerId, date, value);
+  int get hashCode => Object.hash(id, playerId, season, week, value);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is ValueHistory &&
           other.id == this.id &&
           other.playerId == this.playerId &&
-          other.date == this.date &&
+          other.season == this.season &&
+          other.week == this.week &&
           other.value == this.value);
 }
 
 class ValueHistoriesCompanion extends UpdateCompanion<ValueHistory> {
   final Value<int> id;
   final Value<int> playerId;
-  final Value<DateTime> date;
+  final Value<int> season;
+  final Value<int> week;
   final Value<double> value;
   const ValueHistoriesCompanion({
     this.id = const Value.absent(),
     this.playerId = const Value.absent(),
-    this.date = const Value.absent(),
+    this.season = const Value.absent(),
+    this.week = const Value.absent(),
     this.value = const Value.absent(),
   });
   ValueHistoriesCompanion.insert({
     this.id = const Value.absent(),
     required int playerId,
-    required DateTime date,
+    required int season,
+    required int week,
     required double value,
   }) : playerId = Value(playerId),
-       date = Value(date),
+       season = Value(season),
+       week = Value(week),
        value = Value(value);
   static Insertable<ValueHistory> custom({
     Expression<int>? id,
     Expression<int>? playerId,
-    Expression<DateTime>? date,
+    Expression<int>? season,
+    Expression<int>? week,
     Expression<double>? value,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (playerId != null) 'player_id': playerId,
-      if (date != null) 'date': date,
+      if (season != null) 'season': season,
+      if (week != null) 'week': week,
       if (value != null) 'value': value,
     });
   }
@@ -5057,13 +5095,15 @@ class ValueHistoriesCompanion extends UpdateCompanion<ValueHistory> {
   ValueHistoriesCompanion copyWith({
     Value<int>? id,
     Value<int>? playerId,
-    Value<DateTime>? date,
+    Value<int>? season,
+    Value<int>? week,
     Value<double>? value,
   }) {
     return ValueHistoriesCompanion(
       id: id ?? this.id,
       playerId: playerId ?? this.playerId,
-      date: date ?? this.date,
+      season: season ?? this.season,
+      week: week ?? this.week,
       value: value ?? this.value,
     );
   }
@@ -5077,8 +5117,11 @@ class ValueHistoriesCompanion extends UpdateCompanion<ValueHistory> {
     if (playerId.present) {
       map['player_id'] = Variable<int>(playerId.value);
     }
-    if (date.present) {
-      map['date'] = Variable<DateTime>(date.value);
+    if (season.present) {
+      map['season'] = Variable<int>(season.value);
+    }
+    if (week.present) {
+      map['week'] = Variable<int>(week.value);
     }
     if (value.present) {
       map['value'] = Variable<double>(value.value);
@@ -5091,8 +5134,353 @@ class ValueHistoriesCompanion extends UpdateCompanion<ValueHistory> {
     return (StringBuffer('ValueHistoriesCompanion(')
           ..write('id: $id, ')
           ..write('playerId: $playerId, ')
-          ..write('date: $date, ')
+          ..write('season: $season, ')
+          ..write('week: $week, ')
           ..write('value: $value')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $CurrentAbilityHistoriesTable extends CurrentAbilityHistories
+    with TableInfo<$CurrentAbilityHistoriesTable, CurrentAbilityHistory> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CurrentAbilityHistoriesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _playerIdMeta = const VerificationMeta(
+    'playerId',
+  );
+  @override
+  late final GeneratedColumn<int> playerId = GeneratedColumn<int>(
+    'player_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES players (id)',
+    ),
+  );
+  static const VerificationMeta _seasonMeta = const VerificationMeta('season');
+  @override
+  late final GeneratedColumn<int> season = GeneratedColumn<int>(
+    'season',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _weekMeta = const VerificationMeta('week');
+  @override
+  late final GeneratedColumn<int> week = GeneratedColumn<int>(
+    'week',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _caMeta = const VerificationMeta('ca');
+  @override
+  late final GeneratedColumn<double> ca = GeneratedColumn<double>(
+    'ca',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, playerId, season, week, ca];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'current_ability_histories';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CurrentAbilityHistory> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('player_id')) {
+      context.handle(
+        _playerIdMeta,
+        playerId.isAcceptableOrUnknown(data['player_id']!, _playerIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_playerIdMeta);
+    }
+    if (data.containsKey('season')) {
+      context.handle(
+        _seasonMeta,
+        season.isAcceptableOrUnknown(data['season']!, _seasonMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_seasonMeta);
+    }
+    if (data.containsKey('week')) {
+      context.handle(
+        _weekMeta,
+        week.isAcceptableOrUnknown(data['week']!, _weekMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_weekMeta);
+    }
+    if (data.containsKey('ca')) {
+      context.handle(_caMeta, ca.isAcceptableOrUnknown(data['ca']!, _caMeta));
+    } else if (isInserting) {
+      context.missing(_caMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  CurrentAbilityHistory map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CurrentAbilityHistory(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      playerId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}player_id'],
+      )!,
+      season: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}season'],
+      )!,
+      week: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}week'],
+      )!,
+      ca: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}ca'],
+      )!,
+    );
+  }
+
+  @override
+  $CurrentAbilityHistoriesTable createAlias(String alias) {
+    return $CurrentAbilityHistoriesTable(attachedDatabase, alias);
+  }
+}
+
+class CurrentAbilityHistory extends DataClass
+    implements Insertable<CurrentAbilityHistory> {
+  final int id;
+  final int playerId;
+  final int season;
+  final int week;
+  final double ca;
+  const CurrentAbilityHistory({
+    required this.id,
+    required this.playerId,
+    required this.season,
+    required this.week,
+    required this.ca,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['player_id'] = Variable<int>(playerId);
+    map['season'] = Variable<int>(season);
+    map['week'] = Variable<int>(week);
+    map['ca'] = Variable<double>(ca);
+    return map;
+  }
+
+  CurrentAbilityHistoriesCompanion toCompanion(bool nullToAbsent) {
+    return CurrentAbilityHistoriesCompanion(
+      id: Value(id),
+      playerId: Value(playerId),
+      season: Value(season),
+      week: Value(week),
+      ca: Value(ca),
+    );
+  }
+
+  factory CurrentAbilityHistory.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CurrentAbilityHistory(
+      id: serializer.fromJson<int>(json['id']),
+      playerId: serializer.fromJson<int>(json['playerId']),
+      season: serializer.fromJson<int>(json['season']),
+      week: serializer.fromJson<int>(json['week']),
+      ca: serializer.fromJson<double>(json['ca']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'playerId': serializer.toJson<int>(playerId),
+      'season': serializer.toJson<int>(season),
+      'week': serializer.toJson<int>(week),
+      'ca': serializer.toJson<double>(ca),
+    };
+  }
+
+  CurrentAbilityHistory copyWith({
+    int? id,
+    int? playerId,
+    int? season,
+    int? week,
+    double? ca,
+  }) => CurrentAbilityHistory(
+    id: id ?? this.id,
+    playerId: playerId ?? this.playerId,
+    season: season ?? this.season,
+    week: week ?? this.week,
+    ca: ca ?? this.ca,
+  );
+  CurrentAbilityHistory copyWithCompanion(
+    CurrentAbilityHistoriesCompanion data,
+  ) {
+    return CurrentAbilityHistory(
+      id: data.id.present ? data.id.value : this.id,
+      playerId: data.playerId.present ? data.playerId.value : this.playerId,
+      season: data.season.present ? data.season.value : this.season,
+      week: data.week.present ? data.week.value : this.week,
+      ca: data.ca.present ? data.ca.value : this.ca,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CurrentAbilityHistory(')
+          ..write('id: $id, ')
+          ..write('playerId: $playerId, ')
+          ..write('season: $season, ')
+          ..write('week: $week, ')
+          ..write('ca: $ca')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, playerId, season, week, ca);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CurrentAbilityHistory &&
+          other.id == this.id &&
+          other.playerId == this.playerId &&
+          other.season == this.season &&
+          other.week == this.week &&
+          other.ca == this.ca);
+}
+
+class CurrentAbilityHistoriesCompanion
+    extends UpdateCompanion<CurrentAbilityHistory> {
+  final Value<int> id;
+  final Value<int> playerId;
+  final Value<int> season;
+  final Value<int> week;
+  final Value<double> ca;
+  const CurrentAbilityHistoriesCompanion({
+    this.id = const Value.absent(),
+    this.playerId = const Value.absent(),
+    this.season = const Value.absent(),
+    this.week = const Value.absent(),
+    this.ca = const Value.absent(),
+  });
+  CurrentAbilityHistoriesCompanion.insert({
+    this.id = const Value.absent(),
+    required int playerId,
+    required int season,
+    required int week,
+    required double ca,
+  }) : playerId = Value(playerId),
+       season = Value(season),
+       week = Value(week),
+       ca = Value(ca);
+  static Insertable<CurrentAbilityHistory> custom({
+    Expression<int>? id,
+    Expression<int>? playerId,
+    Expression<int>? season,
+    Expression<int>? week,
+    Expression<double>? ca,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (playerId != null) 'player_id': playerId,
+      if (season != null) 'season': season,
+      if (week != null) 'week': week,
+      if (ca != null) 'ca': ca,
+    });
+  }
+
+  CurrentAbilityHistoriesCompanion copyWith({
+    Value<int>? id,
+    Value<int>? playerId,
+    Value<int>? season,
+    Value<int>? week,
+    Value<double>? ca,
+  }) {
+    return CurrentAbilityHistoriesCompanion(
+      id: id ?? this.id,
+      playerId: playerId ?? this.playerId,
+      season: season ?? this.season,
+      week: week ?? this.week,
+      ca: ca ?? this.ca,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (playerId.present) {
+      map['player_id'] = Variable<int>(playerId.value);
+    }
+    if (season.present) {
+      map['season'] = Variable<int>(season.value);
+    }
+    if (week.present) {
+      map['week'] = Variable<int>(week.value);
+    }
+    if (ca.present) {
+      map['ca'] = Variable<double>(ca.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CurrentAbilityHistoriesCompanion(')
+          ..write('id: $id, ')
+          ..write('playerId: $playerId, ')
+          ..write('season: $season, ')
+          ..write('week: $week, ')
+          ..write('ca: $ca')
           ..write(')'))
         .toString();
   }
@@ -6414,6 +6802,16 @@ class $PerformancesTable extends Performances
     requiredDuringInsert: false,
     defaultValue: const Constant(1),
   );
+  static const VerificationMeta _weekMeta = const VerificationMeta('week');
+  @override
+  late final GeneratedColumn<int> week = GeneratedColumn<int>(
+    'week',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
   static const VerificationMeta _ratingMeta = const VerificationMeta('rating');
   @override
   late final GeneratedColumn<double> rating = GeneratedColumn<double>(
@@ -6435,6 +6833,7 @@ class $PerformancesTable extends Performances
     yellowCards,
     redCards,
     season,
+    week,
     rating,
   ];
   @override
@@ -6510,6 +6909,12 @@ class $PerformancesTable extends Performances
         season.isAcceptableOrUnknown(data['season']!, _seasonMeta),
       );
     }
+    if (data.containsKey('week')) {
+      context.handle(
+        _weekMeta,
+        week.isAcceptableOrUnknown(data['week']!, _weekMeta),
+      );
+    }
     if (data.containsKey('rating')) {
       context.handle(
         _ratingMeta,
@@ -6561,6 +6966,10 @@ class $PerformancesTable extends Performances
         DriftSqlType.int,
         data['${effectivePrefix}season'],
       )!,
+      week: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}week'],
+      )!,
       rating: attachedDatabase.typeMapping.read(
         DriftSqlType.double,
         data['${effectivePrefix}rating'],
@@ -6584,6 +6993,7 @@ class Performance extends DataClass implements Insertable<Performance> {
   final int yellowCards;
   final int redCards;
   final int season;
+  final int week;
   final double rating;
   const Performance({
     required this.id,
@@ -6595,6 +7005,7 @@ class Performance extends DataClass implements Insertable<Performance> {
     required this.yellowCards,
     required this.redCards,
     required this.season,
+    required this.week,
     required this.rating,
   });
   @override
@@ -6609,6 +7020,7 @@ class Performance extends DataClass implements Insertable<Performance> {
     map['yellow_cards'] = Variable<int>(yellowCards);
     map['red_cards'] = Variable<int>(redCards);
     map['season'] = Variable<int>(season);
+    map['week'] = Variable<int>(week);
     map['rating'] = Variable<double>(rating);
     return map;
   }
@@ -6624,6 +7036,7 @@ class Performance extends DataClass implements Insertable<Performance> {
       yellowCards: Value(yellowCards),
       redCards: Value(redCards),
       season: Value(season),
+      week: Value(week),
       rating: Value(rating),
     );
   }
@@ -6643,6 +7056,7 @@ class Performance extends DataClass implements Insertable<Performance> {
       yellowCards: serializer.fromJson<int>(json['yellowCards']),
       redCards: serializer.fromJson<int>(json['redCards']),
       season: serializer.fromJson<int>(json['season']),
+      week: serializer.fromJson<int>(json['week']),
       rating: serializer.fromJson<double>(json['rating']),
     );
   }
@@ -6659,6 +7073,7 @@ class Performance extends DataClass implements Insertable<Performance> {
       'yellowCards': serializer.toJson<int>(yellowCards),
       'redCards': serializer.toJson<int>(redCards),
       'season': serializer.toJson<int>(season),
+      'week': serializer.toJson<int>(week),
       'rating': serializer.toJson<double>(rating),
     };
   }
@@ -6673,6 +7088,7 @@ class Performance extends DataClass implements Insertable<Performance> {
     int? yellowCards,
     int? redCards,
     int? season,
+    int? week,
     double? rating,
   }) => Performance(
     id: id ?? this.id,
@@ -6684,6 +7100,7 @@ class Performance extends DataClass implements Insertable<Performance> {
     yellowCards: yellowCards ?? this.yellowCards,
     redCards: redCards ?? this.redCards,
     season: season ?? this.season,
+    week: week ?? this.week,
     rating: rating ?? this.rating,
   );
   Performance copyWithCompanion(PerformancesCompanion data) {
@@ -6701,6 +7118,7 @@ class Performance extends DataClass implements Insertable<Performance> {
           : this.yellowCards,
       redCards: data.redCards.present ? data.redCards.value : this.redCards,
       season: data.season.present ? data.season.value : this.season,
+      week: data.week.present ? data.week.value : this.week,
       rating: data.rating.present ? data.rating.value : this.rating,
     );
   }
@@ -6717,6 +7135,7 @@ class Performance extends DataClass implements Insertable<Performance> {
           ..write('yellowCards: $yellowCards, ')
           ..write('redCards: $redCards, ')
           ..write('season: $season, ')
+          ..write('week: $week, ')
           ..write('rating: $rating')
           ..write(')'))
         .toString();
@@ -6733,6 +7152,7 @@ class Performance extends DataClass implements Insertable<Performance> {
     yellowCards,
     redCards,
     season,
+    week,
     rating,
   );
   @override
@@ -6748,6 +7168,7 @@ class Performance extends DataClass implements Insertable<Performance> {
           other.yellowCards == this.yellowCards &&
           other.redCards == this.redCards &&
           other.season == this.season &&
+          other.week == this.week &&
           other.rating == this.rating);
 }
 
@@ -6761,6 +7182,7 @@ class PerformancesCompanion extends UpdateCompanion<Performance> {
   final Value<int> yellowCards;
   final Value<int> redCards;
   final Value<int> season;
+  final Value<int> week;
   final Value<double> rating;
   const PerformancesCompanion({
     this.id = const Value.absent(),
@@ -6772,6 +7194,7 @@ class PerformancesCompanion extends UpdateCompanion<Performance> {
     this.yellowCards = const Value.absent(),
     this.redCards = const Value.absent(),
     this.season = const Value.absent(),
+    this.week = const Value.absent(),
     this.rating = const Value.absent(),
   });
   PerformancesCompanion.insert({
@@ -6784,6 +7207,7 @@ class PerformancesCompanion extends UpdateCompanion<Performance> {
     this.yellowCards = const Value.absent(),
     this.redCards = const Value.absent(),
     this.season = const Value.absent(),
+    this.week = const Value.absent(),
     this.rating = const Value.absent(),
   }) : matchId = Value(matchId),
        playerId = Value(playerId);
@@ -6797,6 +7221,7 @@ class PerformancesCompanion extends UpdateCompanion<Performance> {
     Expression<int>? yellowCards,
     Expression<int>? redCards,
     Expression<int>? season,
+    Expression<int>? week,
     Expression<double>? rating,
   }) {
     return RawValuesInsertable({
@@ -6809,6 +7234,7 @@ class PerformancesCompanion extends UpdateCompanion<Performance> {
       if (yellowCards != null) 'yellow_cards': yellowCards,
       if (redCards != null) 'red_cards': redCards,
       if (season != null) 'season': season,
+      if (week != null) 'week': week,
       if (rating != null) 'rating': rating,
     });
   }
@@ -6823,6 +7249,7 @@ class PerformancesCompanion extends UpdateCompanion<Performance> {
     Value<int>? yellowCards,
     Value<int>? redCards,
     Value<int>? season,
+    Value<int>? week,
     Value<double>? rating,
   }) {
     return PerformancesCompanion(
@@ -6835,6 +7262,7 @@ class PerformancesCompanion extends UpdateCompanion<Performance> {
       yellowCards: yellowCards ?? this.yellowCards,
       redCards: redCards ?? this.redCards,
       season: season ?? this.season,
+      week: week ?? this.week,
       rating: rating ?? this.rating,
     );
   }
@@ -6869,6 +7297,9 @@ class PerformancesCompanion extends UpdateCompanion<Performance> {
     if (season.present) {
       map['season'] = Variable<int>(season.value);
     }
+    if (week.present) {
+      map['week'] = Variable<int>(week.value);
+    }
     if (rating.present) {
       map['rating'] = Variable<double>(rating.value);
     }
@@ -6887,6 +7318,7 @@ class PerformancesCompanion extends UpdateCompanion<Performance> {
           ..write('yellowCards: $yellowCards, ')
           ..write('redCards: $redCards, ')
           ..write('season: $season, ')
+          ..write('week: $week, ')
           ..write('rating: $rating')
           ..write(')'))
         .toString();
@@ -6906,6 +7338,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $TransferNeedsTable transferNeeds = $TransferNeedsTable(this);
   late final $TransferOffersTable transferOffers = $TransferOffersTable(this);
   late final $ValueHistoriesTable valueHistories = $ValueHistoriesTable(this);
+  late final $CurrentAbilityHistoriesTable currentAbilityHistories =
+      $CurrentAbilityHistoriesTable(this);
   late final $RelationshipsTable relationships = $RelationshipsTable(this);
   late final $CountriesTable countries = $CountriesTable(this);
   late final $MatchesTable matches = $MatchesTable(this);
@@ -6925,6 +7359,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     transferNeeds,
     transferOffers,
     valueHistories,
+    currentAbilityHistories,
     relationships,
     countries,
     matches,
@@ -8255,7 +8690,7 @@ typedef $$PlayersTableCreateCompanionBuilder =
       Value<int?> clubId,
       Value<int?> agentId,
       required String position,
-      required int ca,
+      required double ca,
       required int pa,
       required int reputation,
       required int marketValue,
@@ -8268,7 +8703,7 @@ typedef $$PlayersTableUpdateCompanionBuilder =
       Value<int?> clubId,
       Value<int?> agentId,
       Value<String> position,
-      Value<int> ca,
+      Value<double> ca,
       Value<int> pa,
       Value<int> reputation,
       Value<int> marketValue,
@@ -8425,6 +8860,34 @@ final class $$PlayersTableReferences
     );
   }
 
+  static MultiTypedResultKey<
+    $CurrentAbilityHistoriesTable,
+    List<CurrentAbilityHistory>
+  >
+  _currentAbilityHistoriesRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.currentAbilityHistories,
+        aliasName: $_aliasNameGenerator(
+          db.players.id,
+          db.currentAbilityHistories.playerId,
+        ),
+      );
+
+  $$CurrentAbilityHistoriesTableProcessedTableManager
+  get currentAbilityHistoriesRefs {
+    final manager = $$CurrentAbilityHistoriesTableTableManager(
+      $_db,
+      $_db.currentAbilityHistories,
+    ).filter((f) => f.playerId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _currentAbilityHistoriesRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
   static MultiTypedResultKey<$PerformancesTable, List<Performance>>
   _performancesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
     db.performances,
@@ -8473,7 +8936,7 @@ class $$PlayersTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<int> get ca => $composableBuilder(
+  ColumnFilters<double> get ca => $composableBuilder(
     column: $table.ca,
     builder: (column) => ColumnFilters(column),
   );
@@ -8689,6 +9152,32 @@ class $$PlayersTableFilterComposer
     return f(composer);
   }
 
+  Expression<bool> currentAbilityHistoriesRefs(
+    Expression<bool> Function($$CurrentAbilityHistoriesTableFilterComposer f) f,
+  ) {
+    final $$CurrentAbilityHistoriesTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.currentAbilityHistories,
+          getReferencedColumn: (t) => t.playerId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$CurrentAbilityHistoriesTableFilterComposer(
+                $db: $db,
+                $table: $db.currentAbilityHistories,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
   Expression<bool> performancesRefs(
     Expression<bool> Function($$PerformancesTableFilterComposer f) f,
   ) {
@@ -8744,7 +9233,7 @@ class $$PlayersTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get ca => $composableBuilder(
+  ColumnOrderings<double> get ca => $composableBuilder(
     column: $table.ca,
     builder: (column) => ColumnOrderings(column),
   );
@@ -8832,7 +9321,7 @@ class $$PlayersTableAnnotationComposer
   GeneratedColumn<String> get position =>
       $composableBuilder(column: $table.position, builder: (column) => column);
 
-  GeneratedColumn<int> get ca =>
+  GeneratedColumn<double> get ca =>
       $composableBuilder(column: $table.ca, builder: (column) => column);
 
   GeneratedColumn<int> get pa =>
@@ -9044,6 +9533,33 @@ class $$PlayersTableAnnotationComposer
     return f(composer);
   }
 
+  Expression<T> currentAbilityHistoriesRefs<T extends Object>(
+    Expression<T> Function($$CurrentAbilityHistoriesTableAnnotationComposer a)
+    f,
+  ) {
+    final $$CurrentAbilityHistoriesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.currentAbilityHistories,
+          getReferencedColumn: (t) => t.playerId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$CurrentAbilityHistoriesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.currentAbilityHistories,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
   Expression<T> performancesRefs<T extends Object>(
     Expression<T> Function($$PerformancesTableAnnotationComposer a) f,
   ) {
@@ -9092,6 +9608,7 @@ class $$PlayersTableTableManager
             bool transferNeedsRefs,
             bool transferOffersRefs,
             bool valueHistoriesRefs,
+            bool currentAbilityHistoriesRefs,
             bool performancesRefs,
           })
         > {
@@ -9114,7 +9631,7 @@ class $$PlayersTableTableManager
                 Value<int?> clubId = const Value.absent(),
                 Value<int?> agentId = const Value.absent(),
                 Value<String> position = const Value.absent(),
-                Value<int> ca = const Value.absent(),
+                Value<double> ca = const Value.absent(),
                 Value<int> pa = const Value.absent(),
                 Value<int> reputation = const Value.absent(),
                 Value<int> marketValue = const Value.absent(),
@@ -9138,7 +9655,7 @@ class $$PlayersTableTableManager
                 Value<int?> clubId = const Value.absent(),
                 Value<int?> agentId = const Value.absent(),
                 required String position,
-                required int ca,
+                required double ca,
                 required int pa,
                 required int reputation,
                 required int marketValue,
@@ -9172,6 +9689,7 @@ class $$PlayersTableTableManager
                 transferNeedsRefs = false,
                 transferOffersRefs = false,
                 valueHistoriesRefs = false,
+                currentAbilityHistoriesRefs = false,
                 performancesRefs = false,
               }) {
                 return PrefetchHooks(
@@ -9183,6 +9701,7 @@ class $$PlayersTableTableManager
                     if (transferNeedsRefs) db.transferNeeds,
                     if (transferOffersRefs) db.transferOffers,
                     if (valueHistoriesRefs) db.valueHistories,
+                    if (currentAbilityHistoriesRefs) db.currentAbilityHistories,
                     if (performancesRefs) db.performances,
                   ],
                   addJoins:
@@ -9358,6 +9877,27 @@ class $$PlayersTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (currentAbilityHistoriesRefs)
+                        await $_getPrefetchedData<
+                          Player,
+                          $PlayersTable,
+                          CurrentAbilityHistory
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PlayersTableReferences
+                              ._currentAbilityHistoriesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PlayersTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).currentAbilityHistoriesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.playerId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                       if (performancesRefs)
                         await $_getPrefetchedData<
                           Player,
@@ -9408,6 +9948,7 @@ typedef $$PlayersTableProcessedTableManager =
         bool transferNeedsRefs,
         bool transferOffersRefs,
         bool valueHistoriesRefs,
+        bool currentAbilityHistoriesRefs,
         bool performancesRefs,
       })
     >;
@@ -12320,14 +12861,16 @@ typedef $$ValueHistoriesTableCreateCompanionBuilder =
     ValueHistoriesCompanion Function({
       Value<int> id,
       required int playerId,
-      required DateTime date,
+      required int season,
+      required int week,
       required double value,
     });
 typedef $$ValueHistoriesTableUpdateCompanionBuilder =
     ValueHistoriesCompanion Function({
       Value<int> id,
       Value<int> playerId,
-      Value<DateTime> date,
+      Value<int> season,
+      Value<int> week,
       Value<double> value,
     });
 
@@ -12373,8 +12916,13 @@ class $$ValueHistoriesTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<DateTime> get date => $composableBuilder(
-    column: $table.date,
+  ColumnFilters<int> get season => $composableBuilder(
+    column: $table.season,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get week => $composableBuilder(
+    column: $table.week,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -12421,8 +12969,13 @@ class $$ValueHistoriesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<DateTime> get date => $composableBuilder(
-    column: $table.date,
+  ColumnOrderings<int> get season => $composableBuilder(
+    column: $table.season,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get week => $composableBuilder(
+    column: $table.week,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -12467,8 +13020,11 @@ class $$ValueHistoriesTableAnnotationComposer
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumn<DateTime> get date =>
-      $composableBuilder(column: $table.date, builder: (column) => column);
+  GeneratedColumn<int> get season =>
+      $composableBuilder(column: $table.season, builder: (column) => column);
+
+  GeneratedColumn<int> get week =>
+      $composableBuilder(column: $table.week, builder: (column) => column);
 
   GeneratedColumn<double> get value =>
       $composableBuilder(column: $table.value, builder: (column) => column);
@@ -12529,24 +13085,28 @@ class $$ValueHistoriesTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 Value<int> playerId = const Value.absent(),
-                Value<DateTime> date = const Value.absent(),
+                Value<int> season = const Value.absent(),
+                Value<int> week = const Value.absent(),
                 Value<double> value = const Value.absent(),
               }) => ValueHistoriesCompanion(
                 id: id,
                 playerId: playerId,
-                date: date,
+                season: season,
+                week: week,
                 value: value,
               ),
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
                 required int playerId,
-                required DateTime date,
+                required int season,
+                required int week,
                 required double value,
               }) => ValueHistoriesCompanion.insert(
                 id: id,
                 playerId: playerId,
-                date: date,
+                season: season,
+                week: week,
                 value: value,
               ),
           withReferenceMapper: (p0) => p0
@@ -12615,6 +13175,344 @@ typedef $$ValueHistoriesTableProcessedTableManager =
       $$ValueHistoriesTableUpdateCompanionBuilder,
       (ValueHistory, $$ValueHistoriesTableReferences),
       ValueHistory,
+      PrefetchHooks Function({bool playerId})
+    >;
+typedef $$CurrentAbilityHistoriesTableCreateCompanionBuilder =
+    CurrentAbilityHistoriesCompanion Function({
+      Value<int> id,
+      required int playerId,
+      required int season,
+      required int week,
+      required double ca,
+    });
+typedef $$CurrentAbilityHistoriesTableUpdateCompanionBuilder =
+    CurrentAbilityHistoriesCompanion Function({
+      Value<int> id,
+      Value<int> playerId,
+      Value<int> season,
+      Value<int> week,
+      Value<double> ca,
+    });
+
+final class $$CurrentAbilityHistoriesTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $CurrentAbilityHistoriesTable,
+          CurrentAbilityHistory
+        > {
+  $$CurrentAbilityHistoriesTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $PlayersTable _playerIdTable(_$AppDatabase db) =>
+      db.players.createAlias(
+        $_aliasNameGenerator(
+          db.currentAbilityHistories.playerId,
+          db.players.id,
+        ),
+      );
+
+  $$PlayersTableProcessedTableManager get playerId {
+    final $_column = $_itemColumn<int>('player_id')!;
+
+    final manager = $$PlayersTableTableManager(
+      $_db,
+      $_db.players,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_playerIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$CurrentAbilityHistoriesTableFilterComposer
+    extends Composer<_$AppDatabase, $CurrentAbilityHistoriesTable> {
+  $$CurrentAbilityHistoriesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get season => $composableBuilder(
+    column: $table.season,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get week => $composableBuilder(
+    column: $table.week,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get ca => $composableBuilder(
+    column: $table.ca,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$PlayersTableFilterComposer get playerId {
+    final $$PlayersTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.playerId,
+      referencedTable: $db.players,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlayersTableFilterComposer(
+            $db: $db,
+            $table: $db.players,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CurrentAbilityHistoriesTableOrderingComposer
+    extends Composer<_$AppDatabase, $CurrentAbilityHistoriesTable> {
+  $$CurrentAbilityHistoriesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get season => $composableBuilder(
+    column: $table.season,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get week => $composableBuilder(
+    column: $table.week,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get ca => $composableBuilder(
+    column: $table.ca,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$PlayersTableOrderingComposer get playerId {
+    final $$PlayersTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.playerId,
+      referencedTable: $db.players,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlayersTableOrderingComposer(
+            $db: $db,
+            $table: $db.players,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CurrentAbilityHistoriesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CurrentAbilityHistoriesTable> {
+  $$CurrentAbilityHistoriesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get season =>
+      $composableBuilder(column: $table.season, builder: (column) => column);
+
+  GeneratedColumn<int> get week =>
+      $composableBuilder(column: $table.week, builder: (column) => column);
+
+  GeneratedColumn<double> get ca =>
+      $composableBuilder(column: $table.ca, builder: (column) => column);
+
+  $$PlayersTableAnnotationComposer get playerId {
+    final $$PlayersTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.playerId,
+      referencedTable: $db.players,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlayersTableAnnotationComposer(
+            $db: $db,
+            $table: $db.players,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CurrentAbilityHistoriesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CurrentAbilityHistoriesTable,
+          CurrentAbilityHistory,
+          $$CurrentAbilityHistoriesTableFilterComposer,
+          $$CurrentAbilityHistoriesTableOrderingComposer,
+          $$CurrentAbilityHistoriesTableAnnotationComposer,
+          $$CurrentAbilityHistoriesTableCreateCompanionBuilder,
+          $$CurrentAbilityHistoriesTableUpdateCompanionBuilder,
+          (CurrentAbilityHistory, $$CurrentAbilityHistoriesTableReferences),
+          CurrentAbilityHistory,
+          PrefetchHooks Function({bool playerId})
+        > {
+  $$CurrentAbilityHistoriesTableTableManager(
+    _$AppDatabase db,
+    $CurrentAbilityHistoriesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CurrentAbilityHistoriesTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$CurrentAbilityHistoriesTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$CurrentAbilityHistoriesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> playerId = const Value.absent(),
+                Value<int> season = const Value.absent(),
+                Value<int> week = const Value.absent(),
+                Value<double> ca = const Value.absent(),
+              }) => CurrentAbilityHistoriesCompanion(
+                id: id,
+                playerId: playerId,
+                season: season,
+                week: week,
+                ca: ca,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int playerId,
+                required int season,
+                required int week,
+                required double ca,
+              }) => CurrentAbilityHistoriesCompanion.insert(
+                id: id,
+                playerId: playerId,
+                season: season,
+                week: week,
+                ca: ca,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$CurrentAbilityHistoriesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({playerId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (playerId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.playerId,
+                                referencedTable:
+                                    $$CurrentAbilityHistoriesTableReferences
+                                        ._playerIdTable(db),
+                                referencedColumn:
+                                    $$CurrentAbilityHistoriesTableReferences
+                                        ._playerIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$CurrentAbilityHistoriesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CurrentAbilityHistoriesTable,
+      CurrentAbilityHistory,
+      $$CurrentAbilityHistoriesTableFilterComposer,
+      $$CurrentAbilityHistoriesTableOrderingComposer,
+      $$CurrentAbilityHistoriesTableAnnotationComposer,
+      $$CurrentAbilityHistoriesTableCreateCompanionBuilder,
+      $$CurrentAbilityHistoriesTableUpdateCompanionBuilder,
+      (CurrentAbilityHistory, $$CurrentAbilityHistoriesTableReferences),
+      CurrentAbilityHistory,
       PrefetchHooks Function({bool playerId})
     >;
 typedef $$RelationshipsTableCreateCompanionBuilder =
@@ -13573,6 +14471,7 @@ typedef $$PerformancesTableCreateCompanionBuilder =
       Value<int> yellowCards,
       Value<int> redCards,
       Value<int> season,
+      Value<int> week,
       Value<double> rating,
     });
 typedef $$PerformancesTableUpdateCompanionBuilder =
@@ -13586,6 +14485,7 @@ typedef $$PerformancesTableUpdateCompanionBuilder =
       Value<int> yellowCards,
       Value<int> redCards,
       Value<int> season,
+      Value<int> week,
       Value<double> rating,
     });
 
@@ -13673,6 +14573,11 @@ class $$PerformancesTableFilterComposer
 
   ColumnFilters<int> get season => $composableBuilder(
     column: $table.season,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get week => $composableBuilder(
+    column: $table.week,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -13772,6 +14677,11 @@ class $$PerformancesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get week => $composableBuilder(
+    column: $table.week,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<double> get rating => $composableBuilder(
     column: $table.rating,
     builder: (column) => ColumnOrderings(column),
@@ -13857,6 +14767,9 @@ class $$PerformancesTableAnnotationComposer
 
   GeneratedColumn<int> get season =>
       $composableBuilder(column: $table.season, builder: (column) => column);
+
+  GeneratedColumn<int> get week =>
+      $composableBuilder(column: $table.week, builder: (column) => column);
 
   GeneratedColumn<double> get rating =>
       $composableBuilder(column: $table.rating, builder: (column) => column);
@@ -13945,6 +14858,7 @@ class $$PerformancesTableTableManager
                 Value<int> yellowCards = const Value.absent(),
                 Value<int> redCards = const Value.absent(),
                 Value<int> season = const Value.absent(),
+                Value<int> week = const Value.absent(),
                 Value<double> rating = const Value.absent(),
               }) => PerformancesCompanion(
                 id: id,
@@ -13956,6 +14870,7 @@ class $$PerformancesTableTableManager
                 yellowCards: yellowCards,
                 redCards: redCards,
                 season: season,
+                week: week,
                 rating: rating,
               ),
           createCompanionCallback:
@@ -13969,6 +14884,7 @@ class $$PerformancesTableTableManager
                 Value<int> yellowCards = const Value.absent(),
                 Value<int> redCards = const Value.absent(),
                 Value<int> season = const Value.absent(),
+                Value<int> week = const Value.absent(),
                 Value<double> rating = const Value.absent(),
               }) => PerformancesCompanion.insert(
                 id: id,
@@ -13980,6 +14896,7 @@ class $$PerformancesTableTableManager
                 yellowCards: yellowCards,
                 redCards: redCards,
                 season: season,
+                week: week,
                 rating: rating,
               ),
           withReferenceMapper: (p0) => p0
@@ -14086,6 +15003,11 @@ class $AppDatabaseManager {
       $$TransferOffersTableTableManager(_db, _db.transferOffers);
   $$ValueHistoriesTableTableManager get valueHistories =>
       $$ValueHistoriesTableTableManager(_db, _db.valueHistories);
+  $$CurrentAbilityHistoriesTableTableManager get currentAbilityHistories =>
+      $$CurrentAbilityHistoriesTableTableManager(
+        _db,
+        _db.currentAbilityHistories,
+      );
   $$RelationshipsTableTableManager get relationships =>
       $$RelationshipsTableTableManager(_db, _db.relationships);
   $$CountriesTableTableManager get countries =>

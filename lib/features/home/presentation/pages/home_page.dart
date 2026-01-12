@@ -2,8 +2,11 @@ import 'dart:ui'; // Blur efekti için gerekli
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../agents/providers/user_agent_provider.dart';
+import '../../../clubs/providers/club_provider.dart';
 import '../../../leagues/presentation/providers/fixture_provider.dart';
 import '../../../players/presentation/pages/players_page.dart';
+import '../../../players/presentation/providers/player_provider.dart';
+import '../../../players/presentation/widgets/player_history_tab.dart';
 import '../../../scouting/presentation/pages/scouting_page.dart';
 import '../../../contracts/presentation/pages/contracts_page.dart';
 import '../../../leagues/presentation/pages/leagues_page.dart';
@@ -381,6 +384,11 @@ class HomeContent extends ConsumerWidget {
       ref.invalidate(sellNeedsProvider);
       ref.invalidate(completedTransfersProvider);
       ref.invalidate(activeOffersProvider);
+      ref.invalidate(clubsProvider);
+      ref.invalidate(filteredPlayersProvider);
+      ref.invalidate(playersByClubProvider);
+      ref.invalidate(playerValueHistoryProvider);
+      ref.invalidate(playerCaHistoryProvider);
       
       // Refresh User Agent to update weekly offers limit if needed (though it uses SP directly)
       ref.invalidate(userAgentProvider);

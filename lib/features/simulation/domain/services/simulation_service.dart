@@ -8,12 +8,14 @@ import '../../../performances/domain/entities/performance.dart';
 import '../../../performances/domain/repositories/performance_repository.dart';
 import '../../../clubs/domain/repositories/club_repository.dart';
 import '../../../players/domain/repositories/player_repository.dart';
+import '../../../players/domain/services/player_growth_service.dart';
 
 class SimulationService {
   final MatchRepository _matchRepository;
   final PerformanceRepository _performanceRepository;
   final ClubRepository _clubRepository; // Need to fetch clubs to map Name -> ID
   final PlayerRepository _playerRepository; // Need to fetch players for stats
+  final PlayerGrowthService _playerGrowthService;
 
   Map<String, dynamic>? _fixtureData;
   Map<String, int>? _clubIdCache;
@@ -23,10 +25,12 @@ class SimulationService {
     required PerformanceRepository performanceRepository,
     required ClubRepository clubRepository,
     required PlayerRepository playerRepository,
+    required PlayerGrowthService playerGrowthService,
   })  : _matchRepository = matchRepository,
         _performanceRepository = performanceRepository,
         _clubRepository = clubRepository,
-        _playerRepository = playerRepository;
+        _playerRepository = playerRepository,
+        _playerGrowthService = playerGrowthService;
 
   Future<void> _loadFixtureIfNeeded() async {
     if (_fixtureData != null) return;
@@ -203,13 +207,13 @@ class SimulationService {
         }
 
         if (needsStats) {
-             // Generate stats for Home Team
+            // Generate stats for Home Team
             final homePlayers = await _getBest11(match.homeClubId);
-            _distributeStats(preparedPerformances, homePlayers, match.id, match.homeScore!, random, season);
+            _distributeStats(preparedPerformances, homePlayers, match.id, match.homeScore!, random, season, week);
             
             // Generate stats for Away Team
             final awayPlayers = await _getBest11(match.awayClubId);
-            _distributeStats(preparedPerformances, awayPlayers, match.id, match.awayScore!, random, season);
+            _distributeStats(preparedPerformances, awayPlayers, match.id, match.awayScore!, random, season, week);
         }
     }
     
@@ -218,9 +222,12 @@ class SimulationService {
       await _performanceRepository.savePerformances(preparedPerformances);
       print("Performances Saved. Simulation Complete for Week $week.");
     }
+    
+    // Step 6: Process Player Growth (if applicable)
+    await _playerGrowthService.processGrowthCycle(season, week);
   }
 
-  void _distributeStats(List<Performance> performances, List<dynamic> players, int matchId, int teamGoals, Random r, int season) {
+  void _distributeStats(List<Performance> performances, List<dynamic> players, int matchId, int teamGoals, Random r, int season, int week) {
       if (players.isEmpty) return;
 
       // Track goals and assists
@@ -259,6 +266,7 @@ class SimulationService {
               redCards: 0,
               rating: 6.0 + r.nextDouble() * 4.0 + (goals * 0.5) + (assists * 0.3), // Bonus rating
               season: season,
+              week: week,
           ));
       }
   }

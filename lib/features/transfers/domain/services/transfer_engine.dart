@@ -266,7 +266,7 @@ class TransferEngine {
         if (need.maxAge != null) query.where((p) =>
             p.age.isSmallerOrEqualValue(need.maxAge!));
         if (need.minCa != null) query.where((p) =>
-            p.ca.isBiggerOrEqualValue(need.minCa!));
+            p.ca.isBiggerOrEqualValue(need.minCa!.toDouble()));
         // Position filter is tricky with string map, simplified check:
         // Ideally we would do this in Dart for precise 'DEF' mapping, OR use LIKE
         // For performance, let's fetch first then filter by position in Dart

@@ -14,6 +14,7 @@ import '../../features/transfers/data/datasources/tables/transfers_table.dart';
 import '../../features/transfers/data/datasources/tables/transfer_needs_table.dart';
 import '../../features/transfers/data/datasources/tables/transfer_offers_table.dart';
 import '../../features/players/data/datasources/tables/value_histories_table.dart';
+import '../../features/players/data/datasources/tables/current_ability_histories_table.dart';
 import '../../features/relationships/data/datasources/tables/relationships_table.dart';
 import '../../features/countries/data/datasources/tables/countries_table.dart';
 import '../../features/home/domain/entities/home_entity.dart';
@@ -34,6 +35,7 @@ part 'app_database.g.dart';
   TransferNeeds,
   TransferOffers,
   ValueHistories,
+  CurrentAbilityHistories,
   Relationships,
   Countries,
   Matches,

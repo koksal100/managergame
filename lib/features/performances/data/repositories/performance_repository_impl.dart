@@ -23,6 +23,8 @@ class PerformanceRepositoryImpl implements PerformanceRepository {
           assists: Value(p.assists),
           yellowCards: Value(p.yellowCards),
           redCards: Value(p.redCards),
+          season: Value(p.season),
+          week: Value(p.week),
           rating: Value(p.rating),
         )),
       );
@@ -46,6 +48,7 @@ class PerformanceRepositoryImpl implements PerformanceRepository {
       yellowCards: row.yellowCards,
       redCards: row.redCards,
       season: row.season,
+      week: row.week,
       rating: row.rating,
     )).toList();
   }
@@ -67,6 +70,7 @@ class PerformanceRepositoryImpl implements PerformanceRepository {
       yellowCards: row.yellowCards,
       redCards: row.redCards,
       season: row.season,
+      week: row.week,
       rating: row.rating,
     )).toList();
   }

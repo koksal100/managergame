@@ -5,6 +5,7 @@ import '../../../../core/error/failures.dart';
 import '../../domain/repositories/player_repository.dart';
 import '../../domain/entities/player.dart';
 import '../../domain/entities/player_filter.dart';
+import '../../domain/entities/player_history.dart';
 
 
 class PlayerRepositoryImpl implements PlayerRepository {
@@ -31,7 +32,7 @@ class PlayerRepositoryImpl implements PlayerRepository {
           query.where((tbl) => tbl.age.isSmallerOrEqualValue(filter.maxAge!));
         }
         if (filter.minCa != null) {
-          query.where((tbl) => tbl.ca.isBiggerOrEqualValue(filter.minCa!));
+          query.where((tbl) => tbl.ca.isBiggerOrEqualValue(filter.minCa!.toDouble()));
         }
         if (filter.minPa != null) {
           query.where((tbl) => tbl.pa.isBiggerOrEqualValue(filter.minPa!));
@@ -253,8 +254,56 @@ class PlayerRepositoryImpl implements PlayerRepository {
   @override
   Future<Either<Failure, void>> deletePlayer(int id) async {
     try {
-      await (database.delete(database.players)..where((tbl) => tbl.id.equals(id))).go();
+      await (database.delete(database.players)
+        ..where((tbl) => tbl.id.equals(id))).go();
       return const Right(null);
+    } catch (e) {
+      return Left(CacheFailure(e.toString()));
+    }
+  }
+  @override
+  Future<Either<Failure, List<PlayerValueHistory>>> getValueHistory(int playerId) async {
+    try {
+      final query = database.select(database.valueHistories)
+        ..where((t) => t.playerId.equals(playerId))
+        ..orderBy([
+          (t) => OrderingTerm(expression: t.season, mode: OrderingMode.asc),
+          (t) => OrderingTerm(expression: t.week, mode: OrderingMode.asc)
+        ]);
+        
+      final rows = await query.get();
+      
+      return Right(rows.map((row) => PlayerValueHistory(
+        id: row.id,
+        playerId: row.playerId,
+        season: row.season,
+        week: row.week,
+        value: row.value,
+      )).toList());
+    } catch (e) {
+      return Left(CacheFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<PlayerCaHistory>>> getCaHistory(int playerId) async {
+    try {
+      final query = database.select(database.currentAbilityHistories)
+        ..where((t) => t.playerId.equals(playerId))
+        ..orderBy([
+          (t) => OrderingTerm(expression: t.season, mode: OrderingMode.asc),
+          (t) => OrderingTerm(expression: t.week, mode: OrderingMode.asc)
+        ]);
+        
+      final rows = await query.get();
+      
+      return Right(rows.map((row) => PlayerCaHistory(
+        id: row.id,
+        playerId: row.playerId,
+        season: row.season,
+        week: row.week,
+        ca: row.ca,
+      )).toList());
     } catch (e) {
       return Left(CacheFailure(e.toString()));
     }

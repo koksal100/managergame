@@ -7,7 +7,7 @@ class Player extends Equatable {
   final int? clubId;
   final int? agentId;
   final String position;
-  final int ca; // Current Ability
+  final double ca; // Current Ability
   final int pa; // Potential Ability
   final int reputation;
   final int marketValue;

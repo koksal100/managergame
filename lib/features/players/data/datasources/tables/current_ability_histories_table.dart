@@ -1,10 +1,10 @@
 import 'package:drift/drift.dart';
-import '../../../../players/data/datasources/tables/players_table.dart';
+import 'players_table.dart';
 
-class ValueHistories extends Table {
+class CurrentAbilityHistories extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get playerId => integer().references(Players, #id)();
   IntColumn get season => integer()();
   IntColumn get week => integer()();
-  RealColumn get value => real()();
+  RealColumn get ca => real()();
 }

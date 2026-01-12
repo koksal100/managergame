@@ -1,14 +1,18 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../domain/services/simulation_service.dart';
-import '../../../../core/providers/repository_providers.dart';
+import '../../../../core/providers/database_provider.dart';
 import '../../../../core/providers/game_date_provider.dart';
+import '../../../../core/providers/repository_providers.dart';
+import '../../../players/domain/services/player_growth_service.dart';
+import '../../domain/services/simulation_service.dart';
 
 final simulationServiceProvider = Provider<SimulationService>((ref) {
+  final database = ref.watch(appDatabaseProvider);
   return SimulationService(
     matchRepository: ref.watch(matchRepositoryProvider),
     performanceRepository: ref.watch(performanceRepositoryProvider),
     clubRepository: ref.watch(clubRepositoryProvider),
     playerRepository: ref.watch(playerRepositoryProvider),
+    playerGrowthService: PlayerGrowthService(database),
   );
 });
 
