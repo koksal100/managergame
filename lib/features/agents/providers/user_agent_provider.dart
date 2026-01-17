@@ -56,6 +56,26 @@ class UserAgentNotifier extends AsyncNotifier<Agent?> {
       const PlayersCompanion(agentId: Value(_userId)),
     );
 
+    // 2b. Create Agent Contract
+    // Deactivate old contracts
+    await (db.update(db.agentContracts)..where((t) => t.playerId.equals(playerId)))
+      .write(const AgentContractsCompanion(status: Value('Inactive')));
+    
+    // Insert new contract
+    final now = DateTime.now();
+    await db.into(db.agentContracts).insert(
+      AgentContractsCompanion(
+        agentId: const Value(_userId),
+        playerId: Value(playerId),
+        startDate: Value(now),
+        endDate: Value(now.add(const Duration(days: 365 * 2))), // 2 Years default
+        feePercentage: const Value(10.0), // Default 10%
+        wage: const Value(0),
+        releaseClause: const Value(0),
+        status: const Value('Active'),
+      ),
+    );
+
     // Refresh state
     ref.invalidateSelf(); 
     
@@ -80,6 +100,13 @@ class UserAgentNotifier extends AsyncNotifier<Agent?> {
     await (db.update(db.players)..where((tbl) => tbl.id.equals(playerId))).write(
       const PlayersCompanion(agentId: Value(null)),
     );
+
+    // Terminate Contract
+    await (db.update(db.agentContracts)
+      ..where((t) => t.playerId.equals(playerId))
+      ..where((t) => t.agentId.equals(_userId))
+      ..where((t) => t.status.equals('Active'))) // Case insensitive? Standardizing on 'Active'
+      .write(const AgentContractsCompanion(status: Value('Terminated')));
 
     // Refresh UI
     ref.invalidateSelf();

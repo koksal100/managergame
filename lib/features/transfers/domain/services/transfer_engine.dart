@@ -421,6 +421,55 @@ class TransferEngine {
 
 
 
+  /// Manually create an offer (e.g. from Negotiation Dialog).
+  /// If [accepted] is true, it finalizes the transfer immediately.
+  Future<void> createManualOffer({
+    required int needId,
+    required int playerId,
+    required int fromClubId, // Club BUYING (Need owner)
+    required int toClubId,   // Club SELLING (Current owner)
+    required int amount,
+    required int wage,
+    required int years,
+    required int season,
+    required int week,
+    required bool accepted,
+  }) async {
+    // 1. Create Offer Record
+    final id = await database.into(database.transferOffers).insert(TransferOffersCompanion(
+      needId: Value(needId),
+      playerId: Value(playerId),
+      fromClubId: Value(fromClubId),
+      toClubId: Value(toClubId),
+      offerAmount: Value(amount),
+      proposedSalary: Value(wage),
+      contractYears: Value(years),
+      season: Value(season),
+      createdAtWeek: Value(week),
+      status: Value(accepted ? 'accepted' : 'rejected'),
+    ));
+
+    // 2. Finalize if accepted
+    if (accepted) {
+      // Need to fetch the created offer object or construct it
+      final offer = TransferOffer(
+        id: id,
+        needId: needId,
+        playerId: playerId,
+        fromClubId: fromClubId,
+        toClubId: toClubId,
+        offerAmount: amount,
+        proposedSalary: wage,
+        contractYears: years,
+        season: season,
+        createdAtWeek: week,
+        status: 'accepted',
+      );
+      
+      await _finalizeTransfer(offer, season, week);
+    }
+  }
+
   /// Complete a transfer: update player, create contracts, log transfer.
   Future<void> _finalizeTransfer(TransferOffer offer, int season, int week) async {
     final now = DateTime.now();
@@ -477,6 +526,35 @@ class TransferEngine {
       ..where((t) => t.type.equals('sell'))
       ..where((t) => t.playerToSellId.equals(offer.playerId)))
       .write(const TransferNeedsCompanion(isFulfilled: Value(true)));
+
+    // 8. Agent Commission
+    print('[TransferEngine] Checking for agent contract for Player ${offer.playerId}...');
+    final activeContracts = await (database.select(database.agentContracts)
+      ..where((t) => t.playerId.equals(offer.playerId))).get();
+    
+    // Check for 'Active' (Case insensitive just in case, or match Seeder 'Active')
+    final activeContract = activeContracts.where((c) => c.status.toLowerCase() == 'active').firstOrNull;
+
+    if (activeContract != null) {
+      final agentId = activeContract.agentId;
+      final feePercentage = activeContract.feePercentage;
+      print('[TransferEngine] FOUND Contract: Agent $agentId with $feePercentage% fee.');
+
+      final commission = (offer.offerAmount * (feePercentage / 100)).toInt();
+      print('[TransferEngine] Calculated Commission: €$commission (Fee: €${offer.offerAmount})');
+
+      final agent = await (database.select(database.agents)..where((a) => a.id.equals(agentId))).getSingleOrNull();
+      if (agent != null) {
+         print('[TransferEngine] Updating Agent ${agent.name} Balance: ${agent.balance} -> ${agent.balance + commission}');
+         await (database.update(database.agents)..where((a) => a.id.equals(agentId)))
+           .write(AgentsCompanion(balance: Value(agent.balance + commission)));
+         print('[TransferEngine] COMMISSION PAID: €$commission to Agent ${agent.name} ($feePercentage%)');
+      } else {
+        print('[TransferEngine] ERROR: Agent $agentId found in contract but not in Agents table.');
+      }
+    } else {
+      print('[TransferEngine] NO ACTIVE CONTRACT regarding Player ${offer.playerId}. Found ${activeContracts.length} total contracts.');
+    }
 
     print('[TransferEngine] TRANSFER FINALIZED: Player ${offer.playerId} moved from Club ${offer.toClubId} to Club ${offer.fromClubId} for €${offer.offerAmount / 1000000}M');
   }
