@@ -5,6 +5,26 @@ import '../../providers/transfer_provider.dart';
 import '../../../clubs/providers/club_provider.dart';
 import '../../../players/providers/player_provider.dart';
 import '../../../players/presentation/widgets/player_detail_dialog.dart';
+import '../../../../core/providers/game_date_provider.dart';
+import '../widgets/suggest_player_dialog.dart';
+
+// --- ENUMS & STATE MANAGEMENT FOR SORTING ---
+
+// Geçmiş Transferler için Sıralama (History)
+enum HistoryColumn { date, fee }
+
+final historySortColumnProvider = StateProvider<HistoryColumn>(
+  (ref) => HistoryColumn.date,
+);
+final historySortAscendingProvider = StateProvider<bool>((ref) => false);
+
+// İlanlar (Needs) için Sıralama
+enum NeedsColumn { budget, salary, fee, age, ca }
+
+final needsSortColumnProvider = StateProvider<NeedsColumn>(
+  (ref) => NeedsColumn.budget,
+);
+final needsSortAscendingProvider = StateProvider<bool>((ref) => false);
 
 class TransferMarketPage extends ConsumerWidget {
   const TransferMarketPage({super.key});
@@ -19,52 +39,93 @@ class TransferMarketPage extends ConsumerWidget {
     return DefaultTabController(
       length: 4,
       child: Scaffold(
-        backgroundColor: const Color(0xFF121212),
+        backgroundColor: const Color(0xFF0F0F0F),
         appBar: AppBar(
-          backgroundColor: Colors.transparent,
+          backgroundColor: const Color(0xFF0F0F0F),
           elevation: 0,
-          title: const Text('Transfer Market', style: TextStyle(color: Colors.white)),
-          iconTheme: const IconThemeData(color: Colors.white),
+          title: const Text(
+            'MARKET',
+            style: TextStyle(
+              color: Colors.white,
+              letterSpacing: 1.2,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          centerTitle: true,
           bottom: TabBar(
-            indicatorColor: Colors.tealAccent,
-            labelColor: Colors.tealAccent,
-            unselectedLabelColor: Colors.white54,
-            isScrollable: false, // Force fit on screen
-            labelStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold), // Smaller font
-            labelPadding: const EdgeInsets.symmetric(horizontal: 4), // Reduce padding
+            indicatorColor: const Color(0xFF64FFDA),
+            indicatorWeight: 2,
+            indicatorSize: TabBarIndicatorSize.label,
+            labelColor: const Color(0xFF64FFDA),
+            unselectedLabelColor: Colors.white38,
+            labelStyle: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.5,
+            ),
             tabs: const [
-              Tab(text: 'SELL LISTINGS'),
-              Tab(text: 'BUY REQUESTS'),
+              Tab(text: 'SELL LIST'),
+              Tab(text: 'BUY REQ'),
               Tab(text: 'OFFERS'),
-              Tab(text: 'COMPLETED'),
+              Tab(text: 'HISTORY'),
             ],
           ),
         ),
         body: TabBarView(
           children: [
-            // Sell Needs Tab
+            // 1. Sell Needs (Tablo)
             sellNeedsAsync.when(
-              data: (needs) => _buildNeedsList(ref, needs, isBuy: false),
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Center(child: Text('Error: $e', style: const TextStyle(color: Colors.red))),
+              data: (needs) => _buildNeedsTable(ref, needs, isBuy: false),
+              loading: () => const Center(
+                child: CircularProgressIndicator(color: Color(0xFF64FFDA)),
+              ),
+              error: (e, _) => Center(
+                child: Text(
+                  'Error: $e',
+                  style: const TextStyle(color: Colors.red),
+                ),
+              ),
             ),
-            // Buy Needs Tab
+            // 2. Buy Needs (Tablo)
             buyNeedsAsync.when(
-              data: (needs) => _buildNeedsList(ref, needs, isBuy: true),
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Center(child: Text('Error: $e', style: const TextStyle(color: Colors.red))),
+              data: (needs) => _buildNeedsTable(ref, needs, isBuy: true),
+              loading: () => const Center(
+                child: CircularProgressIndicator(color: Color(0xFF64FFDA)),
+              ),
+              error: (e, _) => Center(
+                child: Text(
+                  'Error: $e',
+                  style: const TextStyle(color: Colors.red),
+                ),
+              ),
             ),
-            // Active Offers Tab
+            // 3. Active Offers (Liste)
             activeOffersAsync.when(
               data: (offers) => _buildActiveOffersList(offers),
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Center(child: Text('Error: $e', style: const TextStyle(color: Colors.red))),
+              loading: () => const Center(
+                child: CircularProgressIndicator(color: Color(0xFF64FFDA)),
+              ),
+              error: (e, _) => Center(
+                child: Text(
+                  'Error: $e',
+                  style: const TextStyle(color: Colors.red),
+                ),
+              ),
             ),
-            // Completed Transfers Tab
+            // 4. Completed Transfers (Tablo)
             completedTransfersAsync.when(
-              data: (transfers) => _buildCompletedTransfersList(ref, transfers),
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Center(child: Text('Error: $e', style: const TextStyle(color: Colors.red))),
+              data: (transfers) =>
+                  _buildCompletedTransfersTable(ref, transfers),
+              loading: () => const Center(
+                child: CircularProgressIndicator(color: Color(0xFF64FFDA)),
+              ),
+              error: (e, _) => Center(
+                child: Text(
+                  'Error: $e',
+                  style: const TextStyle(color: Colors.red),
+                ),
+              ),
             ),
           ],
         ),
@@ -72,511 +133,761 @@ class TransferMarketPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildActiveOffersList(List<TransferOffer> offers) {
-    if (offers.isEmpty) {
-      return const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.pending_actions, size: 64, color: Colors.white24),
-            SizedBox(height: 16),
-            Text('No active offers pending', style: TextStyle(color: Colors.white54, fontSize: 16)),
-          ],
-        ),
-      );
-    }
+  // ===========================================================================
+  // 1 & 2. NEEDS TABLE (BUY & SELL)
+  // ===========================================================================
 
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: offers.length,
-      itemBuilder: (context, index) {
-        return _ActiveOfferCard(offer: offers[index]);
-      },
-    );
-  }
-
-  Widget _buildNeedsList(WidgetRef ref, List<TransferNeed> needs, {required bool isBuy}) {
+  Widget _buildNeedsTable(
+    WidgetRef ref,
+    List<TransferNeed> needs, {
+    required bool isBuy,
+  }) {
     if (needs.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(isBuy ? Icons.search_off : Icons.sell_outlined, size: 64, color: Colors.white24),
-            const SizedBox(height: 16),
-            Text(
-              isBuy ? 'No clubs looking to buy' : 'No players for sale',
-              style: const TextStyle(color: Colors.white54, fontSize: 16),
-            ),
-          ],
-        ),
+      return _buildEmptyState(
+        isBuy ? Icons.search_off : Icons.sell_outlined,
+        isBuy ? 'No clubs looking to buy' : 'No players listed for sale',
       );
     }
 
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: needs.length,
-      itemBuilder: (context, index) {
-        final need = needs[index];
-        return _TransferNeedCard(need: need, isBuy: isBuy);
-      },
-    );
-  }
+    final sortColumn = ref.watch(needsSortColumnProvider);
+    final isAscending = ref.watch(needsSortAscendingProvider);
 
-  Widget _buildCompletedTransfersList(WidgetRef ref, List<Transfer> transfers) {
-    final currentSort = ref.watch(completedTransfersSortProvider);
+    // Sorting Logic
+    List<TransferNeed> sortedNeeds = List.from(needs);
+    sortedNeeds.sort((a, b) {
+      int comparison = 0;
+      switch (sortColumn) {
+        case NeedsColumn.budget:
+          comparison = (a.maxTransferBudget ?? 0).compareTo(
+            b.maxTransferBudget ?? 0,
+          );
+          break;
+        case NeedsColumn.salary:
+          comparison = (a.maxWeeklySalary ?? 0).compareTo(
+            b.maxWeeklySalary ?? 0,
+          );
+          break;
+        case NeedsColumn.fee:
+          comparison = (a.minimumFee ?? 0).compareTo(b.minimumFee ?? 0);
+          break;
+        case NeedsColumn.age:
+          comparison = (a.minAge ?? 0).compareTo(b.minAge ?? 0);
+          break;
+        case NeedsColumn.ca:
+          comparison = (a.minCa ?? 0).compareTo(b.minCa ?? 0);
+          break;
+        default:
+          comparison = 0;
+      }
+      return isAscending ? comparison : -comparison;
+    });
 
     return Column(
       children: [
-        // Sort Header
+        // --- HEADER ---
         Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          decoration: const BoxDecoration(
-            color: Colors.black12,
-            border: Border(bottom: BorderSide(color: Colors.white10)),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1E1E1E),
+            border: Border(
+              bottom: BorderSide(color: Colors.white.withOpacity(0.1)),
+            ),
           ),
           child: Row(
             children: [
-              const Icon(Icons.sort, color: Colors.white54, size: 16),
-              const SizedBox(width: 8),
-              const Text('Sort by:', style: TextStyle(color: Colors.white54, fontSize: 13)),
-              const SizedBox(width: 12),
-              _buildSortChip(ref, currentSort, 'Date', TransferSort.dateDesc),
-              const SizedBox(width: 8),
-              _buildSortChip(ref, currentSort, 'Fee', TransferSort.feeDesc),
+              if (isBuy) ...[
+                // BUY HEADERS: Club | Pos | MIN CA | Budget | Salary
+                _buildStaticHeader('CLUB', flex: 3),
+                _buildStaticHeader('POS', flex: 2),
+                _buildSortableHeader(
+                  ref,
+                  'MIN CA',
+                  NeedsColumn.ca,
+                  flex: 2,
+                  alignment: Alignment.center,
+                ),
+                _buildSortableHeader(
+                  ref,
+                  'BUDGET',
+                  NeedsColumn.budget,
+                  flex: 3,
+                  alignment: Alignment.centerRight,
+                ),
+                _buildSortableHeader(
+                  ref,
+                  'SALARY',
+                  NeedsColumn.salary,
+                  flex: 3,
+                  alignment: Alignment.centerRight,
+                ),
+              ] else ...[
+                // SELL HEADERS: Player | Pos | Fee
+                _buildStaticHeader('PLAYER', flex: 4),
+                _buildStaticHeader('POS', flex: 2),
+                _buildSortableHeader(
+                  ref,
+                  'FEE',
+                  NeedsColumn.fee,
+                  flex: 3,
+                  alignment: Alignment.centerRight,
+                ),
+              ],
+              // Action Button Space
+              const SizedBox(width: 40),
             ],
           ),
         ),
 
-        // List Content
+        // --- BODY ---
         Expanded(
-          child: transfers.isEmpty
-              ? const Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.history_toggle_off, size: 64, color: Colors.white24),
-                      SizedBox(height: 16),
-                      Text('No transfers completed yet', style: TextStyle(color: Colors.white54, fontSize: 16)),
-                    ],
-                  ),
-                )
-              : ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: transfers.length,
-                  itemBuilder: (context, index) {
-                    return _CompletedTransferCard(transfer: transfers[index]);
-                  },
-                ),
+          child: ListView.separated(
+            padding: EdgeInsets.zero,
+            itemCount: sortedNeeds.length,
+            separatorBuilder: (c, i) =>
+                Divider(height: 1, color: Colors.white.withOpacity(0.05)),
+            itemBuilder: (context, index) {
+              return _NeedDataRow(
+                need: sortedNeeds[index],
+                isBuy: isBuy,
+                index: index,
+              );
+            },
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildSortChip(WidgetRef ref, TransferSort currentSort, String label, TransferSort sortValue) {
-    final isSelected = currentSort == sortValue;
-    return GestureDetector(
-      onTap: () {
-        ref.read(completedTransfersSortProvider.notifier).state = sortValue;
-      },
+  // Tıklanamayan başlık
+  Widget _buildStaticHeader(
+    String title, {
+    int flex = 1,
+    Alignment alignment = Alignment.centerLeft,
+  }) {
+    return Expanded(
+      flex: flex,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: isSelected ? Colors.tealAccent.withOpacity(0.2) : Colors.white.withOpacity(0.05),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: isSelected ? Colors.tealAccent : Colors.white12,
-            width: 1,
-          ),
-        ),
+        alignment: alignment,
+        padding: const EdgeInsets.symmetric(vertical: 4),
         child: Text(
-          label,
-          style: TextStyle(
-            color: isSelected ? Colors.tealAccent : Colors.white70,
-            fontSize: 12,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          title,
+          style: const TextStyle(
+            color: Colors.white38,
+            fontSize: 11,
+            fontWeight: FontWeight.bold,
           ),
         ),
       ),
     );
   }
-}
 
-class _ActiveOfferCard extends ConsumerWidget {
-  final TransferOffer offer;
+  // Tıklanabilir ve sıralanabilir başlık
+  Widget _buildSortableHeader(
+    WidgetRef ref,
+    String title,
+    NeedsColumn column, {
+    int flex = 1,
+    Alignment alignment = Alignment.centerLeft,
+  }) {
+    final currentSort = ref.watch(needsSortColumnProvider);
+    final isAscending = ref.watch(needsSortAscendingProvider);
+    final isSelected = currentSort == column;
 
-  const _ActiveOfferCard({required this.offer});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final fromClubFuture = ref.watch(clubRepositoryProvider).getClubById(offer.fromClubId);
-    final toClubFuture = ref.watch(clubRepositoryProvider).getClubById(offer.toClubId);
-    final playerFuture = ref.watch(playerRepositoryProvider).getPlayerById(offer.playerId);
-
-    return FutureBuilder(
-      future: Future.wait([fromClubFuture, toClubFuture, playerFuture]),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) return const SizedBox();
-
-        final fromClub = (snapshot.data![0] as dynamic).fold((l) => null, (r) => r);
-        final toClub = (snapshot.data![1] as dynamic).fold((l) => null, (r) => r);
-        final player = (snapshot.data![2] as dynamic).fold((l) => null, (r) => r);
-
-        if (player == null) return const SizedBox();
-
-        return Card(
-          color: Colors.white.withOpacity(0.05),
-          margin: const EdgeInsets.only(bottom: 12),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          child: InkWell(
-            onTap: () {
-              showDialog(
-                context: context,
-                builder: (context) => PlayerDetailDialog(player: player),
-              );
-            },
-            borderRadius: BorderRadius.circular(12),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // Status Badge
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Colors.amber.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(4),
-                          border: Border.all(color: Colors.amber.withOpacity(0.5)),
-                        ),
-                        child: const Text(
-                          'PENDING',
-                          style: TextStyle(color: Colors.amber, fontSize: 10, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      // Amount
-                      Text(
-                        _formatCurrency(offer.offerAmount),
-                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
-                      ),
-                    ],
-                  ),
-                  const Divider(color: Colors.white10, height: 24),
-                  Row(
-                    children: [
-                      // From Club (Bidder)
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(fromClub?.name ?? 'Unknown', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500)),
-                            Text('Bidder', style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 10)),
-                          ],
-                        ),
-                      ),
-                      // Arrow
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 8),
-                        child: Icon(Icons.arrow_forward, color: Colors.white24, size: 16),
-                      ),
-                      // To Club (Owner)
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(toClub?.name ?? 'Unknown', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500)),
-                            Text('Owner', style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 10)),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  // Player Name
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.05),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Center(
-                      child: Text(
-                        player.name,
-                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-                ],
+    return Expanded(
+      flex: flex,
+      child: InkWell(
+        onTap: () {
+          if (isSelected) {
+            ref.read(needsSortAscendingProvider.notifier).state = !isAscending;
+          } else {
+            ref.read(needsSortColumnProvider.notifier).state = column;
+            ref.read(needsSortAscendingProvider.notifier).state = true;
+          }
+        },
+        child: Container(
+          alignment: alignment,
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  color: isSelected ? const Color(0xFF64FFDA) : Colors.white54,
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
+              if (isSelected)
+                Padding(
+                  padding: const EdgeInsets.only(left: 4),
+                  child: Icon(
+                    isAscending ? Icons.arrow_upward : Icons.arrow_downward,
+                    size: 7,
+                    color: const Color(0xFF64FFDA),
+                  ),
+                ),
+            ],
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 
-  String _formatCurrency(int value) {
-    if (value >= 1000000) {
-      return '€${(value / 1000000).toStringAsFixed(1)}M';
-    } else if (value >= 1000) {
-      return '€${(value / 1000).toStringAsFixed(0)}K';
-    }
-    return '€$value';
+  // ===========================================================================
+  // 4. COMPLETED TRANSFERS TABLE
+  // ===========================================================================
+
+  Widget _buildCompletedTransfersTable(
+    WidgetRef ref,
+    List<Transfer> transfers,
+  ) {
+    if (transfers.isEmpty)
+      return _buildEmptyState(Icons.history_toggle_off, 'No transfer history');
+
+    final sortColumn = ref.watch(historySortColumnProvider);
+    final isAscending = ref.watch(historySortAscendingProvider);
+
+    List<Transfer> sortedTransfers = List.from(transfers);
+    sortedTransfers.sort((a, b) {
+      int comparison = 0;
+      switch (sortColumn) {
+        case HistoryColumn.fee:
+          comparison = a.feeAmount.compareTo(b.feeAmount);
+          break;
+        case HistoryColumn.date:
+        default:
+          final dateA = a.season * 100 + a.week;
+          final dateB = b.season * 100 + b.week;
+          comparison = dateA.compareTo(dateB);
+          break;
+      }
+      return isAscending ? comparison : -comparison;
+    });
+
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1E1E1E),
+            border: Border(
+              bottom: BorderSide(color: Colors.white.withOpacity(0.1)),
+            ),
+          ),
+          child: Row(
+            children: [
+              _buildHistoryHeader(ref, 'DATE', HistoryColumn.date, flex: 2),
+              _buildStaticHeader('PLAYER', flex: 4),
+              _buildStaticHeader('FROM', flex: 3),
+              const Icon(
+                Icons.arrow_forward,
+                size: 12,
+                color: Colors.transparent,
+              ),
+              _buildStaticHeader('TO', flex: 3),
+              _buildHistoryHeader(
+                ref,
+                'FEE',
+                HistoryColumn.fee,
+                flex: 3,
+                alignment: Alignment.centerRight,
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: ListView.separated(
+            padding: EdgeInsets.zero,
+            itemCount: sortedTransfers.length,
+            separatorBuilder: (c, i) =>
+                Divider(height: 1, color: Colors.white.withOpacity(0.05)),
+            itemBuilder: (context, index) => _TransferHistoryRow(
+              transfer: sortedTransfers[index],
+              index: index,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildHistoryHeader(
+    WidgetRef ref,
+    String title,
+    HistoryColumn column, {
+    int flex = 1,
+    Alignment alignment = Alignment.centerLeft,
+  }) {
+    final currentSort = ref.watch(historySortColumnProvider);
+    final isAscending = ref.watch(historySortAscendingProvider);
+    final isSelected = currentSort == column;
+    return Expanded(
+      flex: flex,
+      child: InkWell(
+        onTap: () {
+          if (isSelected) {
+            ref.read(historySortAscendingProvider.notifier).state =
+                !isAscending;
+          } else {
+            ref.read(historySortColumnProvider.notifier).state = column;
+            ref.read(historySortAscendingProvider.notifier).state = true;
+          }
+        },
+        child: Container(
+          alignment: alignment,
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  color: isSelected ? const Color(0xFF64FFDA) : Colors.white54,
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              if (isSelected)
+                Padding(
+                  padding: const EdgeInsets.only(left: 4.0),
+                  child: Icon(
+                    isAscending ? Icons.arrow_upward : Icons.arrow_downward,
+                    size: 10,
+                    color: const Color(0xFF64FFDA),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ===========================================================================
+  // HELPERS
+  // ===========================================================================
+
+  Widget _buildActiveOffersList(List<TransferOffer> offers) {
+    if (offers.isEmpty)
+      return _buildEmptyState(Icons.pending_actions, 'No active offers');
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: offers.length,
+      itemBuilder: (context, index) => _ActiveOfferRow(offer: offers[index]),
+    );
+  }
+
+  Widget _buildEmptyState(IconData icon, String message) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, size: 48, color: Colors.white10),
+          const SizedBox(height: 16),
+          Text(
+            message,
+            style: const TextStyle(color: Colors.white38, fontSize: 14),
+          ),
+        ],
+      ),
+    );
   }
 }
 
-class _TransferNeedCard extends ConsumerWidget {
+// ===========================================================================
+// ROW WIDGETS
+// ===========================================================================
+
+class _NeedDataRow extends ConsumerWidget {
   final TransferNeed need;
   final bool isBuy;
+  final int index;
 
-  const _TransferNeedCard({required this.need, required this.isBuy});
+  const _NeedDataRow({
+    required this.need,
+    required this.isBuy,
+    required this.index,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final clubFuture = ref.watch(clubRepositoryProvider).getClubById(need.clubId);
-
-    // Fetch player if it's a sell need
+    final clubFuture = ref
+        .watch(clubRepositoryProvider)
+        .getClubById(need.clubId);
     final playerFuture = (!isBuy && need.playerToSellId != null)
-        ? ref.watch(playerRepositoryProvider).getPlayerById(need.playerToSellId!)
+        ? ref
+              .watch(playerRepositoryProvider)
+              .getPlayerById(need.playerToSellId!)
         : Future.value(null);
 
     return FutureBuilder(
       future: Future.wait([clubFuture, playerFuture]),
       builder: (context, snapshot) {
-        if (!snapshot.hasData) return const SizedBox();
+        if (!snapshot.hasData) return const SizedBox(height: 50);
 
         final club = (snapshot.data![0] as dynamic).fold((l) => null, (r) => r);
-        final playerResult = snapshot.data![1];
-        final player = (playerResult is! Future && playerResult != null)
-             ? (playerResult as dynamic).fold((l) => null, (r) => r)
-             : null;
+        final player = (snapshot.data![1] as dynamic)?.fold(
+          (l) => null,
+          (r) => r,
+        );
 
-        final clubName = club?.name ?? 'Unknown';
+        // Buy Row Cells
+        List<Widget> rowChildren = [];
 
-        // Determine Main Title and Subtitle
-        String mainTitle = clubName;
-        String? subtitle;
-        IconData icon = isBuy ? Icons.add_shopping_cart : Icons.sell;
-        Color color = isBuy ? Colors.greenAccent : Colors.orangeAccent;
-
-        if (!isBuy && player != null) {
-          mainTitle = player.name;
-          subtitle = clubName; // Club name becomes subtitle
-        } else if (isBuy) {
-           subtitle = 'Looking to Buy';
+        if (isBuy) {
+          rowChildren = [
+            // Club Name
+            Expanded(
+              flex: 3,
+              child: Text(
+                club?.name ?? 'Unknown',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            // Position
+            Expanded(
+              flex: 2,
+              child: Text(
+                need.targetPosition ?? 'Any',
+                style: const TextStyle(color: Colors.white70, fontSize: 12),
+              ),
+            ),
+            // MIN CA (BUY REQ'teki özellik)
+            Expanded(
+              flex: 2,
+              child: Center(
+                child: Text(
+                  '${need.minCa ?? '-'}',
+                  style: const TextStyle(
+                    color: Color(0xFF64FFDA),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                  ),
+                ),
+              ),
+            ),
+            // Budget
+            Expanded(
+              flex: 3,
+              child: Text(
+                _formatCurrency(need.maxTransferBudget ?? 0),
+                textAlign: TextAlign.right,
+                style: const TextStyle(color: Colors.white70, fontSize: 12),
+              ),
+            ),
+            // Salary
+            Expanded(
+              flex: 3,
+              child: Text(
+                '${_formatCurrency(need.maxWeeklySalary ?? 0)}/w',
+                textAlign: TextAlign.right,
+                style: const TextStyle(
+                  color: Color(0xFF64FFDA),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ];
         } else {
-           subtitle = 'Looking to Sell';
-        }
-
-        return Card(
-          color: Colors.white.withOpacity(0.05),
-          margin: const EdgeInsets.only(bottom: 12),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          child: InkWell(
-            onTap: () {
-               if (player != null) {
-                 showDialog(
-                   context: context,
-                   builder: (context) => PlayerDetailDialog(player: player),
-                 );
-               }
-            },
-            borderRadius: BorderRadius.circular(12),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
+          // Sell Row Cells
+          rowChildren = [
+            // Player Name & Club
+            Expanded(
+              flex: 4,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Header Row
-                  Row(
-                    children: [
-                      CircleAvatar(
-                        backgroundColor: isBuy ? Colors.green.withOpacity(0.2) : Colors.orange.withOpacity(0.2),
-                        child: Icon(
-                          icon,
-                          color: color,
-                          size: 20,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(mainTitle, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-                          if (subtitle != null)
-                            Text(
-                              subtitle,
-                              style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12),
-                            ),
-                        ],
-                      ),
-                    ],
+                  // --- BURASI GÜNCELLENDİ: Oyuncu Adı (Current Ability) ---
+                  Text(
+                    '${player?.name ?? 'Unknown'} (${player?.ca.toString().substring(0,2) ?? '-'})',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 16),
-                  const Divider(color: Colors.white10),
-                  const SizedBox(height: 8),
-
-                  if (isBuy) ...[
-                    _buildInfoRow('Position', need.targetPosition ?? 'Any'),
-                    _buildInfoRow('Age Range', '${need.minAge ?? 16} - ${need.maxAge ?? 40}'),
-                    _buildInfoRow('Min Ability', '${need.minCa ?? 0}'),
-                    _buildInfoRow('Max Budget', _formatCurrency(need.maxTransferBudget ?? 0)),
-                    _buildInfoRow('Max Salary', '${_formatCurrency(need.maxWeeklySalary ?? 0)}/week'),
-                  ] else ...[
-                    if (player != null) _buildInfoRow('Age', '${player.age}'),
-                    if (player != null) _buildInfoRow('Position', player.position),
-                    if (player != null) _buildInfoRow('Ability', '${player.ca}'),
-                    _buildInfoRow('Minimum Fee', _formatCurrency(need.minimumFee ?? 0)),
-                  ],
+                  Text(
+                    club?.name ?? '',
+                    style: const TextStyle(color: Colors.white38, fontSize: 10),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ],
               ),
+            ),
+            // Position
+            Expanded(
+              flex: 2,
+              child: Text(
+                player?.position ?? '-',
+                style: const TextStyle(color: Colors.white70, fontSize: 12),
+              ),
+            ),
+            // Fee
+            Expanded(
+              flex: 3,
+              child: Text(
+                _formatCurrency(need.minimumFee ?? 0),
+                textAlign: TextAlign.right,
+                style: const TextStyle(
+                  color: Colors.amberAccent,
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ];
+        }
+
+        return InkWell(
+          onTap: () {
+            if (isBuy) {
+              final gameDate = ref.read(gameDateProvider);
+              showDialog(
+                context: context,
+                builder: (context) => SuggestPlayerDialog(
+                  need: need,
+                  currentWeek: gameDate.week,
+                  season: gameDate.season,
+                ),
+              );
+            } else if (player != null) {
+              showDialog(
+                context: context,
+                builder: (context) => PlayerDetailDialog(player: player),
+              );
+            }
+          },
+          child: Container(
+            color: index % 2 == 0
+                ? Colors.transparent
+                : Colors.white.withOpacity(0.02),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+            height: 60,
+            child: Row(
+              children: [
+                ...rowChildren,
+                // Action Button
+                SizedBox(
+                  width: 40,
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: Icon(
+                      isBuy ? Icons.person_add : Icons.chevron_right,
+                      color: isBuy ? const Color(0xFF64FFDA) : Colors.white24,
+                      size: 18,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         );
       },
     );
   }
-
-  Widget _buildInfoRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label, style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 13)),
-          Text(value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500)),
-        ],
-      ),
-    );
-  }
-
-  String _formatCurrency(int value) {
-    if (value >= 1000000) {
-      return '€${(value / 1000000).toStringAsFixed(1)}M';
-    } else if (value >= 1000) {
-      return '€${(value / 1000).toStringAsFixed(0)}K';
-    }
-    return '€$value';
-  }
 }
 
-class _CompletedTransferCard extends ConsumerWidget {
+class _TransferHistoryRow extends ConsumerWidget {
   final Transfer transfer;
+  final int index;
 
-  const _CompletedTransferCard({required this.transfer});
+  const _TransferHistoryRow({required this.transfer, required this.index});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final fromClubFuture = ref.watch(clubRepositoryProvider).getClubById(transfer.fromClubId);
-    final toClubFuture = ref.watch(clubRepositoryProvider).getClubById(transfer.toClubId);
-    final playerFuture = ref.watch(playerRepositoryProvider).getPlayerById(transfer.playerId);
+    final fromClubFuture = ref
+        .watch(clubRepositoryProvider)
+        .getClubById(transfer.fromClubId);
+    final toClubFuture = ref
+        .watch(clubRepositoryProvider)
+        .getClubById(transfer.toClubId);
+    final playerFuture = ref
+        .watch(playerRepositoryProvider)
+        .getPlayerById(transfer.playerId);
 
     return FutureBuilder(
       future: Future.wait([fromClubFuture, toClubFuture, playerFuture]),
       builder: (context, snapshot) {
-         if (!snapshot.hasData) return const SizedBox();
-
-        final fromClub = (snapshot.data![0] as dynamic).fold((l) => null, (r) => r);
-        final toClub = (snapshot.data![1] as dynamic).fold((l) => null, (r) => r);
-        final player = (snapshot.data![2] as dynamic).fold((l) => null, (r) => r);
+        if (!snapshot.hasData) return const SizedBox(height: 50);
+        final fromClub = (snapshot.data![0] as dynamic).fold(
+          (l) => null,
+          (r) => r,
+        );
+        final toClub = (snapshot.data![1] as dynamic).fold(
+          (l) => null,
+          (r) => r,
+        );
+        final player = (snapshot.data![2] as dynamic).fold(
+          (l) => null,
+          (r) => r,
+        );
 
         if (player == null) return const SizedBox();
 
-        return Card(
-          color: Colors.white.withOpacity(0.05),
-          margin: const EdgeInsets.only(bottom: 12),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          child: InkWell(
-            onTap: () {
-               showDialog(
-                 context: context,
-                 builder: (context) => PlayerDetailDialog(player: player),
-               );
-            },
-            borderRadius: BorderRadius.circular(12),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        // Date
-                        'Season ${transfer.season} | Week ${transfer.week}',
-                        style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12),
-                      ),
-                      // Fee
-                      Text(
-                        _formatCurrency(transfer.feeAmount.toInt()),
-                        style: const TextStyle(color: Colors.greenAccent, fontWeight: FontWeight.bold, fontSize: 16),
-                      ),
-                    ],
+        return InkWell(
+          onTap: () => showDialog(
+            context: context,
+            builder: (context) => PlayerDetailDialog(player: player),
+          ),
+          child: Container(
+            color: index % 2 == 0
+                ? Colors.transparent
+                : Colors.white.withOpacity(0.02),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            child: Row(
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: Text(
+                    'S${transfer.season}/W${transfer.week}',
+                    style: const TextStyle(color: Colors.white38, fontSize: 11),
                   ),
-                  const Divider(color: Colors.white10, height: 24),
-                  Row(
-                    children: [
-                      // From Club
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(fromClub?.name ?? 'Unknown', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500)),
-                            Text('From', style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 10)),
-                          ],
-                        ),
-                      ),
-                      // Arrow
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 8),
-                        child: Icon(Icons.arrow_forward, color: Colors.white24, size: 16),
-                      ),
-                      // To Club
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(toClub?.name ?? 'Unknown', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500)),
-                            Text('To', style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 10)),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  // Player Name
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.05),
-                      borderRadius: BorderRadius.circular(8),
+                ),
+                Expanded(
+                  flex: 4,
+                  child: Text(
+                    player.name,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
                     ),
-                    child: Center(
-                      child: Text(
-                        player.name,
-                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                      ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Expanded(
+                  flex: 3,
+                  child: Text(
+                    fromClub?.name ?? '-',
+                    style: const TextStyle(color: Colors.white70, fontSize: 12),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 4),
+                  child: Icon(
+                    Icons.arrow_right_alt,
+                    color: Colors.white12,
+                    size: 14,
+                  ),
+                ),
+                Expanded(
+                  flex: 3,
+                  child: Text(
+                    toClub?.name ?? '-',
+                    style: const TextStyle(color: Colors.white70, fontSize: 12),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Expanded(
+                  flex: 3,
+                  child: Text(
+                    _formatCurrency(transfer.feeAmount.toInt()),
+                    textAlign: TextAlign.right,
+                    style: const TextStyle(
+                      color: Color(0xFF64FFDA),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         );
       },
     );
   }
+}
 
-  String _formatCurrency(int value) {
-    if (value >= 1000000) {
-      return '€${(value / 1000000).toStringAsFixed(1)}M';
-    } else if (value >= 1000) {
-      return '€${(value / 1000).toStringAsFixed(0)}K';
-    }
-    return '€$value';
+class _ActiveOfferRow extends ConsumerWidget {
+  final TransferOffer offer;
+
+  const _ActiveOfferRow({required this.offer});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final fromClubFuture = ref
+        .watch(clubRepositoryProvider)
+        .getClubById(offer.fromClubId);
+    final playerFuture = ref
+        .watch(playerRepositoryProvider)
+        .getPlayerById(offer.playerId);
+
+    return FutureBuilder(
+      future: Future.wait([fromClubFuture, playerFuture]),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) return const SizedBox();
+        final fromClub = (snapshot.data![0] as dynamic).fold(
+          (l) => null,
+          (r) => r,
+        );
+        final player = (snapshot.data![1] as dynamic).fold(
+          (l) => null,
+          (r) => r,
+        );
+
+        return Container(
+          margin: const EdgeInsets.only(bottom: 8),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1E1E1E),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.white.withOpacity(0.05)),
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.pending, color: Colors.amber, size: 20),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      player?.name ?? 'Unknown',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      'From ${fromClub?.name ?? 'Unknown'}',
+                      style: const TextStyle(
+                        color: Colors.white54,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Text(
+                _formatCurrency(offer.offerAmount),
+                style: const TextStyle(
+                  color: Colors.amber,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
+}
+
+String _formatCurrency(int value) {
+  if (value >= 1000000) return '€${(value / 1000000).toStringAsFixed(1)}M';
+  if (value >= 1000) return '€${(value / 1000).toStringAsFixed(0)}K';
+  return '€$value';
 }
