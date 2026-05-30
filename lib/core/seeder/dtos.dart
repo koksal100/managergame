@@ -1,5 +1,3 @@
-import '../../features/players/domain/enums/player_position.dart';
-
 class CountryDTO {
   final String name;
   final String code;
@@ -7,8 +5,8 @@ class CountryDTO {
   final String nameSource;
 
   CountryDTO({
-    required this.name, 
-    required this.code, 
+    required this.name,
+    required this.code,
     required this.reputation,
     required this.nameSource,
   });

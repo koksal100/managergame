@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/presentation/widgets/game_button.dart'; // Adjust path if needed
 import '../../../players/domain/entities/player.dart';
 import '../../../players/domain/entities/player_filter.dart';
 import '../../../players/presentation/providers/player_provider.dart';
@@ -20,11 +19,8 @@ class ScoutingPage extends ConsumerWidget {
         fit: StackFit.expand,
         children: [
           // Background Image
-          Image.asset(
-            'assets/images/scout_background.png',
-            fit: BoxFit.cover,
-          ),
-          
+          Image.asset('assets/images/scout_background.png', fit: BoxFit.cover),
+
           // Overlay Gradient
           Container(
             decoration: BoxDecoration(
@@ -43,7 +39,6 @@ class ScoutingPage extends ConsumerWidget {
           Column(
             children: [
               const SizedBox(height: 50), // Spacing for AppBar
-
               // Search Bar & Filter
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -54,7 +49,8 @@ class ScoutingPage extends ConsumerWidget {
                         onChanged: (value) {
                           // Update only name part of filter
                           final currentFilter = ref.read(playerFilterProvider);
-                          ref.read(playerFilterProvider.notifier).state = currentFilter.copyWith(nameQuery: value);
+                          ref.read(playerFilterProvider.notifier).state =
+                              currentFilter.copyWith(nameQuery: value);
                         },
                         style: const TextStyle(color: Colors.white),
                         decoration: InputDecoration(
@@ -62,7 +58,10 @@ class ScoutingPage extends ConsumerWidget {
                           hintStyle: const TextStyle(color: Colors.white54),
                           filled: true,
                           fillColor: Colors.white.withOpacity(0.1),
-                          prefixIcon: const Icon(Icons.search, color: Colors.white54),
+                          prefixIcon: const Icon(
+                            Icons.search,
+                            color: Colors.white54,
+                          ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide.none,
@@ -79,7 +78,10 @@ class ScoutingPage extends ConsumerWidget {
                         border: Border.all(color: Colors.teal.withOpacity(0.5)),
                       ),
                       child: IconButton(
-                        icon: const Icon(Icons.filter_list, color: Colors.tealAccent),
+                        icon: const Icon(
+                          Icons.filter_list,
+                          color: Colors.tealAccent,
+                        ),
                         onPressed: () {
                           showModalBottomSheet(
                             context: context,
@@ -96,18 +98,45 @@ class ScoutingPage extends ConsumerWidget {
 
               // Sorting Headers Row
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 10,
+                ),
                 child: Row(
                   children: [
                     _buildSortHeader(ref, 'Name', PlayerSortType.name),
                     const SizedBox(width: 8),
-                    _buildSortHeader(ref, 'Age', PlayerSortType.age, flex: 0, width: 40),
+                    _buildSortHeader(
+                      ref,
+                      'Age',
+                      PlayerSortType.age,
+                      flex: 0,
+                      width: 40,
+                    ),
                     const SizedBox(width: 8),
-                    _buildSortHeader(ref, 'CA', PlayerSortType.ca, flex: 0, width: 40),
+                    _buildSortHeader(
+                      ref,
+                      'CA',
+                      PlayerSortType.ca,
+                      flex: 0,
+                      width: 40,
+                    ),
                     const SizedBox(width: 8),
-                    _buildSortHeader(ref, 'PA', PlayerSortType.pa, flex: 0, width: 40),
+                    _buildSortHeader(
+                      ref,
+                      'PA',
+                      PlayerSortType.pa,
+                      flex: 0,
+                      width: 40,
+                    ),
                     const SizedBox(width: 8),
-                    _buildSortHeader(ref, 'Value', PlayerSortType.marketValue, flex: 0, width: 60), // Added Value Sort
+                    _buildSortHeader(
+                      ref,
+                      'Value',
+                      PlayerSortType.marketValue,
+                      flex: 0,
+                      width: 60,
+                    ), // Added Value Sort
                     const SizedBox(width: 32), // Space for arrow icon
                   ],
                 ),
@@ -126,7 +155,10 @@ class ScoutingPage extends ConsumerWidget {
                       );
                     }
                     return ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 4,
+                      ),
                       itemCount: players.length,
                       itemBuilder: (context, index) {
                         final player = players[index];
@@ -134,9 +166,14 @@ class ScoutingPage extends ConsumerWidget {
                       },
                     );
                   },
-                  loading: () => const Center(child: CircularProgressIndicator(color: Colors.teal)),
+                  loading: () => const Center(
+                    child: CircularProgressIndicator(color: Colors.teal),
+                  ),
                   error: (err, stack) => Center(
-                    child: Text('Error: $err', style: const TextStyle(color: Colors.redAccent)),
+                    child: Text(
+                      'Error: $err',
+                      style: const TextStyle(color: Colors.redAccent),
+                    ),
                   ),
                 ),
               ),
@@ -169,12 +206,16 @@ class ScoutingPage extends ConsumerWidget {
             CircleAvatar(
               backgroundColor: Colors.blueGrey.shade900,
               child: Text(
-                player.position, 
-                style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                player.position,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
             const SizedBox(width: 16),
-            
+
             // Player Info
             Expanded(
               child: Column(
@@ -204,13 +245,20 @@ class ScoutingPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildSortHeader(WidgetRef ref, String text, PlayerSortType type, {int flex = 1, double? width}) {
+  Widget _buildSortHeader(
+    WidgetRef ref,
+    String text,
+    PlayerSortType type, {
+    int flex = 1,
+    double? width,
+  }) {
     final currentFilter = ref.watch(playerFilterProvider);
     final isSelected = currentFilter.sortType == type;
     final isAscending = currentFilter.ascending;
-    
+
     Widget content = Row(
-      mainAxisAlignment: MainAxisAlignment.center, // Center text in fixed width containers
+      mainAxisAlignment:
+          MainAxisAlignment.center, // Center text in fixed width containers
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
@@ -218,7 +266,7 @@ class ScoutingPage extends ConsumerWidget {
           style: TextStyle(
             color: isSelected ? Colors.tealAccent : Colors.white70,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-            fontSize: 12
+            fontSize: 12,
           ),
         ),
         if (isSelected)
@@ -226,7 +274,7 @@ class ScoutingPage extends ConsumerWidget {
             isAscending ? Icons.arrow_drop_up : Icons.arrow_drop_down,
             color: Colors.tealAccent,
             size: 16,
-          )
+          ),
       ],
     );
 
@@ -258,7 +306,7 @@ class ScoutingPage extends ConsumerWidget {
       },
       child: content,
     );
-    
+
     // Apply Size Constraints Last
     if (flex > 0) {
       return Expanded(flex: flex, child: clickableContent);

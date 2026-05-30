@@ -1,24 +1,25 @@
-
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/providers/repository_providers.dart';
 import '../../domain/entities/player.dart';
 import '../../domain/entities/player_history.dart';
-import '../../../players/presentation/providers/player_provider.dart';
 
 // Provider to fetch value history
-final playerValueHistoryProvider = FutureProvider.family<List<PlayerValueHistory>, int>((ref, playerId) async {
-  final repository = ref.read(playerRepositoryProvider);
-  final result = await repository.getValueHistory(playerId);
-  return result.fold((l) => [], (r) => r);
-});
+final playerValueHistoryProvider =
+    FutureProvider.family<List<PlayerValueHistory>, int>((ref, playerId) async {
+      final repository = ref.read(playerRepositoryProvider);
+      final result = await repository.getValueHistory(playerId);
+      return result.fold((l) => [], (r) => r);
+    });
 
 // Provider to fetch CA history
-final playerCaHistoryProvider = FutureProvider.family<List<PlayerCaHistory>, int>((ref, playerId) async {
-  final repository = ref.read(playerRepositoryProvider);
-  final result = await repository.getCaHistory(playerId);
-  return result.fold((l) => [], (r) => r);
-});
+final playerCaHistoryProvider =
+    FutureProvider.family<List<PlayerCaHistory>, int>((ref, playerId) async {
+      final repository = ref.read(playerRepositoryProvider);
+      final result = await repository.getCaHistory(playerId);
+      return result.fold((l) => [], (r) => r);
+    });
 
 class PlayerHistoryTab extends ConsumerWidget {
   final Player player;
@@ -43,7 +44,12 @@ class PlayerHistoryTab extends ConsumerWidget {
             child: caHistory.when(
               data: (data) => _buildCaChart(data),
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (err, stack) => Center(child: Text('Error: $err', style: const TextStyle(color: Colors.white))),
+              error: (err, stack) => Center(
+                child: Text(
+                  'Error: $err',
+                  style: const TextStyle(color: Colors.white),
+                ),
+              ),
             ),
           ),
           const SizedBox(height: 16),
@@ -54,7 +60,12 @@ class PlayerHistoryTab extends ConsumerWidget {
             child: valueHistory.when(
               data: (data) => _buildValueChart(data),
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (err, stack) => Center(child: Text('Error: $err', style: const TextStyle(color: Colors.white))),
+              error: (err, stack) => Center(
+                child: Text(
+                  'Error: $err',
+                  style: const TextStyle(color: Colors.white),
+                ),
+              ),
             ),
           ),
         ],
@@ -75,12 +86,15 @@ class PlayerHistoryTab extends ConsumerWidget {
   }
 
   Widget _buildCaChart(List<PlayerCaHistory> history) {
-    if (history.isEmpty) return const Center(child: Text("No data yet.", style: TextStyle(color: Colors.white54)));
+    if (history.isEmpty)
+      return const Center(
+        child: Text("No data yet.", style: TextStyle(color: Colors.white54)),
+      );
 
     // Create spots
     // X axis: sequential index (could be time, but simple index is robust)
     // Or better: (season * 52 + week)
-    
+
     // Sort just in case
     // history.sort((a, b) => (a.season * 52 + a.week).compareTo(b.season * 52 + b.week));
 
@@ -90,16 +104,28 @@ class PlayerHistoryTab extends ConsumerWidget {
 
     return LineChart(
       LineChartData(
-        gridData: FlGridData(show: true, drawVerticalLine: false, getDrawingHorizontalLine: (value) => FlLine(color: Colors.white10, strokeWidth: 1)),
+        gridData: FlGridData(
+          show: true,
+          drawVerticalLine: false,
+          getDrawingHorizontalLine: (value) =>
+              FlLine(color: Colors.white10, strokeWidth: 1),
+        ),
         titlesData: FlTitlesData(
           show: true,
-          rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          rightTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          topTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
               reservedSize: 30,
-              interval: max(1, (history.length / 5).toDouble()), // Show ~5 labels
+              interval: max(
+                1,
+                (history.length / 5).toDouble(),
+              ), // Show ~5 labels
               getTitlesWidget: (value, meta) {
                 final index = value.toInt();
                 if (index >= 0 && index < history.length) {
@@ -108,7 +134,10 @@ class PlayerHistoryTab extends ConsumerWidget {
                     padding: const EdgeInsets.only(top: 8.0),
                     child: Text(
                       "S${h.season}W${h.week}",
-                      style: const TextStyle(color: Colors.white54, fontSize: 10),
+                      style: const TextStyle(
+                        color: Colors.white54,
+                        fontSize: 10,
+                      ),
                     ),
                   );
                 }
@@ -122,7 +151,10 @@ class PlayerHistoryTab extends ConsumerWidget {
               interval: 5, // CA interval
               reservedSize: 40,
               getTitlesWidget: (value, meta) {
-                return Text(value.toInt().toString(), style: const TextStyle(color: Colors.white54, fontSize: 10));
+                return Text(
+                  value.toInt().toString(),
+                  style: const TextStyle(color: Colors.white54, fontSize: 10),
+                );
               },
             ),
           ),
@@ -151,7 +183,13 @@ class PlayerHistoryTab extends ConsumerWidget {
   }
 
   Widget _buildValueChart(List<PlayerValueHistory> history) {
-    if (history.isEmpty) return const Center(child: Text("No history data.", style: TextStyle(color: Colors.white54)));
+    if (history.isEmpty)
+      return const Center(
+        child: Text(
+          "No history data.",
+          style: TextStyle(color: Colors.white54),
+        ),
+      );
 
     final spots = history.asMap().entries.map((e) {
       return FlSpot(e.key.toDouble(), e.value.value);
@@ -159,25 +197,37 @@ class PlayerHistoryTab extends ConsumerWidget {
 
     return LineChart(
       LineChartData(
-        gridData: FlGridData(show: true, drawVerticalLine: false, getDrawingHorizontalLine: (value) => FlLine(color: Colors.white10, strokeWidth: 1)),
+        gridData: FlGridData(
+          show: true,
+          drawVerticalLine: false,
+          getDrawingHorizontalLine: (value) =>
+              FlLine(color: Colors.white10, strokeWidth: 1),
+        ),
         titlesData: FlTitlesData(
           show: true,
-          rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          rightTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          topTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
               reservedSize: 30,
-              interval: max(1, (history.length / 5).toDouble()), 
+              interval: max(1, (history.length / 5).toDouble()),
               getTitlesWidget: (value, meta) {
                 final index = value.toInt();
                 if (index >= 0 && index < history.length) {
                   final h = history[index];
-                   return Padding(
+                  return Padding(
                     padding: const EdgeInsets.only(top: 8.0),
                     child: Text(
                       "S${h.season}W${h.week}",
-                      style: const TextStyle(color: Colors.white54, fontSize: 10),
+                      style: const TextStyle(
+                        color: Colors.white54,
+                        fontSize: 10,
+                      ),
                     ),
                   );
                 }
@@ -185,17 +235,27 @@ class PlayerHistoryTab extends ConsumerWidget {
               },
             ),
           ),
-           leftTitles: AxisTitles(
+          leftTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
               reservedSize: 50, // More space for Value
               getTitlesWidget: (value, meta) {
-                if (value == 0) return const Text('0', style: TextStyle(color: Colors.white54, fontSize: 10));
+                if (value == 0)
+                  return const Text(
+                    '0',
+                    style: TextStyle(color: Colors.white54, fontSize: 10),
+                  );
                 // Simplify large numbers
                 if (value >= 1000000) {
-                     return Text('${(value/1000000).toStringAsFixed(1)}M', style: const TextStyle(color: Colors.white54, fontSize: 10));
+                  return Text(
+                    '${(value / 1000000).toStringAsFixed(1)}M',
+                    style: const TextStyle(color: Colors.white54, fontSize: 10),
+                  );
                 }
-                 return Text('${(value/1000).toStringAsFixed(0)}K', style: const TextStyle(color: Colors.white54, fontSize: 10));
+                return Text(
+                  '${(value / 1000).toStringAsFixed(0)}K',
+                  style: const TextStyle(color: Colors.white54, fontSize: 10),
+                );
               },
             ),
           ),
@@ -203,7 +263,7 @@ class PlayerHistoryTab extends ConsumerWidget {
         borderData: FlBorderData(show: false),
         minX: 0,
         maxX: (history.length - 1).toDouble(),
-         // Auto-scale Y
+        // Auto-scale Y
         lineBarsData: [
           LineChartBarData(
             spots: spots,
@@ -212,7 +272,7 @@ class PlayerHistoryTab extends ConsumerWidget {
             barWidth: 3,
             isStrokeCapRound: true,
             dotData: const FlDotData(show: true),
-             belowBarData: BarAreaData(
+            belowBarData: BarAreaData(
               show: true,
               color: Colors.orangeAccent.withOpacity(0.1),
             ),

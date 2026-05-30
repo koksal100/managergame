@@ -1,30 +1,25 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:managergame/main.dart';
+import 'package:managergame/core/models/game_time.dart';
+import 'package:managergame/features/players/domain/services/player_value_calculator.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  test('game time value equality works', () {
+    expect(const GameTime(1, 12), equals(const GameTime(1, 12)));
+    expect(const GameTime(1, 12), isNot(equals(const GameTime(2, 12))));
+  });
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+  test('players aged 33 and over receive the veteran value discount', () {
+    final age32Value = PlayerValueCalculator.calculateMarketValue(
+      80,
+      32,
+      'MID',
+    );
+    final age33Value = PlayerValueCalculator.calculateMarketValue(
+      80,
+      33,
+      'MID',
+    );
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    expect(age33Value, lessThan(age32Value));
   });
 }

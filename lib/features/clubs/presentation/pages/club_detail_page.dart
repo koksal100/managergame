@@ -3,56 +3,47 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../players/presentation/providers/player_provider.dart';
 import '../../../players/presentation/widgets/player_detail_dialog.dart';
 import '../widgets/club_transfer_history.dart';
-import '../../../clubs/domain/entities/club.dart';
 import '../../providers/club_provider.dart';
-import '../../../../core/database/app_database.dart' hide Club; // HIDE Club to avoid ambiguity
-
 
 class ClubDetailPage extends ConsumerStatefulWidget {
   final int clubId;
   final String clubName;
 
-  const ClubDetailPage({super.key, required this.clubId, required this.clubName});
+  const ClubDetailPage({
+    super.key,
+    required this.clubId,
+    required this.clubName,
+  });
 
   @override
   ConsumerState<ClubDetailPage> createState() => _ClubDetailPageState();
 }
 
-class _ClubDetailPageState extends ConsumerState<ClubDetailPage> with SingleTickerProviderStateMixin {
+class _ClubDetailPageState extends ConsumerState<ClubDetailPage>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  Club? _clubDetails;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    _loadClubDetails();
-  }
-
-  Future<void> _loadClubDetails() async {
-    // TODO: Use a proper provider for this
-    // Quick fetch to get budgets
-    // Assuming GetIt or global access for quicker implementation in this refactor step
-    // But since I don't see GetIt setup in file list, I'll rely on the fact that if we are here
-    // we probably can use a provider if one existed.
-    // Ideally: ref.read(clubProvider(widget.clubId))
-    
-    // For now, I will assume we can't easily fetch single club without a Repo provider, 
-    // so I will leave budget as "Loading..." or pass it if possible. 
-    // Actually, I can use the existing club list provider?
-    // Let's create a temporary solution:
-    // We will just show the structure first.
   }
 
   @override
   Widget build(BuildContext context) {
     // We can try to find the club from the list of all clubs if it's cached?
     // Or just fetch it.
-    
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: Text(widget.clubName, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        title: Text(
+          widget.clubName,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
@@ -75,10 +66,7 @@ class _ClubDetailPageState extends ConsumerState<ClubDetailPage> with SingleTick
         fit: StackFit.expand,
         children: [
           // Background
-          Image.asset(
-            'assets/images/background.png',
-            fit: BoxFit.cover,
-          ),
+          Image.asset('assets/images/background.png', fit: BoxFit.cover),
           Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -94,16 +82,15 @@ class _ClubDetailPageState extends ConsumerState<ClubDetailPage> with SingleTick
 
           // Content
           Padding(
-            padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top + kToolbarHeight + 50), 
+            padding: EdgeInsets.only(
+              top: MediaQuery.of(context).padding.top + kToolbarHeight + 50,
+            ),
             child: Column(
               children: [
                 Expanded(
                   child: TabBarView(
                     controller: _tabController,
-                    children: [
-                      _buildSquadTab(),
-                      _buildTransfersTab(),
-                    ],
+                    children: [_buildSquadTab(), _buildTransfersTab()],
                   ),
                 ),
               ],
@@ -133,12 +120,22 @@ class _ClubDetailPageState extends ConsumerState<ClubDetailPage> with SingleTick
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            _buildInfoItem("Transfer Budget", _formatCurrency(club.transferBudget.toInt())),
-            _buildInfoItem("Wage Budget", "${_formatCurrency(club.wageBudget.toInt())}/w"),
+            _buildInfoItem(
+              "Transfer Budget",
+              _formatCurrency(club.transferBudget.toInt()),
+            ),
+            _buildInfoItem(
+              "Wage Budget",
+              "${_formatCurrency(club.wageBudget.toInt())}/w",
+            ),
           ],
         ),
       ),
-      loading: () => Container(padding: const EdgeInsets.all(16), color: Colors.black45, child: const Center(child: CircularProgressIndicator())),
+      loading: () => Container(
+        padding: const EdgeInsets.all(16),
+        color: Colors.black45,
+        child: const Center(child: CircularProgressIndicator()),
+      ),
       error: (_, __) => const SizedBox.shrink(),
     );
   }
@@ -146,9 +143,19 @@ class _ClubDetailPageState extends ConsumerState<ClubDetailPage> with SingleTick
   Widget _buildInfoItem(String label, String value) {
     return Column(
       children: [
-        Text(label, style: const TextStyle(color: Colors.white70, fontSize: 12)),
+        Text(
+          label,
+          style: const TextStyle(color: Colors.white70, fontSize: 12),
+        ),
         const SizedBox(height: 4),
-        Text(value, style: const TextStyle(color: Colors.greenAccent, fontWeight: FontWeight.bold, fontSize: 16)),
+        Text(
+          value,
+          style: const TextStyle(
+            color: Colors.greenAccent,
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
       ],
     );
   }
@@ -159,7 +166,12 @@ class _ClubDetailPageState extends ConsumerState<ClubDetailPage> with SingleTick
     return playersAsync.when(
       data: (players) {
         if (players.isEmpty) {
-          return const Center(child: Text('No players found', style: TextStyle(color: Colors.white)));
+          return const Center(
+            child: Text(
+              'No players found',
+              style: TextStyle(color: Colors.white),
+            ),
+          );
         }
         return ListView.builder(
           padding: const EdgeInsets.all(16),
@@ -195,11 +207,15 @@ class _ClubDetailPageState extends ConsumerState<ClubDetailPage> with SingleTick
                       ),
                       child: Text(
                         player.position.substring(0, 1),
-                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 16),
-                    
+
                     // Name and Age
                     Expanded(
                       child: Column(
@@ -207,17 +223,28 @@ class _ClubDetailPageState extends ConsumerState<ClubDetailPage> with SingleTick
                         children: [
                           Text(
                             player.name,
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
                           ),
-                            Text(
+                          Text(
                             'Age: ${player.age} | Rat: ${player.ca} | Val: ${_formatCurrency(player.marketValue)}',
-                            style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 12),
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.6),
+                              fontSize: 12,
+                            ),
                           ),
                         ],
                       ),
                     ),
-                    
-                    const Icon(Icons.info_outline, color: Colors.white54, size: 20),
+
+                    const Icon(
+                      Icons.info_outline,
+                      color: Colors.white54,
+                      size: 20,
+                    ),
                   ],
                 ),
               ),
@@ -225,16 +252,25 @@ class _ClubDetailPageState extends ConsumerState<ClubDetailPage> with SingleTick
           },
         );
       },
-      loading: () => const Center(child: CircularProgressIndicator(color: Colors.teal)),
-      error: (err, stack) => Center(child: Text('Error: $err', style: const TextStyle(color: Colors.redAccent))),
+      loading: () =>
+          const Center(child: CircularProgressIndicator(color: Colors.teal)),
+      error: (err, stack) => Center(
+        child: Text(
+          'Error: $err',
+          style: const TextStyle(color: Colors.redAccent),
+        ),
+      ),
     );
   }
 
   Color _getPositionColor(String position) {
     if (['GK'].contains(position)) return Colors.orange; // GK: Orange
-    if (['DL', 'DC', 'DR', 'DEF'].contains(position)) return Colors.green; // Defenders: Green
-    if (['DMC', 'MC', 'AMC', 'ML', 'MR', 'MID'].contains(position)) return Colors.amber; // Midfielders: Yellow/Amber
-    if (['AML', 'AMR', 'ST', 'FWD'].contains(position)) return Colors.blue.shade900; // Forwards: Dark Blue
+    if (['DL', 'DC', 'DR', 'DEF'].contains(position))
+      return Colors.green; // Defenders: Green
+    if (['DMC', 'MC', 'AMC', 'ML', 'MR', 'MID'].contains(position))
+      return Colors.amber; // Midfielders: Yellow/Amber
+    if (['AML', 'AMR', 'ST', 'FWD'].contains(position))
+      return Colors.blue.shade900; // Forwards: Dark Blue
     return Colors.grey;
   }
 

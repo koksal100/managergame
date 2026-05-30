@@ -18,7 +18,8 @@ class NegotiationGameDialog extends StatefulWidget {
   State<NegotiationGameDialog> createState() => _NegotiationGameDialogState();
 }
 
-class _NegotiationGameDialogState extends State<NegotiationGameDialog> with SingleTickerProviderStateMixin {
+class _NegotiationGameDialogState extends State<NegotiationGameDialog>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late double _targetStartAngle;
   late double _targetSweepAngle;
@@ -29,7 +30,7 @@ class _NegotiationGameDialogState extends State<NegotiationGameDialog> with Sing
 
   int _requiredHits = 1;
   int _currentHits = 0;
-  
+
   @override
   void initState() {
     super.initState();
@@ -40,42 +41,42 @@ class _NegotiationGameDialogState extends State<NegotiationGameDialog> with Sing
     // Difficulty Calculation
     // Diff: Player Rep - Manager Rep
     int diff = widget.playerReputation - widget.managerReputation;
-    
-    // User Tuning: 
+
+    // User Tuning:
     // Diff <= 60 -> Easy/Normal
     // Diff 100 -> Impossible
 
     int durationMs = 1500;
-    
+
     if (diff <= 20) {
       // EASY (1 Hit)
       _requiredHits = 1;
       _difficultyText = "Easy (1 Hit)";
-      _targetSweepAngle = pi / 3; 
+      _targetSweepAngle = pi / 3;
       durationMs = 1800;
-      
     } else if (diff <= 50) {
       // MEDIUM (2 Hits)
       _requiredHits = 2;
       _difficultyText = "Medium (2 Consecutive Hits)";
       _targetSweepAngle = pi / 4;
       durationMs = 1500;
-      
     } else {
       // HARD (3 Hits)
       _requiredHits = 3;
-      
-      int excess = diff - 50; 
-      durationMs = (1500 - (excess * 20)).clamp(500, 1500);
-      
-      double baseSweep = pi / 4;
-      double reduction = excess * 0.015; 
-      _targetSweepAngle = (baseSweep - reduction).clamp(pi / 36, baseSweep); 
 
-      if (diff >= 90) _difficultyText = "IMPOSSIBLE (3 Hits)";
-      else _difficultyText = "Hard (3 Consecutive Hits)";
+      int excess = diff - 50;
+      durationMs = (1500 - (excess * 20)).clamp(500, 1500);
+
+      double baseSweep = pi / 4;
+      double reduction = excess * 0.015;
+      _targetSweepAngle = (baseSweep - reduction).clamp(pi / 36, baseSweep);
+
+      if (diff >= 90)
+        _difficultyText = "IMPOSSIBLE (3 Hits)";
+      else
+        _difficultyText = "Hard (3 Consecutive Hits)";
     }
-    
+
     _randomizeTarget();
 
     _controller = AnimationController(
@@ -91,7 +92,7 @@ class _NegotiationGameDialogState extends State<NegotiationGameDialog> with Sing
   }
 
   void _randomizeTarget() {
-     _targetStartAngle = Random().nextDouble() * 2 * pi;
+    _targetStartAngle = Random().nextDouble() * 2 * pi;
   }
 
   void _handleTap() {
@@ -101,36 +102,35 @@ class _NegotiationGameDialogState extends State<NegotiationGameDialog> with Sing
     // We normalize everything to 0 -> 2*pi range
     double pointer = _currentAngle % (2 * pi);
     double start = _targetStartAngle;
-    double end = (_targetStartAngle + _targetSweepAngle) % (2 * pi);
 
     bool hit = false;
-    
+
     // Handle wrap-around case
     if (start + _targetSweepAngle > 2 * pi) {
-       double endNormalized = (start + _targetSweepAngle) - (2 * pi);
-       hit = pointer >= start || pointer <= endNormalized;
+      double endNormalized = (start + _targetSweepAngle) - (2 * pi);
+      hit = pointer >= start || pointer <= endNormalized;
     } else {
-       hit = pointer >= start && pointer <= (start + _targetSweepAngle);
+      hit = pointer >= start && pointer <= (start + _targetSweepAngle);
     }
 
     if (hit) {
       _currentHits++;
       if (_currentHits >= _requiredHits) {
-         // WIN
-         _controller.stop();
-         setState(() {
-           _isPlaying = false;
-           _success = true;
-         });
-         Future.delayed(const Duration(milliseconds: 1500), () {
-             if (mounted) Navigator.pop(context, true);
-         });
+        // WIN
+        _controller.stop();
+        setState(() {
+          _isPlaying = false;
+          _success = true;
+        });
+        Future.delayed(const Duration(milliseconds: 1500), () {
+          if (mounted) Navigator.pop(context, true);
+        });
       } else {
-         // CONTINUE STREAK
-         setState(() {
-           // Speed up slightly for next hit? Optional.
-           _randomizeTarget(); // Move target
-         });
+        // CONTINUE STREAK
+        setState(() {
+          // Speed up slightly for next hit? Optional.
+          _randomizeTarget(); // Move target
+        });
       }
     } else {
       // MISS - IMMEDIATE FAILURE
@@ -139,9 +139,9 @@ class _NegotiationGameDialogState extends State<NegotiationGameDialog> with Sing
         _isPlaying = false;
         _success = false;
       });
-      
+
       Future.delayed(const Duration(milliseconds: 1500), () {
-          if (mounted) Navigator.pop(context, false);
+        if (mounted) Navigator.pop(context, false);
       });
     }
   }
@@ -156,7 +156,7 @@ class _NegotiationGameDialogState extends State<NegotiationGameDialog> with Sing
   Widget build(BuildContext context) {
     Color statusColor = Colors.white;
     String statusText = "TAP TO NEGOTIATE";
-    
+
     if (!_isPlaying) {
       if (_success == true) {
         statusColor = Colors.greenAccent;
@@ -167,8 +167,8 @@ class _NegotiationGameDialogState extends State<NegotiationGameDialog> with Sing
       }
     } else {
       // Show progress
-       statusText = "STREAK: $_currentHits / $_requiredHits";
-       if (_currentHits == 0) statusText = "TAP TO START STREAK";
+      statusText = "STREAK: $_currentHits / $_requiredHits";
+      if (_currentHits == 0) statusText = "TAP TO START STREAK";
     }
 
     return Dialog(
@@ -202,17 +202,27 @@ class _NegotiationGameDialogState extends State<NegotiationGameDialog> with Sing
                 ),
                 const SizedBox(height: 5),
                 Container(
-                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                   decoration: BoxDecoration(color: Colors.white10, borderRadius: BorderRadius.circular(4)),
-                   child: Text(
-                     "Difficulty: $_difficultyText",
-                     style: const TextStyle(color: Colors.amberAccent, fontSize: 10, fontWeight: FontWeight.bold),
-                   ),
-                )
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white10,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    "Difficulty: $_difficultyText",
+                    style: const TextStyle(
+                      color: Colors.amberAccent,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
-          
+
           const SizedBox(height: 30),
 
           // GAME CIRCLE
@@ -226,15 +236,16 @@ class _NegotiationGameDialogState extends State<NegotiationGameDialog> with Sing
                 color: Colors.black54,
                 border: Border.all(
                   color: _isPlaying ? Colors.white24 : statusColor,
-                  width: 4
+                  width: 4,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: (_isPlaying ? Colors.tealAccent : statusColor).withOpacity(0.2),
+                    color: (_isPlaying ? Colors.tealAccent : statusColor)
+                        .withOpacity(0.2),
                     blurRadius: 30,
-                    spreadRadius: 5
-                  )
-                ]
+                    spreadRadius: 5,
+                  ),
+                ],
               ),
               child: CustomPaint(
                 painter: _WheelPainter(
@@ -244,13 +255,17 @@ class _NegotiationGameDialogState extends State<NegotiationGameDialog> with Sing
                   success: _success,
                 ),
                 child: Center(
-                  child: _isPlaying 
-                    ? const Icon(Icons.touch_app, color: Colors.white24, size: 40)
-                    : Icon(
-                        _success == true ? Icons.check_circle : Icons.cancel,
-                        color: statusColor,
-                        size: 60,
-                      )
+                  child: _isPlaying
+                      ? const Icon(
+                          Icons.touch_app,
+                          color: Colors.white24,
+                          size: 40,
+                        )
+                      : Icon(
+                          _success == true ? Icons.check_circle : Icons.cancel,
+                          color: statusColor,
+                          size: 60,
+                        ),
                 ),
               ),
             ),
@@ -295,13 +310,13 @@ class _WheelPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = size.width / 2 - 10;
-    
+
     // 1. Draw Background Track
     final trackPaint = Paint()
       ..color = Colors.white10
       ..style = PaintingStyle.stroke
       ..strokeWidth = 20;
-    
+
     canvas.drawCircle(center, radius, trackPaint);
 
     // 2. Draw Target Arc
@@ -310,7 +325,7 @@ class _WheelPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 20
       ..strokeCap = StrokeCap.butt;
-      
+
     canvas.drawArc(
       Rect.fromCircle(center: center, radius: radius),
       targetStartAngle, // Radians
@@ -318,28 +333,28 @@ class _WheelPainter extends CustomPainter {
       false,
       targetPaint,
     );
-    
+
     // 3. Draw Indicator (Spinner)
     // Calculate point on circle
     final indicatorX = center.dx + radius * cos(currentAngle);
     final indicatorY = center.dy + radius * sin(currentAngle);
-    
+
     final indicatorPaint = Paint()
-      ..color = (success != null) 
-          ? (success! ? Colors.green : Colors.red) 
+      ..color = (success != null)
+          ? (success! ? Colors.green : Colors.red)
           : Colors.amber
       ..style = PaintingStyle.fill;
-      
+
     // Draw the pointer tip
     canvas.drawCircle(Offset(indicatorX, indicatorY), 8, indicatorPaint);
-    
+
     // Draw line to center for visual clarity
     final linePaint = Paint()
-      ..color = (success != null) 
+      ..color = (success != null)
           ? (success! ? Colors.green : Colors.red).withOpacity(0.5)
           : Colors.amber.withOpacity(0.5)
       ..strokeWidth = 2;
-      
+
     canvas.drawLine(center, Offset(indicatorX, indicatorY), linePaint);
 
     // Center Hub
@@ -348,6 +363,7 @@ class _WheelPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _WheelPainter oldDelegate) {
-    return oldDelegate.currentAngle != currentAngle || oldDelegate.success != success;
+    return oldDelegate.currentAngle != currentAngle ||
+        oldDelegate.success != success;
   }
 }

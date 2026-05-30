@@ -18,7 +18,6 @@ import '../../features/players/data/datasources/tables/value_histories_table.dar
 import '../../features/players/data/datasources/tables/current_ability_histories_table.dart';
 import '../../features/relationships/data/datasources/tables/relationships_table.dart';
 import '../../features/countries/data/datasources/tables/countries_table.dart';
-import '../../features/home/domain/entities/home_entity.dart';
 
 import '../../features/matches/data/datasources/tables/matches_table.dart';
 import '../../features/performances/data/datasources/tables/performances_table.dart';
@@ -26,24 +25,26 @@ import '../../features/office/data/datasources/tables/agent_staffs_table.dart';
 
 part 'app_database.g.dart';
 
-@DriftDatabase(tables: [
-  Players,
-  Clubs,
-  Agents,
-  Leagues,
-  AgentContracts,
-  ClubContracts,
-  AgentStaffs,
-  Transfers,
-  TransferNeeds,
-  TransferOffers,
-  ValueHistories,
-  CurrentAbilityHistories,
-  Relationships,
-  Countries,
-  Matches,
-  Performances,
-])
+@DriftDatabase(
+  tables: [
+    Players,
+    Clubs,
+    Agents,
+    Leagues,
+    AgentContracts,
+    ClubContracts,
+    AgentStaffs,
+    Transfers,
+    TransferNeeds,
+    TransferOffers,
+    ValueHistories,
+    CurrentAbilityHistories,
+    Relationships,
+    Countries,
+    Matches,
+    Performances,
+  ],
+)
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 

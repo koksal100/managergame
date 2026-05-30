@@ -7,14 +7,15 @@ import '../../domain/entities/player.dart';
 import '../../domain/entities/player_filter.dart';
 import '../../domain/entities/player_history.dart';
 
-
 class PlayerRepositoryImpl implements PlayerRepository {
   final AppDatabase database;
 
   PlayerRepositoryImpl(this.database);
 
   @override
-  Future<Either<Failure, List<Player>>> getPlayers({PlayerFilter? filter}) async {
+  Future<Either<Failure, List<Player>>> getPlayers({
+    PlayerFilter? filter,
+  }) async {
     try {
       final query = database.select(database.players);
 
@@ -32,63 +33,87 @@ class PlayerRepositoryImpl implements PlayerRepository {
           query.where((tbl) => tbl.age.isSmallerOrEqualValue(filter.maxAge!));
         }
         if (filter.minCa != null) {
-          query.where((tbl) => tbl.ca.isBiggerOrEqualValue(filter.minCa!.toDouble()));
+          query.where(
+            (tbl) => tbl.ca.isBiggerOrEqualValue(filter.minCa!.toDouble()),
+          );
         }
         if (filter.minPa != null) {
           query.where((tbl) => tbl.pa.isBiggerOrEqualValue(filter.minPa!));
         }
         if (filter.minMarketValue != null) {
-          query.where((tbl) => tbl.marketValue.isBiggerOrEqualValue(filter.minMarketValue!));
+          query.where(
+            (tbl) =>
+                tbl.marketValue.isBiggerOrEqualValue(filter.minMarketValue!),
+          );
         }
         if (filter.maxMarketValue != null) {
-          query.where((tbl) => tbl.marketValue.isSmallerOrEqualValue(filter.maxMarketValue!));
+          query.where(
+            (tbl) =>
+                tbl.marketValue.isSmallerOrEqualValue(filter.maxMarketValue!),
+          );
         }
         if (filter.hasNoAgent == true) {
-           query.where((tbl) => tbl.agentId.isNull());
+          query.where((tbl) => tbl.agentId.isNull());
         }
       }
 
       // Dynamic Sorting
-      final sortMode = (filter?.ascending ?? false) ? OrderingMode.asc : OrderingMode.desc;
+      final sortMode = (filter?.ascending ?? false)
+          ? OrderingMode.asc
+          : OrderingMode.desc;
       final sortType = filter?.sortType ?? PlayerSortType.ca;
 
       switch (sortType) {
         case PlayerSortType.name:
-          query.orderBy([(t) => OrderingTerm(expression: t.name, mode: sortMode)]);
+          query.orderBy([
+            (t) => OrderingTerm(expression: t.name, mode: sortMode),
+          ]);
           break;
         case PlayerSortType.age:
-          query.orderBy([(t) => OrderingTerm(expression: t.age, mode: sortMode)]);
+          query.orderBy([
+            (t) => OrderingTerm(expression: t.age, mode: sortMode),
+          ]);
           break;
         case PlayerSortType.pa:
-          query.orderBy([(t) => OrderingTerm(expression: t.pa, mode: sortMode)]);
+          query.orderBy([
+            (t) => OrderingTerm(expression: t.pa, mode: sortMode),
+          ]);
           break;
         case PlayerSortType.reputation:
-          query.orderBy([(t) => OrderingTerm(expression: t.reputation, mode: sortMode)]);
+          query.orderBy([
+            (t) => OrderingTerm(expression: t.reputation, mode: sortMode),
+          ]);
           break;
         case PlayerSortType.marketValue:
-          query.orderBy([(t) => OrderingTerm(expression: t.marketValue, mode: sortMode)]);
+          query.orderBy([
+            (t) => OrderingTerm(expression: t.marketValue, mode: sortMode),
+          ]);
           break;
         case PlayerSortType.ca:
-        default:
-          query.orderBy([(t) => OrderingTerm(expression: t.ca, mode: sortMode)]);
+          query.orderBy([
+            (t) => OrderingTerm(expression: t.ca, mode: sortMode),
+          ]);
           break;
       }
 
       final playerRows = await query.get();
 
-      final players = playerRows.map((row) => Player(
-        id: row.id,
-        name: row.name,
-        age: row.age,
-        clubId: row.clubId,
-        agentId: row.agentId,
-        position: row.position,
-        ca: row.ca,
-        pa: row.pa,
-        reputation: row.reputation,
-        marketValue: row.marketValue,
-
-      )).toList();
+      final players = playerRows
+          .map(
+            (row) => Player(
+              id: row.id,
+              name: row.name,
+              age: row.age,
+              clubId: row.clubId,
+              agentId: row.agentId,
+              position: row.position,
+              ca: row.ca,
+              pa: row.pa,
+              reputation: row.reputation,
+              marketValue: row.marketValue,
+            ),
+          )
+          .toList();
       return Right(players);
     } catch (e) {
       return Left(CacheFailure(e.toString()));
@@ -98,26 +123,32 @@ class PlayerRepositoryImpl implements PlayerRepository {
   @override
   Future<Either<Failure, List<Player>>> getPlayersByClubId(int clubId) async {
     try {
-      final query = database.select(database.players)..where((tbl) => tbl.clubId.equals(clubId));
-      
+      final query = database.select(database.players)
+        ..where((tbl) => tbl.clubId.equals(clubId));
+
       // Default sort by CA descending for squad view
-      query.orderBy([(t) => OrderingTerm(expression: t.ca, mode: OrderingMode.desc)]);
+      query.orderBy([
+        (t) => OrderingTerm(expression: t.ca, mode: OrderingMode.desc),
+      ]);
 
       final playerRows = await query.get();
 
-      final players = playerRows.map((row) => Player(
-        id: row.id,
-        name: row.name,
-        age: row.age,
-        clubId: row.clubId,
-        agentId: row.agentId,
-        position: row.position,
-        ca: row.ca,
-        pa: row.pa,
-        reputation: row.reputation,
-        marketValue: row.marketValue,
-
-      )).toList();
+      final players = playerRows
+          .map(
+            (row) => Player(
+              id: row.id,
+              name: row.name,
+              age: row.age,
+              clubId: row.clubId,
+              agentId: row.agentId,
+              position: row.position,
+              ca: row.ca,
+              pa: row.pa,
+              reputation: row.reputation,
+              marketValue: row.marketValue,
+            ),
+          )
+          .toList();
 
       // Define position weights
       final positionWeights = {
@@ -151,26 +182,32 @@ class PlayerRepositoryImpl implements PlayerRepository {
   @override
   Future<Either<Failure, List<Player>>> getPlayersByAgentId(int agentId) async {
     try {
-      final query = database.select(database.players)..where((tbl) => tbl.agentId.equals(agentId));
-      
+      final query = database.select(database.players)
+        ..where((tbl) => tbl.agentId.equals(agentId));
+
       // Sort by CA descending
-      query.orderBy([(t) => OrderingTerm(expression: t.ca, mode: OrderingMode.desc)]);
+      query.orderBy([
+        (t) => OrderingTerm(expression: t.ca, mode: OrderingMode.desc),
+      ]);
 
       final playerRows = await query.get();
 
-      final players = playerRows.map((row) => Player(
-        id: row.id,
-        name: row.name,
-        age: row.age,
-        clubId: row.clubId,
-        agentId: row.agentId,
-        position: row.position,
-        ca: row.ca,
-        pa: row.pa,
-        reputation: row.reputation,
-        marketValue: row.marketValue,
-
-      )).toList();
+      final players = playerRows
+          .map(
+            (row) => Player(
+              id: row.id,
+              name: row.name,
+              age: row.age,
+              clubId: row.clubId,
+              agentId: row.agentId,
+              position: row.position,
+              ca: row.ca,
+              pa: row.pa,
+              reputation: row.reputation,
+              marketValue: row.marketValue,
+            ),
+          )
+          .toList();
 
       return Right(players);
     } catch (e) {
@@ -181,26 +218,28 @@ class PlayerRepositoryImpl implements PlayerRepository {
   @override
   Future<Either<Failure, Player>> getPlayerById(int id) async {
     try {
-      final query = database.select(database.players)..where((tbl) => tbl.id.equals(id));
+      final query = database.select(database.players)
+        ..where((tbl) => tbl.id.equals(id));
       final row = await query.getSingleOrNull();
-      
+
       if (row == null) {
         return const Left(CacheFailure('Player not found'));
       }
 
-      return Right(Player(
-        id: row.id,
-        name: row.name,
-        age: row.age,
-        clubId: row.clubId,
-        agentId: row.agentId,
-        position: row.position,
-        ca: row.ca,
-        pa: row.pa,
-        reputation: row.reputation,
-        marketValue: row.marketValue,
-
-      ));
+      return Right(
+        Player(
+          id: row.id,
+          name: row.name,
+          age: row.age,
+          clubId: row.clubId,
+          agentId: row.agentId,
+          position: row.position,
+          ca: row.ca,
+          pa: row.pa,
+          reputation: row.reputation,
+          marketValue: row.marketValue,
+        ),
+      );
     } catch (e) {
       return Left(CacheFailure(e.toString()));
     }
@@ -219,7 +258,6 @@ class PlayerRepositoryImpl implements PlayerRepository {
         pa: Value(player.pa),
         reputation: Value(player.reputation),
         marketValue: Value(player.marketValue),
-
       );
       final id = await database.into(database.players).insert(companion);
       return Right(id);
@@ -231,7 +269,7 @@ class PlayerRepositoryImpl implements PlayerRepository {
   @override
   Future<Either<Failure, void>> updatePlayer(Player player) async {
     try {
-       final companion = PlayersCompanion(
+      final companion = PlayersCompanion(
         id: Value(player.id),
         name: Value(player.name),
         age: Value(player.age),
@@ -242,7 +280,6 @@ class PlayerRepositoryImpl implements PlayerRepository {
         pa: Value(player.pa),
         reputation: Value(player.reputation),
         marketValue: Value(player.marketValue),
-
       );
       await database.update(database.players).replace(companion);
       return const Right(null);
@@ -254,56 +291,74 @@ class PlayerRepositoryImpl implements PlayerRepository {
   @override
   Future<Either<Failure, void>> deletePlayer(int id) async {
     try {
-      await (database.delete(database.players)
-        ..where((tbl) => tbl.id.equals(id))).go();
+      await (database.delete(
+        database.players,
+      )..where((tbl) => tbl.id.equals(id))).go();
       return const Right(null);
-    } catch (e) {
-      return Left(CacheFailure(e.toString()));
-    }
-  }
-  @override
-  Future<Either<Failure, List<PlayerValueHistory>>> getValueHistory(int playerId) async {
-    try {
-      final query = database.select(database.valueHistories)
-        ..where((t) => t.playerId.equals(playerId))
-        ..orderBy([
-          (t) => OrderingTerm(expression: t.season, mode: OrderingMode.asc),
-          (t) => OrderingTerm(expression: t.week, mode: OrderingMode.asc)
-        ]);
-        
-      final rows = await query.get();
-      
-      return Right(rows.map((row) => PlayerValueHistory(
-        id: row.id,
-        playerId: row.playerId,
-        season: row.season,
-        week: row.week,
-        value: row.value,
-      )).toList());
     } catch (e) {
       return Left(CacheFailure(e.toString()));
     }
   }
 
   @override
-  Future<Either<Failure, List<PlayerCaHistory>>> getCaHistory(int playerId) async {
+  Future<Either<Failure, List<PlayerValueHistory>>> getValueHistory(
+    int playerId,
+  ) async {
+    try {
+      final query = database.select(database.valueHistories)
+        ..where((t) => t.playerId.equals(playerId))
+        ..orderBy([
+          (t) => OrderingTerm(expression: t.season, mode: OrderingMode.asc),
+          (t) => OrderingTerm(expression: t.week, mode: OrderingMode.asc),
+        ]);
+
+      final rows = await query.get();
+
+      return Right(
+        rows
+            .map(
+              (row) => PlayerValueHistory(
+                id: row.id,
+                playerId: row.playerId,
+                season: row.season,
+                week: row.week,
+                value: row.value,
+              ),
+            )
+            .toList(),
+      );
+    } catch (e) {
+      return Left(CacheFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<PlayerCaHistory>>> getCaHistory(
+    int playerId,
+  ) async {
     try {
       final query = database.select(database.currentAbilityHistories)
         ..where((t) => t.playerId.equals(playerId))
         ..orderBy([
           (t) => OrderingTerm(expression: t.season, mode: OrderingMode.asc),
-          (t) => OrderingTerm(expression: t.week, mode: OrderingMode.asc)
+          (t) => OrderingTerm(expression: t.week, mode: OrderingMode.asc),
         ]);
-        
+
       final rows = await query.get();
-      
-      return Right(rows.map((row) => PlayerCaHistory(
-        id: row.id,
-        playerId: row.playerId,
-        season: row.season,
-        week: row.week,
-        ca: row.ca,
-      )).toList());
+
+      return Right(
+        rows
+            .map(
+              (row) => PlayerCaHistory(
+                id: row.id,
+                playerId: row.playerId,
+                season: row.season,
+                week: row.week,
+                ca: row.ca,
+              ),
+            )
+            .toList(),
+      );
     } catch (e) {
       return Left(CacheFailure(e.toString()));
     }

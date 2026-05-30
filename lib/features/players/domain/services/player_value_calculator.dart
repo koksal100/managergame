@@ -28,10 +28,10 @@ class PlayerValueCalculator {
       ageMultiplier = 1.5;
     } else if (age <= 24) {
       ageMultiplier = 1.2;
-    } else if (age >= 30) {
-      ageMultiplier = 0.7;
     } else if (age >= 33) {
       ageMultiplier = 0.4;
+    } else if (age >= 30) {
+      ageMultiplier = 0.7;
     }
 
     // Position Multiplier (Attackers usually worth more)

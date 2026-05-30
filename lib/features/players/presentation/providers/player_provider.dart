@@ -1,22 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:dartz/dartz.dart';
-import '../../../../core/error/failures.dart';
+import '../../../../core/providers/repository_providers.dart';
 import '../../domain/entities/player.dart';
-import '../../domain/repositories/player_repository.dart';
-import '../../data/repositories/player_repository_impl.dart';
-import '../../../../core/database/app_database.dart' hide Player;
-import '../../../../core/providers/database_provider.dart';
 import '../../domain/entities/player_filter.dart';
 
-// Repository Provider
-final playerRepositoryProvider = Provider<PlayerRepository>((ref) {
-  final database = ref.watch(appDatabaseProvider);
-  return PlayerRepositoryImpl(database);
-});
-
-
 // Filter State Provider
-final playerFilterProvider = StateProvider<PlayerFilter>((ref) => const PlayerFilter());
+final playerFilterProvider = StateProvider<PlayerFilter>(
+  (ref) => const PlayerFilter(),
+);
 
 // Filtered Players Provider (Future)
 final filteredPlayersProvider = FutureProvider<List<Player>>((ref) async {
@@ -26,13 +16,17 @@ final filteredPlayersProvider = FutureProvider<List<Player>>((ref) async {
   final result = await repository.getPlayers(filter: filter);
 
   return result.fold(
-    (failure) => <Player>[], // Return empty list on failure or handle error differently
+    (failure) =>
+        <Player>[], // Return empty list on failure or handle error differently
     (players) => players,
   );
 });
 
 // Players by Club Provider (Family)
-final playersByClubProvider = FutureProvider.family<List<Player>, int>((ref, clubId) async {
+final playersByClubProvider = FutureProvider.family<List<Player>, int>((
+  ref,
+  clubId,
+) async {
   final repository = ref.watch(playerRepositoryProvider);
   final result = await repository.getPlayersByClubId(clubId);
   return result.fold(
@@ -42,7 +36,10 @@ final playersByClubProvider = FutureProvider.family<List<Player>, int>((ref, clu
 });
 
 // Players by Agent Provider (Family)
-final playersByAgentProvider = FutureProvider.family<List<Player>, int>((ref, agentId) async {
+final playersByAgentProvider = FutureProvider.family<List<Player>, int>((
+  ref,
+  agentId,
+) async {
   final repository = ref.watch(playerRepositoryProvider);
   final result = await repository.getPlayersByAgentId(agentId);
   return result.fold(

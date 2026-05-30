@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/database/app_database.dart';
+import '../../../../core/providers/repository_providers.dart';
 import '../../providers/transfer_provider.dart';
-import '../../../clubs/providers/club_provider.dart';
-import '../../../players/providers/player_provider.dart';
 import '../../../players/presentation/widgets/player_detail_dialog.dart';
 import '../../../../core/providers/game_date_provider.dart';
 import '../widgets/suggest_player_dialog.dart';
@@ -43,6 +42,8 @@ class TransferMarketPage extends ConsumerWidget {
         appBar: AppBar(
           backgroundColor: const Color(0xFF0F0F0F),
           elevation: 0,
+          foregroundColor: Colors.white,
+          iconTheme: const IconThemeData(color: Colors.white),
           title: const Text(
             'MARKET',
             style: TextStyle(
@@ -176,8 +177,6 @@ class TransferMarketPage extends ConsumerWidget {
         case NeedsColumn.ca:
           comparison = (a.minCa ?? 0).compareTo(b.minCa ?? 0);
           break;
-        default:
-          comparison = 0;
       }
       return isAscending ? comparison : -comparison;
     });
@@ -343,8 +342,9 @@ class TransferMarketPage extends ConsumerWidget {
     WidgetRef ref,
     List<Transfer> transfers,
   ) {
-    if (transfers.isEmpty)
+    if (transfers.isEmpty) {
       return _buildEmptyState(Icons.history_toggle_off, 'No transfer history');
+    }
 
     final sortColumn = ref.watch(historySortColumnProvider);
     final isAscending = ref.watch(historySortAscendingProvider);
@@ -357,7 +357,6 @@ class TransferMarketPage extends ConsumerWidget {
           comparison = a.feeAmount.compareTo(b.feeAmount);
           break;
         case HistoryColumn.date:
-        default:
           final dateA = a.season * 100 + a.week;
           final dateB = b.season * 100 + b.week;
           comparison = dateA.compareTo(dateB);
@@ -470,8 +469,9 @@ class TransferMarketPage extends ConsumerWidget {
   // ===========================================================================
 
   Widget _buildActiveOffersList(List<TransferOffer> offers) {
-    if (offers.isEmpty)
+    if (offers.isEmpty) {
       return _buildEmptyState(Icons.pending_actions, 'No active offers');
+    }
     return ListView.builder(
       padding: const EdgeInsets.all(16),
       itemCount: offers.length,
@@ -608,7 +608,7 @@ class _NeedDataRow extends ConsumerWidget {
                 children: [
                   // --- BURASI GÜNCELLENDİ: Oyuncu Adı (Current Ability) ---
                   Text(
-                    '${player?.name ?? 'Unknown'} (${player?.ca.toString().substring(0,2) ?? '-'})',
+                    '${player?.name ?? 'Unknown'} (${player?.ca.toString().substring(0, 2) ?? '-'})',
                     style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w600,

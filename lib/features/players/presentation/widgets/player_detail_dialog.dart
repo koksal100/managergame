@@ -1,10 +1,9 @@
 import 'dart:ui'; // ImageFilter için gerekli
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/providers/repository_providers.dart';
 import '../../../agents/providers/user_agent_provider.dart';
 import '../../domain/entities/player.dart';
-import '../../../clubs/domain/entities/club.dart';
-import '../../../clubs/providers/club_provider.dart';
 import '../../../contracts/providers/contract_provider.dart';
 import 'negotiation_game_dialog.dart';
 import 'player_history_tab.dart';
@@ -34,7 +33,11 @@ class PlayerDetailDialog extends ConsumerWidget {
               color: _cardBg,
               border: Border.all(color: Colors.white.withOpacity(0.1)),
               boxShadow: [
-                BoxShadow(color: Colors.black.withOpacity(0.5), blurRadius: 30, spreadRadius: 5),
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.5),
+                  blurRadius: 30,
+                  spreadRadius: 5,
+                ),
               ],
             ),
             child: DefaultTabController(
@@ -43,7 +46,7 @@ class PlayerDetailDialog extends ConsumerWidget {
                 children: [
                   // 1. Header Area
                   _buildHeader(player),
-                  
+
                   // Tab Bar
                   const TabBar(
                     indicatorColor: _accentColor,
@@ -87,9 +90,22 @@ class PlayerDetailDialog extends ConsumerWidget {
           // Temel Bilgiler Kartı
           _buildInfoCard([
             _buildStatRow('Age', '${player.age}', icon: Icons.cake),
-            _buildStatRow('Position', player.position, icon: Icons.sports_soccer),
-            _buildStatRow('Market Value', _formatCurrency(player.marketValue), icon: Icons.monetization_on, valueColor: _accentColor),
-            _buildStatRow('Reputation', '${player.reputation} / 100', icon: Icons.trending_up),
+            _buildStatRow(
+              'Position',
+              player.position,
+              icon: Icons.sports_soccer,
+            ),
+            _buildStatRow(
+              'Market Value',
+              _formatCurrency(player.marketValue),
+              icon: Icons.monetization_on,
+              valueColor: _accentColor,
+            ),
+            _buildStatRow(
+              'Reputation',
+              '${player.reputation} / 100',
+              icon: Icons.trending_up,
+            ),
           ]),
 
           const SizedBox(height: 20),
@@ -99,7 +115,11 @@ class PlayerDetailDialog extends ConsumerWidget {
           // Yetenek Barları (FM Style)
           _buildAbilityBar('Current Ability', player.ca),
           const SizedBox(height: 8),
-          _buildAbilityBar('Potential Ability', player.pa.toDouble(), isPotential: true),
+          _buildAbilityBar(
+            'Potential Ability',
+            player.pa.toDouble(),
+            isPotential: true,
+          ),
 
           const SizedBox(height: 20),
           _buildSectionTitle('Career Info'),
@@ -132,7 +152,11 @@ class PlayerDetailDialog extends ConsumerWidget {
         Positioned(
           top: -20,
           right: -20,
-          child: Icon(Icons.shield, size: 150, color: Colors.white.withOpacity(0.05)),
+          child: Icon(
+            Icons.shield,
+            size: 150,
+            color: Colors.white.withOpacity(0.05),
+          ),
         ),
         Padding(
           padding: const EdgeInsets.all(20),
@@ -142,14 +166,23 @@ class PlayerDetailDialog extends ConsumerWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(color: _accentColor, width: 2),
-                  boxShadow: [BoxShadow(color: _accentColor.withOpacity(0.3), blurRadius: 10)],
+                  boxShadow: [
+                    BoxShadow(
+                      color: _accentColor.withOpacity(0.3),
+                      blurRadius: 10,
+                    ),
+                  ],
                 ),
                 child: CircleAvatar(
                   radius: 35,
                   backgroundColor: Colors.grey.shade800,
                   child: Text(
                     player.position,
-                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
@@ -160,20 +193,32 @@ class PlayerDetailDialog extends ConsumerWidget {
                   children: [
                     Text(
                       player.name,
-                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white, height: 1.1),
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        height: 1.1,
+                      ),
                       overflow: TextOverflow.ellipsis,
                       maxLines: 2,
                     ),
                     const SizedBox(height: 4),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
                         'Professional Footballer',
-                        style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 10, letterSpacing: 0.5),
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.8),
+                          fontSize: 10,
+                          letterSpacing: 0.5,
+                        ),
                       ),
                     ),
                   ],
@@ -197,7 +242,13 @@ class PlayerDetailDialog extends ConsumerWidget {
     );
   }
 
-  Widget _buildStatRow(String label, String value, {IconData? icon, Color? valueColor, Widget? trailing}) {
+  Widget _buildStatRow(
+    String label,
+    String value, {
+    IconData? icon,
+    Color? valueColor,
+    Widget? trailing,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
@@ -206,18 +257,39 @@ class PlayerDetailDialog extends ConsumerWidget {
             Icon(icon, size: 16, color: Colors.white54),
             const SizedBox(width: 8),
           ],
-          Text(label, style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 13)),
+          Text(
+            label,
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.6),
+              fontSize: 13,
+            ),
+          ),
           const Spacer(),
-          Text(value, style: TextStyle(color: valueColor ?? Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+          Text(
+            value,
+            style: TextStyle(
+              color: valueColor ?? Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+            ),
+          ),
           if (trailing != null) ...[const SizedBox(width: 8), trailing],
         ],
       ),
     );
   }
 
-  Widget _buildAbilityBar(String label, double value, {bool isPotential = false}) {
+  Widget _buildAbilityBar(
+    String label,
+    double value, {
+    bool isPotential = false,
+  }) {
     final double percentage = (value / 100).clamp(0.0, 1.0);
-    final Color barColor = isPotential ? Colors.amber : (value > 80 ? Colors.greenAccent : (value > 50 ? Colors.blueAccent : Colors.orangeAccent));
+    final Color barColor = isPotential
+        ? Colors.amber
+        : (value > 80
+              ? Colors.greenAccent
+              : (value > 50 ? Colors.blueAccent : Colors.orangeAccent));
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -225,8 +297,18 @@ class PlayerDetailDialog extends ConsumerWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(label, style: const TextStyle(color: Colors.white70, fontSize: 12)),
-            Text("${value.toStringAsFixed(1)}/100", style: TextStyle(color: barColor, fontWeight: FontWeight.bold, fontSize: 12)),
+            Text(
+              label,
+              style: const TextStyle(color: Colors.white70, fontSize: 12),
+            ),
+            Text(
+              "${value.toStringAsFixed(1)}/100",
+              style: TextStyle(
+                color: barColor,
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 6),
@@ -268,13 +350,22 @@ class PlayerDetailDialog extends ConsumerWidget {
           ? Future.value('Free Agent')
           : clubFuture.then((res) => res.fold((l) => 'Unknown', (r) => r.name)),
       onTap: () async {
-        if(player.clubId == null) return;
-        final contract = await ref.read(playerClubContractProvider(player.id).future);
+        if (player.clubId == null) return;
+        final contract = await ref.read(
+          playerClubContractProvider(player.id).future,
+        );
         if (contract != null && ref.context.mounted) {
           _showContractDetails(ref.context, "Club Contract", [
             MapEntry("Weekly Salary", _formatCurrency(contract.weeklySalary)),
-            MapEntry("Duration", "${_formatDate(contract.startDate)} - ${_formatDate(contract.endDate)}"),
-            if (contract.releaseClause != null) MapEntry("Release Clause", _formatCurrency(contract.releaseClause!)),
+            MapEntry(
+              "Duration",
+              "${_formatDate(contract.startDate)} - ${_formatDate(contract.endDate)}",
+            ),
+            if (contract.releaseClause != null)
+              MapEntry(
+                "Release Clause",
+                _formatCurrency(contract.releaseClause!),
+              ),
           ]);
         }
       },
@@ -287,14 +378,23 @@ class PlayerDetailDialog extends ConsumerWidget {
       icon: Icons.person_outline,
       label: 'Agent',
       // Burası gerçek Agent adı çekmek için güncellenmeli, şimdilik statik
-      futureValue: Future.value(player.agentId == 1 ? 'You (My Agency)' : (player.agentId != null ? 'Other Agent' : 'None')),
+      futureValue: Future.value(
+        player.agentId == 1
+            ? 'You (My Agency)'
+            : (player.agentId != null ? 'Other Agent' : 'None'),
+      ),
       onTap: () async {
-        if(player.agentId == null) return;
-        final contract = await ref.read(playerAgentContractProvider(player.id).future);
+        if (player.agentId == null) return;
+        final contract = await ref.read(
+          playerAgentContractProvider(player.id).future,
+        );
         if (contract != null && ref.context.mounted) {
           _showContractDetails(ref.context, "Agent Contract", [
             MapEntry("Fee Percentage", "%${contract.feePercentage}"),
-            MapEntry("Duration", "${_formatDate(contract.startDate)} - ${_formatDate(contract.endDate)}"),
+            MapEntry(
+              "Duration",
+              "${_formatDate(contract.startDate)} - ${_formatDate(contract.endDate)}",
+            ),
           ]);
         }
       },
@@ -328,13 +428,22 @@ class PlayerDetailDialog extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(label, style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11)),
+                    Text(
+                      label,
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.5),
+                        fontSize: 11,
+                      ),
+                    ),
                     FutureBuilder<String>(
                       future: futureValue,
                       builder: (context, snapshot) {
                         return Text(
                           snapshot.data ?? '...',
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
                           overflow: TextOverflow.ellipsis,
                         );
                       },
@@ -368,7 +477,9 @@ class PlayerDetailDialog extends ConsumerWidget {
                 foregroundColor: Colors.white70,
                 side: BorderSide(color: Colors.white.withOpacity(0.2)),
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
               child: const Text('Close'),
             ),
@@ -381,11 +492,15 @@ class PlayerDetailDialog extends ConsumerWidget {
                   ? _handleTerminate(context, ref)
                   : _handleNegotiation(context, ref),
               style: ElevatedButton.styleFrom(
-                backgroundColor: isMyPlayer ? _dangerColor.withOpacity(0.2) : _accentColor,
+                backgroundColor: isMyPlayer
+                    ? _dangerColor.withOpacity(0.2)
+                    : _accentColor,
                 foregroundColor: isMyPlayer ? _dangerColor : Colors.black,
                 elevation: isMyPlayer ? 0 : 5,
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
               child: Text(
                 isMyPlayer ? 'Terminate Contract' : 'Offer Representation',
@@ -407,14 +522,25 @@ class PlayerDetailDialog extends ConsumerWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xFF2C2C2C),
-        title: const Text("Terminate Contract?", style: TextStyle(color: Colors.white)),
-        content: Text("Are you sure you want to release ${player.name}? This cannot be undone.",
-            style: const TextStyle(color: Colors.white70)),
+        title: const Text(
+          "Terminate Contract?",
+          style: TextStyle(color: Colors.white),
+        ),
+        content: Text(
+          "Are you sure you want to release ${player.name}? This cannot be undone.",
+          style: const TextStyle(color: Colors.white70),
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text("Cancel")),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text("Cancel"),
+          ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text("Terminate", style: TextStyle(color: Colors.redAccent)),
+            child: const Text(
+              "Terminate",
+              style: TextStyle(color: Colors.redAccent),
+            ),
           ),
         ],
       ),
@@ -446,7 +572,8 @@ class PlayerDetailDialog extends ConsumerWidget {
 
     // 2. Check Offer Limit
     if (!await notifier.checkCanMakeOffer()) {
-      if (context.mounted) _showSnack(context, 'Weekly Offer Limit Reached!', isError: true);
+      if (context.mounted)
+        _showSnack(context, 'Weekly Offer Limit Reached!', isError: true);
       return;
     }
 
@@ -468,7 +595,8 @@ class PlayerDetailDialog extends ConsumerWidget {
     );
 
     if (success != true) {
-      if (context.mounted) _showSnack(context, 'Negotiation Failed.', isError: true);
+      if (context.mounted)
+        _showSnack(context, 'Negotiation Failed.', isError: true);
       return;
     }
 
@@ -479,12 +607,20 @@ class PlayerDetailDialog extends ConsumerWidget {
         _showSnack(context, error, isError: true);
       } else {
         Navigator.of(context).pop(); // Close Main Dialog
-        _showSnack(context, 'Success! ${player.name} joined your agency.', isError: false);
+        _showSnack(
+          context,
+          'Success! ${player.name} joined your agency.',
+          isError: false,
+        );
       }
     }
   }
 
-  void _showSnack(BuildContext context, String message, {bool isError = false}) {
+  void _showSnack(
+    BuildContext context,
+    String message, {
+    bool isError = false,
+  }) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
@@ -495,29 +631,51 @@ class PlayerDetailDialog extends ConsumerWidget {
     );
   }
 
-  void _showContractDetails(BuildContext context, String title, List<MapEntry<String, String>> details) {
+  void _showContractDetails(
+    BuildContext context,
+    String title,
+    List<MapEntry<String, String>> details,
+  ) {
     showModalBottomSheet(
       context: context,
       backgroundColor: const Color(0xFF1E1E1E),
-      shape: const RoundedRectangleBorder( borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       builder: (c) => Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
-            const Divider(color: Colors.white24, height: 30),
-            ...details.map((e) => Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(e.key, style: const TextStyle(color: Colors.white60)),
-                  Text(e.value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-                ],
+            Text(
+              title,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
               ),
-            )),
+            ),
+            const Divider(color: Colors.white24, height: 30),
+            ...details.map(
+              (e) => Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(e.key, style: const TextStyle(color: Colors.white60)),
+                    Text(
+                      e.value,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
             const SizedBox(height: 20),
           ],
         ),
