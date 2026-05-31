@@ -230,7 +230,7 @@ class ScoutingPage extends ConsumerWidget {
                     ),
                   ),
                   Text(
-                    'Age: ${player.age} • CA: ${player.ca} • Val: ${_formatCurrency(player.marketValue)}',
+                    'Age: ${player.age} • CA: ${player.ca} • PA: ${player.pa} • Val: ${_formatCurrency(player.marketValue)}',
                     style: const TextStyle(color: Colors.white54, fontSize: 12),
                   ),
                 ],

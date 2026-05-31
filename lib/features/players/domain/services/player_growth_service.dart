@@ -19,12 +19,14 @@ class PlayerGrowthService {
       return;
     }
 
-    print('[PlayerGrowthService] Starting growth cycle for Season $season Week $currentWeek');
+    print(
+      '[PlayerGrowthService] Starting growth cycle for Season $season Week $currentWeek',
+    );
     final startTime = DateTime.now();
 
     // 1. Fetch all active players
     final players = await database.select(database.players).get();
-    
+
     // 2. Fetch Performance Stats for the last 5 weeks
     // We need to count matches played per player in the relevant period.
     // Period: [currentWeek - 5, currentWeek - 1] basically.
@@ -34,14 +36,15 @@ class PlayerGrowthService {
     // If it runs at start of Week 14, it processes performance up to Week 13.
     // Let's assume we look at all performances for this season so far, or just last 5 weeks?
     // "son 5 hafta boyunca" -> Last 5 weeks.
-    
+
     final lookbackStartWeek = currentWeek - 5;
-    
-    final performances = await (database.select(database.performances)
-      ..where((p) => p.season.equals(season))
-      ..where((p) => p.week.isBiggerOrEqualValue(lookbackStartWeek))
-      ..where((p) => p.week.isSmallerThanValue(currentWeek)))
-      .get();
+
+    final performances =
+        await (database.select(database.performances)
+              ..where((p) => p.season.equals(season))
+              ..where((p) => p.week.isBiggerOrEqualValue(lookbackStartWeek))
+              ..where((p) => p.week.isSmallerThanValue(currentWeek)))
+            .get();
 
     // Map PlayerId -> Match Count
     final Map<int, int> matchCounts = {};
@@ -69,7 +72,7 @@ class PlayerGrowthService {
       }
 
       final playedMatches = matchCounts[player.id] ?? 0;
-      
+
       // Determine Growth
       // If played >= required -> +1 CA (or fraction since CA is now double?)
       // User said: "oyuncunun currentAbilitysini doubleye çevirelim... ondalıklı hesaplamalar"
@@ -78,22 +81,22 @@ class PlayerGrowthService {
       // Maybe user means +1.0 is the full reward?
       // Standard progression is slower. But let's follow user instruction: "1 artacak".
       // Let's stick to user request.
-      
+
       double change = 0.0;
       if (playedMatches >= requiredMatches) {
-         change = 1.0;
+        change = 1.0;
       } else {
-         // Maybe partial growth or decay?
-         // User didn't specify decay, but usually lack of playtime = stagnation or subtle decay.
-         // Let's implement stagnation (0) for now unless partial is better.
-         // "son 5 hafta boyunca her maçta oynadıysa 1 artacak" implies strict threshold.
-         // But what if 4 matches? 
-         // Let's allow partial growth proportional to playtime? 
-         // "aradaki yaşlarıda da oranlamayı lineer yap" referred to age/matches requirement.
-         // I will strictly Add 1.0 if threshold met, else 0.
-         // Actually, "1 artacak" might be integer +1.
+        // Maybe partial growth or decay?
+        // User didn't specify decay, but usually lack of playtime = stagnation or subtle decay.
+        // Let's implement stagnation (0) for now unless partial is better.
+        // "son 5 hafta boyunca her maçta oynadıysa 1 artacak" implies strict threshold.
+        // But what if 4 matches?
+        // Let's allow partial growth proportional to playtime?
+        // "aradaki yaşlarıda da oranlamayı lineer yap" referred to age/matches requirement.
+        // I will strictly Add 1.0 if threshold met, else 0.
+        // Actually, "1 artacak" might be integer +1.
       }
-      
+
       // Cap CA at PA
       double newCa = player.ca + change;
       if (newCa > player.pa) newCa = player.pa.toDouble();
@@ -101,43 +104,58 @@ class PlayerGrowthService {
       if (newCa > 99) newCa = 99.0;
 
       // Update Database if changed or just periodically update value history
-      if (change > 0 || (currentWeek % 5 == 0)) { // Update value anyway periodically
-         // Recalculate Value
-         final newVal = PlayerValueCalculator.calculateMarketValue(newCa, player.age, player.position);
-         
-         // Update Player
-         await (database.update(database.players)..where((t) => t.id.equals(player.id)))
-           .write(PlayersCompanion(
-             ca: Value(newCa),
-             marketValue: Value(newVal),
-             reputation: Value(newCa.round()), // Rep synonymous with CA often
-           ));
-           
-         // Log CA History
-         await database.into(database.currentAbilityHistories).insert(
-           CurrentAbilityHistoriesCompanion(
-             playerId: Value(player.id),
-             season: Value(season),
-             week: Value(currentWeek),
-             ca: Value(newCa),
-           )
-         );
-         
-         // Log Value History
-         await database.into(database.valueHistories).insert(
-           ValueHistoriesCompanion(
-             playerId: Value(player.id),
-             season: Value(season),
-             week: Value(currentWeek),
-             value: Value(newVal.toDouble()),
-           )
-         );
-         
-         updatedCount++;
+      if (change > 0 || (currentWeek % 5 == 0)) {
+        // Update value anyway periodically
+        // Recalculate Value
+        final newVal = PlayerValueCalculator.calculateMarketValue(
+          newCa,
+          player.age,
+          player.position,
+          pa: player.pa,
+        );
+
+        // Update Player
+        await (database.update(
+          database.players,
+        )..where((t) => t.id.equals(player.id))).write(
+          PlayersCompanion(
+            ca: Value(newCa),
+            marketValue: Value(newVal),
+            reputation: Value(newCa.round()), // Rep synonymous with CA often
+          ),
+        );
+
+        // Log CA History
+        await database
+            .into(database.currentAbilityHistories)
+            .insert(
+              CurrentAbilityHistoriesCompanion(
+                playerId: Value(player.id),
+                season: Value(season),
+                week: Value(currentWeek),
+                ca: Value(newCa),
+              ),
+            );
+
+        // Log Value History
+        await database
+            .into(database.valueHistories)
+            .insert(
+              ValueHistoriesCompanion(
+                playerId: Value(player.id),
+                season: Value(season),
+                week: Value(currentWeek),
+                value: Value(newVal.toDouble()),
+              ),
+            );
+
+        updatedCount++;
       }
     }
 
     final duration = DateTime.now().difference(startTime);
-    print('[PlayerGrowthService] Updated $updatedCount players in ${duration.inMilliseconds}ms');
+    print(
+      '[PlayerGrowthService] Updated $updatedCount players in ${duration.inMilliseconds}ms',
+    );
   }
 }

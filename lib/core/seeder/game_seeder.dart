@@ -23,9 +23,15 @@ class GameSeeder {
     final teamsJson = await _loadJson('assets/data/teams.json');
     final namesJson = await _loadJson('assets/data/names.json');
 
-    final countryDTOs = (countriesJson as List).map((e) => CountryDTO.fromJson(e)).toList();
-    final leagueDTOs = (leaguesJson as List).map((e) => LeagueDTO.fromJson(e)).toList();
-    final teamDTOs = (teamsJson as List).map((e) => TeamDTO.fromJson(e)).toList();
+    final countryDTOs = (countriesJson as List)
+        .map((e) => CountryDTO.fromJson(e))
+        .toList();
+    final leagueDTOs = (leaguesJson as List)
+        .map((e) => LeagueDTO.fromJson(e))
+        .toList();
+    final teamDTOs = (teamsJson as List)
+        .map((e) => TeamDTO.fromJson(e))
+        .toList();
     final namesDTO = NamesDTO.fromJson(namesJson);
 
     // 2. Seed Countries
@@ -40,27 +46,35 @@ class GameSeeder {
     // Optimization: Wrap in transaction to speed up thousands of inserts
     print('[GameSeeder] Starting Transaction for Leagues/Clubs/Players...');
     final startTime = DateTime.now();
-    
+
     await database.transaction(() async {
       await _seedLeaguesAndClubs(leagueDTOs, teamDTOs, namesDTO, countryDTOs);
     });
-    
-    print('[GameSeeder] Transaction completed in ${DateTime.now().difference(startTime).inSeconds}s');
+
+    print(
+      '[GameSeeder] Transaction completed in ${DateTime.now().difference(startTime).inSeconds}s',
+    );
   }
 
   Future<void> _seedAgents() async {
     // Check if we already seeded rivals (check ID 2)
-    final existingRival = await (database.select(database.agents)..where((tbl) => tbl.id.equals(2))).getSingleOrNull();
-    
+    final existingRival = await (database.select(
+      database.agents,
+    )..where((tbl) => tbl.id.equals(2))).getSingleOrNull();
+
     if (existingRival != null) {
-        // If already seeded, load into cache for player assignment
-        final allAgents = await database.select(database.agents).get();
-        _cachedAgents = allAgents.map((a) => AgentsCompanion(
-            id: Value(a.id),
-            name: Value(a.name),
-            reputation: Value(a.reputation),
-        )).toList();
-        return;
+      // If already seeded, load into cache for player assignment
+      final allAgents = await database.select(database.agents).get();
+      _cachedAgents = allAgents
+          .map(
+            (a) => AgentsCompanion(
+              id: Value(a.id),
+              name: Value(a.name),
+              reputation: Value(a.reputation),
+            ),
+          )
+          .toList();
+      return;
     }
 
     final agentsJson = await _loadJson('assets/data/agents.json');
@@ -68,26 +82,26 @@ class GameSeeder {
     final List<AgentsCompanion> newAgents = [];
 
     int currentId = 2; // Start from ID 2 (ID 1 is User)
-    
+
     for (var agentData in agentsList) {
       final name = agentData['name'];
       final reputation = agentData['reputation'] as int;
-      
+
       final level = (reputation / 5).clamp(1, 60).toInt();
       final balance = (reputation * 100000.0) + (_random.nextInt(5000000));
       final negotiation = (reputation / 10).round() + _random.nextInt(5);
       final scouting = (reputation / 10).round() + _random.nextInt(5);
 
       final companion = AgentsCompanion(
-          id: Value(currentId),
-          name: Value(name),
-          balance: Value(balance),
-          reputation: Value(reputation),
-          negotiationSkill: Value(negotiation.clamp(1, 20)),
-          scoutingSkill: Value(scouting.clamp(1, 20)),
-          level: Value(level),
+        id: Value(currentId),
+        name: Value(name),
+        balance: Value(balance),
+        reputation: Value(reputation),
+        negotiationSkill: Value(negotiation.clamp(1, 20)),
+        scoutingSkill: Value(scouting.clamp(1, 20)),
+        level: Value(level),
       );
-      
+
       newAgents.add(companion);
       currentId++;
     }
@@ -101,19 +115,23 @@ class GameSeeder {
   }
 
   Future<void> seedUserAgent() async {
-    final userAgent = await (database.select(database.agents)..where((tbl) => tbl.id.equals(1))).getSingleOrNull();
+    final userAgent = await (database.select(
+      database.agents,
+    )..where((tbl) => tbl.id.equals(1))).getSingleOrNull();
     if (userAgent == null) {
-      await database.into(database.agents).insert(
-        AgentsCompanion(
-          id: const Value(1),
-          name: const Value("Player One"),
-          balance: const Value(0.0),
-          reputation: const Value(0),
-          negotiationSkill: const Value(10), // Base stats
-          scoutingSkill: const Value(10),
-          level: const Value(1),
-        ),
-      );
+      await database
+          .into(database.agents)
+          .insert(
+            AgentsCompanion(
+              id: const Value(1),
+              name: const Value("Player One"),
+              balance: const Value(0.0),
+              reputation: const Value(0),
+              negotiationSkill: const Value(10), // Base stats
+              scoutingSkill: const Value(10),
+              level: const Value(1),
+            ),
+          );
     }
   }
 
@@ -126,34 +144,43 @@ class GameSeeder {
     await database.batch((batch) {
       batch.insertAll(
         database.countries,
-        dtos.map((dto) => CountriesCompanion(
-          name: Value(dto.name),
-          code: Value(dto.code),
-          reputation: Value(dto.reputation),
-        )).toList(),
+        dtos
+            .map(
+              (dto) => CountriesCompanion(
+                name: Value(dto.name),
+                code: Value(dto.code),
+                reputation: Value(dto.reputation),
+              ),
+            )
+            .toList(),
       );
     });
   }
 
   Future<void> _seedLeaguesAndClubs(
-    List<LeagueDTO> leagues, 
-    List<TeamDTO> teams, 
+    List<LeagueDTO> leagues,
+    List<TeamDTO> teams,
     NamesDTO names,
-    List<CountryDTO> countries
+    List<CountryDTO> countries,
   ) async {
     for (var leagueDto in leagues) {
       // Find Country ID
-      final country = await (database.select(database.countries)..where((tbl) => tbl.name.equals(leagueDto.nationality))).getSingleOrNull();
-      
+      final country =
+          await (database.select(database.countries)
+                ..where((tbl) => tbl.name.equals(leagueDto.nationality)))
+              .getSingleOrNull();
+
       if (country != null) {
         // Create League
-        final leagueId = await database.into(database.leagues).insert(
-          LeaguesCompanion(
-            name: Value(leagueDto.name),
-            countryId: Value(country.id),
-            reputation: Value(leagueDto.reputation),
-          ),
-        );
+        final leagueId = await database
+            .into(database.leagues)
+            .insert(
+              LeaguesCompanion(
+                name: Value(leagueDto.name),
+                countryId: Value(country.id),
+                reputation: Value(leagueDto.reputation),
+              ),
+            );
 
         // Create Clubs for this League
         for (var teamName in leagueDto.teamNames) {
@@ -161,25 +188,33 @@ class GameSeeder {
           var teamDetail = teams.firstWhere(
             (t) => t.name == teamName,
             orElse: () => TeamDTO(
-              name: teamName, 
-              reputation: (leagueDto.reputation * 0.9).toInt(), 
-              wageBudget: 10000000, 
-              transferBudget: 5000000
+              name: teamName,
+              reputation: (leagueDto.reputation * 0.9).toInt(),
+              wageBudget: 10000000,
+              transferBudget: 5000000,
             ),
           );
 
-          final clubId = await database.into(database.clubs).insert(
-            ClubsCompanion(
-              name: Value(teamDetail.name),
-              leagueId: Value(leagueId),
-              reputation: Value(teamDetail.reputation),
-              wageBudget: Value(teamDetail.wageBudget),
-              transferBudget: Value(teamDetail.transferBudget),
-            ),
-          );
+          final clubId = await database
+              .into(database.clubs)
+              .insert(
+                ClubsCompanion(
+                  name: Value(teamDetail.name),
+                  leagueId: Value(leagueId),
+                  reputation: Value(teamDetail.reputation),
+                  wageBudget: Value(teamDetail.wageBudget),
+                  transferBudget: Value(teamDetail.transferBudget),
+                ),
+              );
 
           // Generate Players
-          await _generatePlayersForClub(clubId, teamDetail, names, country.name, countries);
+          await _generatePlayersForClub(
+            clubId,
+            teamDetail,
+            names,
+            country.name,
+            countries,
+          );
         }
       }
     }
@@ -188,40 +223,77 @@ class GameSeeder {
   // Obsolete map removed
 
   Future<void> _generatePlayersForClub(
-    int clubId, 
-    TeamDTO club, 
-    NamesDTO names, 
+    int clubId,
+    TeamDTO club,
+    NamesDTO names,
     String countryName,
-    List<CountryDTO> allCountries
+    List<CountryDTO> allCountries,
   ) async {
     // 25 Players total
-    await _createPlayers(clubId, club, PlayerPosition.goalkeeper, 3, names, countryName, allCountries);
-    await _createPlayers(clubId, club, PlayerPosition.defender, 8, names, countryName, allCountries);
-    await _createPlayers(clubId, club, PlayerPosition.midfielder, 8, names, countryName, allCountries);
-    await _createPlayers(clubId, club, PlayerPosition.forward, 6, names, countryName, allCountries);
+    await _createPlayers(
+      clubId,
+      club,
+      PlayerPosition.goalkeeper,
+      3,
+      names,
+      countryName,
+      allCountries,
+    );
+    await _createPlayers(
+      clubId,
+      club,
+      PlayerPosition.defender,
+      8,
+      names,
+      countryName,
+      allCountries,
+    );
+    await _createPlayers(
+      clubId,
+      club,
+      PlayerPosition.midfielder,
+      8,
+      names,
+      countryName,
+      allCountries,
+    );
+    await _createPlayers(
+      clubId,
+      club,
+      PlayerPosition.forward,
+      6,
+      names,
+      countryName,
+      allCountries,
+    );
   }
 
   Future<void> _createPlayers(
-      int clubId,
-      TeamDTO club,
-      PlayerPosition position,
-      int count,
-      NamesDTO names,
-      String clubCountryName,
-      List<CountryDTO> allCountries
-      ) async {
-
+    int clubId,
+    TeamDTO club,
+    PlayerPosition position,
+    int count,
+    NamesDTO names,
+    String clubCountryName,
+    List<CountryDTO> allCountries,
+  ) async {
     for (int i = 0; i < count; i++) {
       // 1. Nationality Logic
       String playerNationality = clubCountryName;
       if (_random.nextInt(100) >= 80) {
-        playerNationality = allCountries[_random.nextInt(allCountries.length)].name;
+        playerNationality =
+            allCountries[_random.nextInt(allCountries.length)].name;
       }
 
       // 2. Name Logic
       final countryDto = allCountries.firstWhere(
-              (c) => c.name == playerNationality,
-          orElse: () => CountryDTO(name: playerNationality, code: 'XX', reputation: 0, nameSource: playerNationality)
+        (c) => c.name == playerNationality,
+        orElse: () => CountryDTO(
+          name: playerNationality,
+          code: 'XX',
+          reputation: 0,
+          nameSource: playerNationality,
+        ),
       );
 
       String nameSource = countryDto.nameSource;
@@ -231,7 +303,8 @@ class GameSeeder {
 
       final nameSet = names.countries[nameSource]!;
       final firstName = nameSet.names[_random.nextInt(nameSet.names.length)];
-      final lastName = nameSet.surnames[_random.nextInt(nameSet.surnames.length)];
+      final lastName =
+          nameSet.surnames[_random.nextInt(nameSet.surnames.length)];
 
       // --- 3. GÜNCELLENMİŞ MATEMATİKSEL MODEL ---
 
@@ -263,17 +336,21 @@ class GameSeeder {
       int ca = rawCa.clamp(57, 96);
 
       // F. PA HESAPLAMA
-      int potentialBonus = 0;
-      if (age < 29) {
-        // Genç oyunculara bonus potansiyel
-        potentialBonus = _random.nextInt(30 - (age - 16));
-      }
-      int pa = (ca + potentialBonus).clamp(ca, 99);
+      final potentialGapRange = _potentialGapRangeForAge(age);
+      final potentialGap =
+          potentialGapRange.min +
+          _random.nextInt(potentialGapRange.max - potentialGapRange.min + 1);
+      int pa = (ca + potentialGap).clamp(ca, 99);
 
       // --- MODEL SONU ---
 
       // G. PİYASA DEĞERİ HESAPLAMA
-      int marketValue = PlayerValueCalculator.calculateMarketValue(ca.toDouble(), age, position.shortName);
+      int marketValue = PlayerValueCalculator.calculateMarketValue(
+        ca.toDouble(),
+        age,
+        position.shortName,
+        pa: pa,
+      );
 
       // --- NEW AGENT ASSIGNMENT LOGIC (Weighted Random) ---
       int? assignedAgentId;
@@ -285,22 +362,22 @@ class GameSeeder {
         // 1. Calculate Weights
         // Weight = 1 / (Distance + 1)^2
         // Distance = |AgentRep - PlayerCA|
-        
+
         Map<int, double> agentWeights = {};
         double totalWeight = 0;
 
         for (var agent in _cachedAgents) {
           int agentRep = agent.reputation.value;
-          
+
           // Players prefer agents slightly better than themselves, but not too high
           // Ideal target is AgentRep = PlayerCA + 5
           double distance = (agentRep - (ca + 5)).abs().toDouble();
-          
+
           // Formula: Higher weight for lower distance
-          // RELAXED FORMULA: Power of 2.0 and base offset of 20.0 
+          // RELAXED FORMULA: Power of 2.0 and base offset of 20.0
           // This creates a much flatter curve, allowing more "reach" for agents
           double weight = 100000.0 / pow(distance + 20.0, 2.0);
-          
+
           agentWeights[agent.id.value] = weight;
           totalWeight += weight;
         }
@@ -316,155 +393,194 @@ class GameSeeder {
             break;
           }
         }
-        
+
         // Fallback (Precision errors)
         assignedAgentId ??= _cachedAgents.first.id.value;
       }
-      
+
       // FALLBACK: If no cached agents (shouldn't happen), use random
       // Or leave null if you want free agents. But for now we assign.
 
-
-      final playerId = await database.into(database.players).insert(
-        PlayersCompanion(
-          name: Value('$firstName $lastName'),
-          age: Value(age),
-          position: Value(position.shortName),
-          clubId: Value(clubId),
-          ca: Value(ca.toDouble()),
-          pa: Value(pa),
-          reputation: Value(ca),
-          marketValue: Value(marketValue),
-          agentId: Value(assignedAgentId),
-        ),
-      );
+      final playerId = await database
+          .into(database.players)
+          .insert(
+            PlayersCompanion(
+              name: Value('$firstName $lastName'),
+              age: Value(age),
+              position: Value(position.shortName),
+              clubId: Value(clubId),
+              ca: Value(ca.toDouble()),
+              pa: Value(pa),
+              reputation: Value(ca),
+              marketValue: Value(marketValue),
+              agentId: Value(assignedAgentId),
+            ),
+          );
 
       // Value History (Initial)
-      await database.into(database.valueHistories).insert(
-        ValueHistoriesCompanion(
-          playerId: Value(playerId),
-          season: const Value(1),
-          week: const Value(1),
-          value: Value(marketValue.toDouble()),
-        ),
-      );
+      await database
+          .into(database.valueHistories)
+          .insert(
+            ValueHistoriesCompanion(
+              playerId: Value(playerId),
+              season: const Value(1),
+              week: const Value(1),
+              value: Value(marketValue.toDouble()),
+            ),
+          );
 
       // CA History (Initial)
-      await database.into(database.currentAbilityHistories).insert(
-        CurrentAbilityHistoriesCompanion(
-          playerId: Value(playerId),
-          season: const Value(1),
-          week: const Value(1),
-          ca: Value(ca.toDouble()),
-        ),
-      );
+      await database
+          .into(database.currentAbilityHistories)
+          .insert(
+            CurrentAbilityHistoriesCompanion(
+              playerId: Value(playerId),
+              season: const Value(1),
+              week: const Value(1),
+              ca: Value(ca.toDouble()),
+            ),
+          );
 
       // --- CONTRACT GENERATION ---
-      
+
       // 1. Club Contract
-      // Salary estimation: ~10-20% of Market Value per year, divided by 52 weeks? 
+      // Salary estimation: ~10-20% of Market Value per year, divided by 52 weeks?
       // Simplified: Market Value / 200 (Roughly)
       int weeklySalary = (marketValue / 200).round();
       if (weeklySalary < 500) weeklySalary = 500; // Minimum wage
-      
+
       // Duration: 1 to 5 years from now
       final now = DateTime.now();
       final contractYears = 1 + _random.nextInt(5);
       final endDate = now.add(Duration(days: 365 * contractYears));
 
-      await database.into(database.clubContracts).insert(
-        ClubContractsCompanion(
-          clubId: Value(clubId),
-          playerId: Value(playerId),
-          weeklySalary: Value(weeklySalary),
-          startDate: Value(now),
-          endDate: Value(endDate),
-          status: const Value('active'),
-          releaseClause: Value((marketValue * 1.5).round()), // Optional
-        ),
-      );
+      await database
+          .into(database.clubContracts)
+          .insert(
+            ClubContractsCompanion(
+              clubId: Value(clubId),
+              playerId: Value(playerId),
+              weeklySalary: Value(weeklySalary),
+              startDate: Value(now),
+              endDate: Value(endDate),
+              status: const Value('active'),
+              releaseClause: Value((marketValue * 1.5).round()), // Optional
+            ),
+          );
 
       // 2. Agent Contract (If assigned)
       if (assignedAgentId != null) {
-        await database.into(database.agentContracts).insert(
-          AgentContractsCompanion(
-             agentId: Value(assignedAgentId),
-             playerId: Value(playerId),
-             startDate: Value(now),
-             endDate: Value(now.add(const Duration(days: 365 * 2))), // Agents usually 2 years
-             feePercentage: const Value(10.0), // Standard 10%
-             wage: const Value(0.0), // Unused legacy field or remove? Keeping for now to avoid compilation error if user hasn't cleaned table
-             releaseClause: const Value(0.0), // Legacy
-             status: const Value('Active'),
-          ),
-        );
+        await database
+            .into(database.agentContracts)
+            .insert(
+              AgentContractsCompanion(
+                agentId: Value(assignedAgentId),
+                playerId: Value(playerId),
+                startDate: Value(now),
+                endDate: Value(
+                  now.add(const Duration(days: 365 * 2)),
+                ), // Agents usually 2 years
+                feePercentage: const Value(10.0), // Standard 10%
+                wage: const Value(
+                  0.0,
+                ), // Unused legacy field or remove? Keeping for now to avoid compilation error if user hasn't cleaned table
+                releaseClause: const Value(0.0), // Legacy
+                status: const Value('Active'),
+              ),
+            );
       }
     }
   }
 
-
-
   Future<void> seedFixtures() async {
     final fixtureJson = await _loadJson('assets/data/fixture.json');
-    final Map<String, dynamic> fixtureData = fixtureJson as Map<String, dynamic>;
+    final Map<String, dynamic> fixtureData =
+        fixtureJson as Map<String, dynamic>;
 
     // Build Cache
     final clubs = await database.select(database.clubs).get();
     final clubCache = {for (var c in clubs) c.name: c.id};
 
     for (var weekStr in fixtureData.keys) {
-        final week = int.tryParse(weekStr) ?? 0;
-        if (week == 0) continue;
+      final week = int.tryParse(weekStr) ?? 0;
+      if (week == 0) continue;
 
-        // Check if week is seeded
-        final existingMatches = await (database.select(database.matches)..where((tbl) => tbl.week.equals(week))).get();
-        if (existingMatches.isNotEmpty) {
-           // Assume seeded or played
-           continue; 
+      // Check if week is seeded
+      final existingMatches = await (database.select(
+        database.matches,
+      )..where((tbl) => tbl.week.equals(week))).get();
+      if (existingMatches.isNotEmpty) {
+        // Assume seeded or played
+        continue;
+      }
+
+      final weekData = fixtureData[weekStr];
+      if (weekData['type'] == 'Match Week' ||
+          weekData['type'] == 'League Match') {
+        final matchesMap = weekData['matches'] as Map<String, dynamic>;
+
+        List<MatchesCompanion> newMatches = [];
+        for (var leagueName in matchesMap.keys) {
+          final matches = matchesMap[leagueName] as List;
+          for (var m in matches) {
+            final homeName = m['home'];
+            final awayName = m['away'];
+            final homeId = clubCache[homeName];
+            final awayId = clubCache[awayName];
+
+            if (homeId != null && awayId != null) {
+              newMatches.add(
+                MatchesCompanion(
+                  homeClubId: Value(homeId),
+                  awayClubId: Value(awayId),
+                  season: Value(1), // Default Season 1
+                  week: Value(week),
+                  isPlayed: Value(false),
+                  homeScore: const Value(null),
+                  awayScore: const Value(null),
+                ),
+              );
+            }
+          }
         }
 
-        final weekData = fixtureData[weekStr];
-        if (weekData['type'] == 'Match Week' || weekData['type'] == 'League Match') {
-             final matchesMap = weekData['matches'] as Map<String, dynamic>;
-             
-             List<MatchesCompanion> newMatches = [];
-             for (var leagueName in matchesMap.keys) {
-                 final matches = matchesMap[leagueName] as List;
-                 for (var m in matches) {
-                     final homeName = m['home'];
-                     final awayName = m['away'];
-                     final homeId = clubCache[homeName];
-                     final awayId = clubCache[awayName];
-
-                     if (homeId != null && awayId != null) {
-                        newMatches.add(MatchesCompanion(
-                           homeClubId: Value(homeId),
-                           awayClubId: Value(awayId),
-                           season: Value(1), // Default Season 1
-                           week: Value(week),
-                           isPlayed: Value(false),
-                           homeScore: const Value(null),
-                           awayScore: const Value(null),
-                        ));
-                     }
-                 }
-             }
-
-             if (newMatches.isNotEmpty) {
-               await database.batch((batch) {
-                 batch.insertAll(database.matches, newMatches);
-               });
-             }
+        if (newMatches.isNotEmpty) {
+          await database.batch((batch) {
+            batch.insertAll(database.matches, newMatches);
+          });
         }
+      }
     }
   }
 
-// Yardımcı Fonksiyon (Aynı kalacak)
+  ({int min, int max}) _potentialGapRangeForAge(int age) {
+    if (age <= 16) return (min: 5, max: 20);
+    if (age <= 18) {
+      final t = (age - 16) / 2;
+      return (min: 5, max: _lerpInt(20, 15, t));
+    }
+    if (age <= 26) {
+      final t = (age - 18) / 8;
+      final minGap = _lerpInt(5, 0, t);
+      final maxGap = _lerpInt(15, 2, t);
+      return (min: minGap, max: max(minGap, maxGap));
+    }
+    if (age <= 30) {
+      final t = (age - 26) / 4;
+      return (min: 0, max: _lerpInt(2, 0, t));
+    }
+    return (min: 0, max: 0);
+  }
+
+  int _lerpInt(int start, int end, double t) {
+    return (start + ((end - start) * t)).round();
+  }
+
+  // Yardımcı Fonksiyon (Aynı kalacak)
   double _nextGaussian(double mean, double stdDev) {
     var u1 = 1.0 - _random.nextDouble();
     var u2 = 1.0 - _random.nextDouble();
     var randStdNormal = sqrt(-2.0 * log(u1)) * sin(2.0 * pi * u2);
     return mean + stdDev * randStdNormal;
   }
-
 }
