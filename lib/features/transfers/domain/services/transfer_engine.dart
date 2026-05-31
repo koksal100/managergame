@@ -121,25 +121,101 @@ class TransferEngine {
           );
     }
 
-    // Create SELL need for worst player (if > 20 players)
+    // Create diversified SELL needs (up to 2 players per window)
+    // to avoid only very low-value players being listed.
     if (players.length > 20) {
-      final sorted = List<Player>.from(players)
-        ..sort((a, b) => a.ca.compareTo(b.ca));
-      final worstPlayer = sorted.first;
+      final avgCa =
+          (players.map((p) => p.ca).reduce((a, b) => a + b) / players.length)
+              .toDouble();
+      final sellCandidates = _pickSellCandidates(
+        players: players,
+        avgCa: avgCa,
+        count: 2,
+      );
 
-      await database
-          .into(database.transferNeeds)
-          .insert(
-            TransferNeedsCompanion(
-              clubId: Value(clubId),
-              type: const Value('sell'),
-              playerToSellId: Value(worstPlayer.id),
-              minimumFee: Value(
-                (worstPlayer.marketValue * 0.7).round(),
-              ), // Accept 70% of market value
-            ),
-          );
+      for (final player in sellCandidates) {
+        await database
+            .into(database.transferNeeds)
+            .insert(
+              TransferNeedsCompanion(
+                clubId: Value(clubId),
+                type: const Value('sell'),
+                playerToSellId: Value(player.id),
+                minimumFee: Value((player.marketValue * 0.8).round()),
+              ),
+            );
+      }
     }
+  }
+
+  List<Player> _pickSellCandidates({
+    required List<Player> players,
+    required double avgCa,
+    required int count,
+  }) {
+    if (players.isEmpty || count <= 0) return [];
+
+    final sortedByValue = List<Player>.from(players)
+      ..sort((a, b) => a.marketValue.compareTo(b.marketValue));
+    final lowIdx = (sortedByValue.length * 0.40).floor().clamp(
+      0,
+      sortedByValue.length - 1,
+    );
+    final highIdx = (sortedByValue.length * 0.80).floor().clamp(
+      0,
+      sortedByValue.length - 1,
+    );
+    final lowCut = sortedByValue[lowIdx].marketValue;
+    final highCut = sortedByValue[highIdx].marketValue;
+
+    final lowRolePool = players
+        .where((p) => p.age >= 29 || p.ca <= (avgCa - 4))
+        .toList();
+    final midValuePool = players
+        .where((p) => p.marketValue >= lowCut && p.marketValue < highCut)
+        .toList();
+    final highValuePool = players
+        .where((p) => p.marketValue >= highCut)
+        .toList();
+
+    final selected = <Player>[];
+    final selectedIds = <int>{};
+
+    Player? pickFrom(List<Player> pool) {
+      final filtered = pool.where((p) => !selectedIds.contains(p.id)).toList();
+      if (filtered.isEmpty) return null;
+      return filtered[_random.nextInt(filtered.length)];
+    }
+
+    for (int i = 0; i < count; i++) {
+      final roll = _random.nextDouble();
+      Player? chosen;
+
+      if (roll < 0.40) {
+        chosen =
+            pickFrom(lowRolePool) ??
+            pickFrom(midValuePool) ??
+            pickFrom(highValuePool);
+      } else if (roll < 0.75) {
+        chosen =
+            pickFrom(midValuePool) ??
+            pickFrom(lowRolePool) ??
+            pickFrom(highValuePool);
+      } else {
+        chosen =
+            pickFrom(highValuePool) ??
+            pickFrom(midValuePool) ??
+            pickFrom(lowRolePool);
+      }
+
+      chosen ??= pickFrom(players);
+      if (chosen == null) break;
+
+      selected.add(chosen);
+      selectedIds.add(chosen.id);
+    }
+
+    return selected;
   }
 
   /// Process offer creation. Each club creates up to 2 offers per day.
