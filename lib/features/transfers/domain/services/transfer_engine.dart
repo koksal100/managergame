@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:drift/drift.dart';
 import '../../../../core/database/app_database.dart';
+import '../../../players/domain/services/player_value_calculator.dart';
 
 /// TransferEngine handles all AI-driven transfer logic.
 /// - Generating transfer needs for clubs
@@ -98,7 +99,14 @@ class TransferEngine {
 
     // Create BUY need for weakest position
     if (weakestPos != null) {
-      final avgCa = lowestAvgCa.round();
+      final avgCaBase = (lowestAvgCa + 2).round();
+      final maxBudget = transferBudget ~/ 2;
+      final budgetBasedCa = _estimateCaFromBudgetAtAge27(
+        budget: maxBudget,
+        positionCategory: weakestPos,
+      );
+      final minCa = ((avgCaBase + budgetBasedCa) / 2).round().clamp(40, 99);
+
       await database
           .into(database.transferNeeds)
           .insert(
@@ -108,12 +116,8 @@ class TransferEngine {
               targetPosition: Value(weakestPos),
               minAge: const Value(18),
               maxAge: const Value(32),
-              minCa: Value(
-                avgCa,
-              ), // Want someone at least as good as current avg
-              maxTransferBudget: Value(
-                transferBudget ~/ 2,
-              ), // Willing to spend half budget
+              minCa: Value(minCa),
+              maxTransferBudget: Value(maxBudget),
               maxWeeklySalary: Value(
                 wageBudget ~/ 25 ~/ 52,
               ), // Roughly 1/25th of annual wage budget per player
@@ -216,6 +220,31 @@ class TransferEngine {
     }
 
     return selected;
+  }
+
+  int _estimateCaFromBudgetAtAge27({
+    required int budget,
+    required String positionCategory,
+  }) {
+    if (budget <= 0) return 40;
+
+    int bestCa = 40;
+    int closestDiff = 1 << 30;
+
+    for (int ca = 40; ca <= 99; ca++) {
+      final value = PlayerValueCalculator.calculateMarketValue(
+        ca.toDouble(),
+        27,
+        positionCategory,
+      );
+      final diff = (value - budget).abs();
+      if (diff < closestDiff) {
+        closestDiff = diff;
+        bestCa = ca;
+      }
+    }
+
+    return bestCa;
   }
 
   /// Process offer creation. Each club creates up to 2 offers per day.

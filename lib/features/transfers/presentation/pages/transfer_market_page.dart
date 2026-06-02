@@ -152,12 +152,15 @@ class TransferMarketPage extends ConsumerWidget {
 
     final sortColumn = ref.watch(needsSortColumnProvider);
     final isAscending = ref.watch(needsSortAscendingProvider);
+    final effectiveSortColumn = isBuy
+        ? sortColumn
+        : (sortColumn == NeedsColumn.fee ? sortColumn : NeedsColumn.fee);
 
     // Sorting Logic
     List<TransferNeed> sortedNeeds = List.from(needs);
     sortedNeeds.sort((a, b) {
       int comparison = 0;
-      switch (sortColumn) {
+      switch (effectiveSortColumn) {
         case NeedsColumn.budget:
           comparison = (a.maxTransferBudget ?? 0).compareTo(
             b.maxTransferBudget ?? 0,
@@ -177,6 +180,11 @@ class TransferMarketPage extends ConsumerWidget {
         case NeedsColumn.ca:
           comparison = (a.minCa ?? 0).compareTo(b.minCa ?? 0);
           break;
+      }
+      if (comparison == 0) {
+        comparison = isBuy
+            ? (a.minCa ?? 0).compareTo(b.minCa ?? 0)
+            : (a.minimumFee ?? 0).compareTo(b.minimumFee ?? 0);
       }
       return isAscending ? comparison : -comparison;
     });
@@ -472,10 +480,13 @@ class TransferMarketPage extends ConsumerWidget {
     if (offers.isEmpty) {
       return _buildEmptyState(Icons.pending_actions, 'No active offers');
     }
+    final sortedOffers = List<TransferOffer>.from(offers)
+      ..sort((a, b) => b.offerAmount.compareTo(a.offerAmount));
     return ListView.builder(
       padding: const EdgeInsets.all(16),
-      itemCount: offers.length,
-      itemBuilder: (context, index) => _ActiveOfferRow(offer: offers[index]),
+      itemCount: sortedOffers.length,
+      itemBuilder: (context, index) =>
+          _ActiveOfferRow(offer: sortedOffers[index]),
     );
   }
 
@@ -542,13 +553,15 @@ class _NeedDataRow extends ConsumerWidget {
             Expanded(
               flex: 3,
               child: Text(
-                club?.name ?? 'Unknown',
+                _formatClubNameForCell(club?.name ?? 'Unknown'),
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w600,
-                  fontSize: 13,
+                  fontSize: 12,
                 ),
-                overflow: TextOverflow.ellipsis,
+                maxLines: 2,
+                softWrap: true,
+                overflow: TextOverflow.fade,
               ),
             ),
             // Position
@@ -608,7 +621,7 @@ class _NeedDataRow extends ConsumerWidget {
                 children: [
                   // --- BURASI GÜNCELLENDİ: Oyuncu Adı (Current Ability) ---
                   Text(
-                    '${player?.name ?? 'Unknown'} (${player?.ca.toString().substring(0, 2) ?? '-'})',
+                    '${player?.name ?? 'Unknown'} (${player?.ca ?? '-'})',
                     style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w600,
@@ -695,6 +708,14 @@ class _NeedDataRow extends ConsumerWidget {
       },
     );
   }
+}
+
+String _formatClubNameForCell(String name) {
+  final words = name.trim().split(RegExp(r'\s+'));
+  if (words.length == 2) {
+    return '${words[0]}\n${words[1]}';
+  }
+  return name;
 }
 
 class _TransferHistoryRow extends ConsumerWidget {
@@ -837,49 +858,92 @@ class _ActiveOfferRow extends ConsumerWidget {
           (r) => r,
         );
 
-        return Container(
-          margin: const EdgeInsets.only(bottom: 8),
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: const Color(0xFF1E1E1E),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.white.withOpacity(0.05)),
-          ),
-          child: Row(
-            children: [
-              const Icon(Icons.pending, color: Colors.amber, size: 20),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+        if (player == null) return const SizedBox();
+
+        final currentClubFuture = player.clubId != null
+            ? ref.watch(clubRepositoryProvider).getClubById(player.clubId!)
+            : Future.value(null);
+
+        return FutureBuilder(
+          future: currentClubFuture,
+          builder: (context, currentClubSnapshot) {
+            final currentClub =
+                currentClubSnapshot.hasData && currentClubSnapshot.data != null
+                ? (currentClubSnapshot.data as dynamic).fold(
+                    (l) => null,
+                    (r) => r,
+                  )
+                : null;
+
+            return InkWell(
+              onTap: () => showDialog(
+                context: context,
+                builder: (context) => PlayerDetailDialog(player: player),
+              ),
+              borderRadius: BorderRadius.circular(8),
+              child: Container(
+                margin: const EdgeInsets.only(bottom: 8),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1E1E1E),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.white.withOpacity(0.05)),
+                ),
+                child: Row(
                   children: [
-                    Text(
-                      player?.name ?? 'Unknown',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
+                    Expanded(
+                      flex: 4,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '${player.name} (${player.ca})',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          Text(
+                            '${player.position} • ${currentClub?.name ?? 'Unknown'}',
+                            style: const TextStyle(
+                              color: Colors.white54,
+                              fontSize: 11,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
                       ),
                     ),
+                    Expanded(
+                      flex: 3,
+                      child: Text(
+                        fromClub?.name ?? 'Unknown',
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
                     Text(
-                      'From ${fromClub?.name ?? 'Unknown'}',
+                      _formatCurrency(offer.offerAmount),
                       style: const TextStyle(
-                        color: Colors.white54,
-                        fontSize: 11,
+                        color: Colors.amber,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
                       ),
                     ),
                   ],
                 ),
               ),
-              Text(
-                _formatCurrency(offer.offerAmount),
-                style: const TextStyle(
-                  color: Colors.amber,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15,
-                ),
-              ),
-            ],
-          ),
+            );
+          },
         );
       },
     );

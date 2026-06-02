@@ -1,4 +1,5 @@
 import 'dart:ui'; // Blur efekti için gerekli
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../agents/providers/user_agent_provider.dart';
@@ -256,26 +257,14 @@ class HomeContent extends ConsumerWidget {
                         */
 
                     // Transfer Market Button
-                    GestureDetector(
+                    _TransferMarketPulseButton(
+                      isTransferWindow: TransferEngine.isTransferWindow(
+                        currentWeek.week,
+                      ),
                       onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (_) => const TransferMarketPage(),
-                        ),
-                      ),
-                      child: Container(
-                        padding: const EdgeInsets.all(5),
-                        decoration: BoxDecoration(
-                          color: Colors.cyan.withOpacity(0.2),
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.cyanAccent.withOpacity(0.5),
-                          ),
-                        ),
-                        child: const Icon(
-                          Icons.swap_horiz_rounded,
-                          color: Colors.cyanAccent,
-                          size: 20,
                         ),
                       ),
                     ),
@@ -424,6 +413,125 @@ class HomeContent extends ConsumerWidget {
     } finally {
       if (context.mounted) Navigator.pop(context);
     }
+  }
+}
+
+class _TransferMarketPulseButton extends StatefulWidget {
+  final bool isTransferWindow;
+  final VoidCallback onTap;
+
+  const _TransferMarketPulseButton({
+    required this.isTransferWindow,
+    required this.onTap,
+  });
+
+  @override
+  State<_TransferMarketPulseButton> createState() =>
+      _TransferMarketPulseButtonState();
+}
+
+class _TransferMarketPulseButtonState extends State<_TransferMarketPulseButton>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<Color?> _colorAnim;
+  late final Animation<Color?> _borderAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1100),
+    );
+    _colorAnim = ColorTween(
+      begin: const Color(0xFFEF5350),
+      end: const Color(0xFFB71C1C),
+    ).animate(_controller);
+    _borderAnim = ColorTween(
+      begin: const Color(0xFFFFCDD2),
+      end: const Color(0xFFEF9A9A),
+    ).animate(_controller);
+    _syncAnimationState();
+  }
+
+  @override
+  void didUpdateWidget(covariant _TransferMarketPulseButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.isTransferWindow != widget.isTransferWindow) {
+      _syncAnimationState();
+    }
+  }
+
+  void _syncAnimationState() {
+    if (widget.isTransferWindow) {
+      _controller.repeat(reverse: true);
+    } else {
+      _controller.stop();
+      _controller.value = 0;
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        final isWindow = widget.isTransferWindow;
+        final glowT = (math.sin(_controller.value * 2 * math.pi) + 1) / 2;
+        final bgColor = isWindow
+            ? (_colorAnim.value ?? const Color(0xFFEF5350))
+            : Colors.white.withOpacity(0.1);
+        final borderColor = isWindow
+            ? (_borderAnim.value ?? const Color(0xFFFFCDD2))
+            : Colors.white.withOpacity(0.2);
+        final shadowColor = isWindow
+            ? Color.lerp(
+                const Color(0xFFFF8A80),
+                const Color(0xFFD50000),
+                glowT,
+              )!
+            : Colors.blueAccent.withOpacity(0.1);
+
+        return GestureDetector(
+          onTap: widget.onTap,
+          child: Container(
+            padding: const EdgeInsets.all(5),
+            decoration: BoxDecoration(
+              color: bgColor,
+              shape: BoxShape.circle,
+              border: Border.all(color: borderColor),
+              boxShadow: [
+                BoxShadow(
+                  color: shadowColor.withOpacity(
+                    isWindow ? (0.65 - (glowT * 0.25)) : 0.12,
+                  ),
+                  blurRadius: isWindow ? (10 + glowT * 8) : 6,
+                  spreadRadius: isWindow ? (1 + glowT * 2.5) : 0,
+                ),
+                BoxShadow(
+                  color: isWindow
+                      ? shadowColor.withOpacity(0.22 * glowT)
+                      : Colors.transparent,
+                  blurRadius: isWindow ? (18 + glowT * 12) : 0,
+                  spreadRadius: isWindow ? (4 + glowT * 5) : 0,
+                ),
+              ],
+            ),
+            child: Icon(
+              Icons.swap_horiz_rounded,
+              color: isWindow ? Colors.white : Colors.cyanAccent,
+              size: 20,
+            ),
+          ),
+        );
+      },
+    );
   }
 }
 
