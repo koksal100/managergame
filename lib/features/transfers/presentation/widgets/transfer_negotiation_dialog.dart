@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/database/app_database.dart' hide Player;
+import '../../../../core/providers/database_provider.dart';
 import '../../../../core/providers/repository_providers.dart';
 import '../../../players/domain/entities/player.dart';
 import '../../providers/transfer_provider.dart';
@@ -41,6 +42,8 @@ class _TransferNegotiationDialogState
   late double _offerAmount;
   late double _wageAmount;
   late int _years;
+  int _clubRelationshipBonus = 0;
+  int _managerReputationBonus = 0;
 
   @override
   void initState() {
@@ -49,6 +52,7 @@ class _TransferNegotiationDialogState
     _offerAmount = (widget.player.marketValue * 1.2).clamp(0, 500000000);
     _wageAmount = (widget.player.marketValue / 200).clamp(0, 5000000);
     _years = 3;
+    _loadNegotiationContext();
   }
 
   int get _probability {
@@ -89,7 +93,54 @@ class _TransferNegotiationDialogState
     if (_offerAmount < widget.player.marketValue * 0.5)
       score -= 20; // Suspiciously low
 
+    score += _clubRelationshipBonus;
+    score += _managerReputationBonus;
+
     return score.clamp(0, 100);
+  }
+
+  Future<void> _loadNegotiationContext() async {
+    final db = ref.read(appDatabaseProvider);
+
+    final relationship =
+        await (db.select(db.relationships)
+              ..where((t) => t.fromId.equals(1))
+              ..where((t) => t.toId.equals(widget.player.clubId!))
+              ..where((t) => t.fromType.equals('Agent'))
+              ..where((t) => t.toType.equals('Club')))
+            .getSingleOrNull();
+
+    final agent = await (db.select(
+      db.agents,
+    )..where((t) => t.id.equals(1))).getSingleOrNull();
+
+    final relationshipScore = relationship?.score ?? 50;
+    final relationshipBonus = relationshipScore >= 80
+        ? 10
+        : relationshipScore >= 60
+        ? 5
+        : relationshipScore <= 19
+        ? -15
+        : relationshipScore <= 39
+        ? -8
+        : 0;
+
+    final reputation = agent?.reputation ?? 50;
+    final reputationBonus = reputation >= 85
+        ? 8
+        : reputation >= 70
+        ? 4
+        : reputation <= 25
+        ? -8
+        : reputation <= 40
+        ? -4
+        : 0;
+
+    if (!mounted) return;
+    setState(() {
+      _clubRelationshipBonus = relationshipBonus;
+      _managerReputationBonus = reputationBonus;
+    });
   }
 
   void _submitOffer() async {

@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:drift/drift.dart';
 import '../../../../core/database/app_database.dart';
+import '../../../agents/domain/services/agency_progression_service.dart';
 import '../../../players/domain/services/player_value_calculator.dart';
 
 /// TransferEngine handles all AI-driven transfer logic.
@@ -32,27 +33,25 @@ class TransferEngine {
     'RW': 'FWD',
   };
 
+  static const Map<String, int> minimumPlayersByCategory = {
+    'GK': 2,
+    'DEF': 5,
+    'MID': 5,
+    'FWD': 3,
+  };
+
   /// Generate transfer needs for all clubs.
   /// Called at game start or before transfer window opens.
   Future<void> generateAllClubNeeds() async {
-    print('[TransferEngine] generateAllClubNeeds() called');
     final clubs = await database.select(database.clubs).get();
-    print('[TransferEngine] Found ${clubs.length} clubs');
 
-    int needsCreated = 0;
     for (final club in clubs) {
       await generateTransferNeedsForClub(
         club.id,
         club.transferBudget.toInt(),
         club.wageBudget.toInt(),
       );
-      needsCreated++;
     }
-    print('[TransferEngine] Generated needs for $needsCreated clubs');
-
-    // Verify
-    final allNeeds = await database.select(database.transferNeeds).get();
-    print('[TransferEngine] Total needs in DB: ${allNeeds.length}');
   }
 
   /// Analyze a club's squad and generate buy/sell needs.
@@ -105,7 +104,10 @@ class TransferEngine {
         budget: maxBudget,
         positionCategory: weakestPos,
       );
-      final minCa = ((avgCaBase + budgetBasedCa) / 2).round().clamp(40, 99);
+      final minCa = ((avgCaBase + budgetBasedCa) / 2)
+          .round()
+          .clamp(40, 99)
+          .toInt();
 
       await database
           .into(database.transferNeeds)
@@ -247,17 +249,117 @@ class TransferEngine {
     return bestCa;
   }
 
+  Future<void> _reviewClubNeedsForPosition(
+    int clubId,
+    String positionCategory,
+  ) async {
+    final club = await (database.select(
+      database.clubs,
+    )..where((t) => t.id.equals(clubId))).getSingleOrNull();
+    if (club == null) return;
+
+    final players = await (database.select(
+      database.players,
+    )..where((t) => t.clubId.equals(clubId))).get();
+    if (players.isEmpty) return;
+
+    final playersInCategory = players.where((p) {
+      return (positionCategories[p.position] ?? 'MID') == positionCategory;
+    }).toList();
+
+    final existingBuyNeed =
+        await (database.select(database.transferNeeds)
+              ..where((t) => t.clubId.equals(clubId))
+              ..where((t) => t.type.equals('buy'))
+              ..where((t) => t.isFulfilled.equals(false))
+              ..where((t) => t.targetPosition.equals(positionCategory)))
+            .getSingleOrNull();
+
+    final minimumCount = minimumPlayersByCategory[positionCategory] ?? 4;
+    final overallAvgCa =
+        players.map((p) => p.ca).reduce((a, b) => a + b) / players.length;
+    final categoryAvgCa = playersInCategory.isEmpty
+        ? 0.0
+        : playersInCategory.map((p) => p.ca).reduce((a, b) => a + b) /
+              playersInCategory.length;
+    final shouldCreateBuyNeed =
+        playersInCategory.length < minimumCount ||
+        categoryAvgCa < (overallAvgCa - 3);
+
+    if (shouldCreateBuyNeed) {
+      final avgCaBase =
+          ((categoryAvgCa == 0 ? overallAvgCa : categoryAvgCa) + 2).round();
+      final maxBudget = club.transferBudget.toInt() ~/ 2;
+      final budgetBasedCa = _estimateCaFromBudgetAtAge27(
+        budget: maxBudget,
+        positionCategory: positionCategory,
+      );
+      final minCa = ((avgCaBase + budgetBasedCa) / 2)
+          .round()
+          .clamp(40, 99)
+          .toInt();
+
+      final companion = TransferNeedsCompanion(
+        clubId: Value(clubId),
+        type: const Value('buy'),
+        targetPosition: Value(positionCategory),
+        minAge: const Value(18),
+        maxAge: const Value(32),
+        minCa: Value(minCa),
+        maxTransferBudget: Value(maxBudget),
+        maxWeeklySalary: Value(club.wageBudget.toInt() ~/ 25 ~/ 52),
+      );
+
+      if (existingBuyNeed == null) {
+        await database.into(database.transferNeeds).insert(companion);
+      } else {
+        await (database.update(
+          database.transferNeeds,
+        )..where((t) => t.id.equals(existingBuyNeed.id))).write(companion);
+      }
+    }
+
+    if (players.length <= 20 || playersInCategory.length < minimumCount + 2) {
+      return;
+    }
+
+    final existingSellNeedForCategory =
+        await (database.select(database.transferNeeds)
+              ..where((t) => t.clubId.equals(clubId))
+              ..where((t) => t.type.equals('sell'))
+              ..where((t) => t.isFulfilled.equals(false))
+              ..where(
+                (t) => t.playerToSellId.isIn(
+                  playersInCategory.map((p) => p.id).toList(),
+                ),
+              ))
+            .getSingleOrNull();
+
+    if (existingSellNeedForCategory != null) return;
+
+    final sellCandidates = List<Player>.from(playersInCategory)
+      ..sort((a, b) => a.ca.compareTo(b.ca));
+    final sellCandidate = sellCandidates.firstOrNull;
+    if (sellCandidate == null) return;
+
+    await database
+        .into(database.transferNeeds)
+        .insert(
+          TransferNeedsCompanion(
+            clubId: Value(clubId),
+            type: const Value('sell'),
+            playerToSellId: Value(sellCandidate.id),
+            minimumFee: Value((sellCandidate.marketValue * 0.8).round()),
+          ),
+        );
+  }
+
   /// Process offer creation. Each club creates up to 2 offers per day.
   /// Process offer creation.
   /// Optimized: Fetches all buy needs, shuffles them, and processes max 50 per day.
   /// Process offer creation.
   /// optimized: Fetches all data upfront (Batch Processing) to minimize DB I/O.
   Future<void> processOfferCreation(int season, int currentWeek) async {
-    final startTime = DateTime.now();
-    print(
-      '[TransferEngine] processOfferCreation started for Season $season Week $currentWeek',
-    );
-
     // 1. Fetch ALL unfulfilled Buy Needs
     final allBuyNeeds =
         await (database.select(database.transferNeeds)
@@ -323,23 +425,12 @@ class TransferEngine {
     final recentlyTransferredPlayerIds = recentlyTransferredOffers
         .map((o) => o.playerId)
         .toSet();
-    print(
-      '[TransferEngine] Found ${recentlyTransferredPlayerIds.length} players already transferred this window. Excluding them.',
-    );
-
     // 6. Processing & Matching (In-Memory)
     final shuffledBuyNeeds = allBuyNeeds.toList()..shuffle(_random);
     int offersCreated = 0;
 
     // Use a transaction/batch insert if possible, but for now simple loop of inserts
     // is fine since we calculate everything in memory first.
-
-    print(
-      '[TransferEngine] Data fetch complete in ${DateTime.now().difference(startTime).inMilliseconds}ms',
-    );
-    print(
-      '[TransferEngine] Processing ${shuffledBuyNeeds.length} buy needs against ${allSellNeeds.length} sell needs',
-    );
 
     for (final need in shuffledBuyNeeds) {
       if (offersCreated >= 50) break;
@@ -370,8 +461,14 @@ class TransferEngine {
         if (need.maxAge != null && player.age > need.maxAge!) continue;
 
         // Calculate offer
+        final relationshipMultiplier = await _pricingTransferMultiplier(
+          player: player,
+          sellingClubId: sellNeed.clubId,
+        );
         final offerAmount =
-            (sellNeed.minimumFee ?? player.marketValue) +
+            (((sellNeed.minimumFee ?? player.marketValue) *
+                    relationshipMultiplier)
+                .round()) +
             _random.nextInt(500000);
         if (need.maxTransferBudget != null &&
             offerAmount > need.maxTransferBudget!)
@@ -403,9 +500,6 @@ class TransferEngine {
 
         offersCreated++;
         matchFound = true;
-        print(
-          '[TransferEngine] OFFER CREATED (Listed): ${need.clubId} offered €${offerAmount / 1000000}M for Player ${player.id} to Club ${sellNeed.clubId}',
-        );
         break; // Match found for this buy need, move to next need
       }
 
@@ -443,8 +537,12 @@ class TransferEngine {
               validCandidates[_random.nextInt(validCandidates.length)];
 
           // Check budget
-          int estimatedFee = (player.marketValue * 1.2)
-              .toInt(); // 20% premium for unlisted
+          final relationshipMultiplier = await _pricingTransferMultiplier(
+            player: player,
+            sellingClubId: player.clubId!,
+          );
+          int estimatedFee = (player.marketValue * 1.2 * relationshipMultiplier)
+              .toInt();
           if (need.maxTransferBudget == null ||
               estimatedFee <= need.maxTransferBudget!) {
             final proposedSalary = (player.marketValue / 200).round();
@@ -468,18 +566,10 @@ class TransferEngine {
                     ),
                   );
               offersCreated++;
-              print(
-                '[TransferEngine] OFFER CREATED (Unlisted): ${need.clubId} offered €${estimatedFee / 1000000}M for Player ${player.id} to Club ${player.clubId}',
-              );
             }
           }
         }
       }
-
-      final endTime = DateTime.now();
-      print(
-        '[TransferEngine] Created $offersCreated offers. Total time: ${endTime.difference(startTime).inMilliseconds}ms',
-      );
     }
   }
 
@@ -531,9 +621,6 @@ class TransferEngine {
       if (currentPlayerParams == null ||
           currentPlayerParams.clubId != bestOffer.toClubId) {
         // Player doesn't exist or has already moved to another club
-        print(
-          '[TransferEngine] INVALID OFFER: Player $playerId is no longer at Club ${bestOffer.toClubId}. Rejecting offers.',
-        );
         final allIds = offers.map((o) => o.id).toList();
         await (database.update(database.transferOffers)
               ..where((t) => t.id.isIn(allIds)))
@@ -552,19 +639,30 @@ class TransferEngine {
 
       bool accepted = false;
 
+      final player = await (database.select(
+        database.players,
+      )..where((t) => t.id.equals(bestOffer.playerId))).getSingleOrNull();
+      final acceptanceMultiplier = player == null
+          ? 1.0
+          : await _acceptanceTransferMultiplier(
+              player: player,
+              sellingClubId: bestOffer.toClubId,
+            );
+
       if (sellNeed != null) {
         // Check if offer meets minimum
+        final requiredFee = sellNeed.minimumFee == null
+            ? 0
+            : (sellNeed.minimumFee! * acceptanceMultiplier).round();
         if (sellNeed.minimumFee == null ||
-            bestOffer.offerAmount >= sellNeed.minimumFee!) {
+            bestOffer.offerAmount >= requiredFee) {
           accepted = true;
         }
       } else {
         // No explicit sell need, decide based on offer vs market value
-        final player = await (database.select(
-          database.players,
-        )..where((t) => t.id.equals(bestOffer.playerId))).getSingleOrNull();
         if (player != null &&
-            bestOffer.offerAmount >= player.marketValue * 0.9) {
+            bestOffer.offerAmount >=
+                (player.marketValue * 0.9 * acceptanceMultiplier)) {
           accepted = _random.nextBool(); // 50% chance
         }
       }
@@ -572,19 +670,12 @@ class TransferEngine {
       if (accepted) {
         // 1. Accept Best Offer
         await _finalizeTransfer(bestOffer, season, currentWeek);
-        print(
-          '[TransferEngine] ACCEPTED best offer for Player $playerId: €${bestOffer.offerAmount}',
-        );
-
         // 2. Auto-Reject all other offers for this player
         if (otherOffers.isNotEmpty) {
           final otherIds = otherOffers.map((o) => o.id).toList();
           await (database.update(database.transferOffers)
                 ..where((t) => t.id.isIn(otherIds)))
               .write(const TransferOffersCompanion(status: Value('rejected')));
-          print(
-            '[TransferEngine] AUTO-REJECTED ${otherOffers.length} lower offers for Player $playerId',
-          );
         }
       } else {
         // Reject Best Offer (and implicitly reject others effectively, or we can mark ALL as rejected)
@@ -594,10 +685,6 @@ class TransferEngine {
         await (database.update(database.transferOffers)
               ..where((t) => t.id.isIn(allIds)))
             .write(const TransferOffersCompanion(status: Value('rejected')));
-
-        print(
-          '[TransferEngine] REJECTED all ${offers.length} offers for Player $playerId (Best offer was €${bestOffer.offerAmount})',
-        );
       }
     }
   }
@@ -662,6 +749,12 @@ class TransferEngine {
     int week,
   ) async {
     final now = DateTime.now();
+    final transferredPlayer = await (database.select(
+      database.players,
+    )..where((t) => t.id.equals(offer.playerId))).getSingleOrNull();
+    final transferredPlayerCategory = transferredPlayer == null
+        ? 'MID'
+        : (positionCategories[transferredPlayer.position] ?? 'MID');
 
     // 1. Update offer status
     await (database.update(database.transferOffers)
@@ -744,9 +837,6 @@ class TransferEngine {
         .write(const TransferNeedsCompanion(isFulfilled: Value(true)));
 
     // 8. Agent Commission
-    print(
-      '[TransferEngine] Checking for agent contract for Player ${offer.playerId}...',
-    );
     final activeContracts = await (database.select(
       database.agentContracts,
     )..where((t) => t.playerId.equals(offer.playerId))).get();
@@ -759,41 +849,34 @@ class TransferEngine {
     if (activeContract != null) {
       final agentId = activeContract.agentId;
       final feePercentage = activeContract.feePercentage;
-      print(
-        '[TransferEngine] FOUND Contract: Agent $agentId with $feePercentage% fee.',
-      );
 
       final commission = (offer.offerAmount * (feePercentage / 100)).toInt();
-      print(
-        '[TransferEngine] Calculated Commission: €$commission (Fee: €${offer.offerAmount})',
-      );
 
       final agent = await (database.select(
         database.agents,
       )..where((a) => a.id.equals(agentId))).getSingleOrNull();
       if (agent != null) {
-        print(
-          '[TransferEngine] Updating Agent ${agent.name} Balance: ${agent.balance} -> ${agent.balance + commission}',
-        );
         await (database.update(database.agents)
               ..where((a) => a.id.equals(agentId)))
             .write(AgentsCompanion(balance: Value(agent.balance + commission)));
-        print(
-          '[TransferEngine] COMMISSION PAID: €$commission to Agent ${agent.name} ($feePercentage%)',
-        );
-      } else {
-        print(
-          '[TransferEngine] ERROR: Agent $agentId found in contract but not in Agents table.',
-        );
       }
-    } else {
-      print(
-        '[TransferEngine] NO ACTIVE CONTRACT regarding Player ${offer.playerId}. Found ${activeContracts.length} total contracts.',
+
+      final xpReward = _calculateTransferXpReward(
+        offer: offer,
+        player: transferredPlayer,
       );
+      await AgencyProgressionService(
+        database,
+      ).addXp(agentId: agentId, amount: xpReward);
     }
 
-    print(
-      '[TransferEngine] TRANSFER FINALIZED: Player ${offer.playerId} moved from Club ${offer.toClubId} to Club ${offer.fromClubId} for €${offer.offerAmount / 1000000}M',
+    await _reviewClubNeedsForPosition(
+      offer.toClubId,
+      transferredPlayerCategory,
+    );
+    await _reviewClubNeedsForPosition(
+      offer.fromClubId,
+      transferredPlayerCategory,
     );
   }
 
@@ -815,5 +898,134 @@ class TransferEngine {
   /// Check if current week ends a transfer window.
   static bool isTransferWindowEnding(int week) {
     return week == 8 || week == 32;
+  }
+
+  int _calculateTransferXpReward({
+    required TransferOffer offer,
+    required Player? player,
+  }) {
+    int reward = 8;
+
+    if (player != null) {
+      final premiumRatio = offer.offerAmount / max(1, player.marketValue);
+      if (premiumRatio >= 1.20) {
+        reward += 5;
+      } else if (premiumRatio >= 1.05) {
+        reward += 3;
+      }
+
+      final potentialGap = (player.pa - player.ca).round();
+      if (potentialGap >= 12) {
+        reward += 4;
+      } else if (potentialGap >= 6) {
+        reward += 2;
+      }
+    }
+
+    return reward;
+  }
+
+  Future<double> _pricingTransferMultiplier({
+    required Player player,
+    required int sellingClubId,
+  }) async {
+    final clubRelationship = await _clubRelationshipThresholdModifier(
+      agentId: player.agentId,
+      clubId: sellingClubId,
+    );
+    final reputationModifier = await _agentReputationThresholdModifier(
+      player.agentId,
+    );
+
+    return (clubRelationship * reputationModifier).clamp(0.82, 1.22);
+  }
+
+  Future<double> _acceptanceTransferMultiplier({
+    required Player player,
+    required int sellingClubId,
+  }) async {
+    final playerRelationship = await _playerRelationshipThresholdModifier(
+      player,
+    );
+    final clubRelationship = await _clubRelationshipThresholdModifier(
+      agentId: player.agentId,
+      clubId: sellingClubId,
+    );
+    final reputationModifier = await _agentReputationThresholdModifier(
+      player.agentId,
+    );
+
+    return (playerRelationship * clubRelationship * reputationModifier).clamp(
+      0.78,
+      1.22,
+    );
+  }
+
+  Future<double> _playerRelationshipThresholdModifier(Player player) async {
+    if (player.agentId == null) return 1.0;
+
+    final relationship = await _readRelationshipScore(
+      fromId: player.agentId!,
+      toId: player.id,
+      fromType: 'Agent',
+      toType: 'Player',
+    );
+
+    if (relationship >= 80) return 1.06;
+    if (relationship >= 60) return 1.03;
+    if (relationship <= 19) return 0.90;
+    if (relationship <= 39) return 0.96;
+    return 1.0;
+  }
+
+  Future<double> _clubRelationshipThresholdModifier({
+    required int? agentId,
+    required int clubId,
+  }) async {
+    if (agentId == null) return 1.0;
+
+    final relationship = await _readRelationshipScore(
+      fromId: agentId,
+      toId: clubId,
+      fromType: 'Agent',
+      toType: 'Club',
+    );
+
+    if (relationship >= 80) return 0.93;
+    if (relationship >= 60) return 0.97;
+    if (relationship <= 19) return 1.12;
+    if (relationship <= 39) return 1.06;
+    return 1.0;
+  }
+
+  Future<double> _agentReputationThresholdModifier(int? agentId) async {
+    if (agentId == null) return 1.0;
+
+    final agent = await (database.select(
+      database.agents,
+    )..where((t) => t.id.equals(agentId))).getSingleOrNull();
+    if (agent == null) return 1.0;
+
+    if (agent.reputation >= 85) return 0.95;
+    if (agent.reputation >= 70) return 0.98;
+    if (agent.reputation <= 25) return 1.08;
+    if (agent.reputation <= 40) return 1.04;
+    return 1.0;
+  }
+
+  Future<int> _readRelationshipScore({
+    required int fromId,
+    required int toId,
+    required String fromType,
+    required String toType,
+  }) async {
+    final row =
+        await (database.select(database.relationships)
+              ..where((t) => t.fromId.equals(fromId))
+              ..where((t) => t.toId.equals(toId))
+              ..where((t) => t.fromType.equals(fromType))
+              ..where((t) => t.toType.equals(toType)))
+            .getSingleOrNull();
+    return row?.score ?? 50;
   }
 }

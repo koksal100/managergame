@@ -16,6 +16,9 @@ import '../../../simulation/presentation/providers/simulation_provider.dart';
 import '../../../leagues/presentation/providers/standings_provider.dart';
 import '../../../../core/presentation/widgets/glass_container.dart';
 import '../../../agents/presentation/pages/agents_page.dart';
+import '../../../decisions/presentation/widgets/weekly_decision_dialog.dart';
+import '../../../decisions/providers/weekly_decision_provider.dart';
+import '../../../relationships/providers/relationship_rule_provider.dart';
 import '../../../transfers/providers/transfer_provider.dart';
 import '../../../transfers/domain/services/transfer_engine.dart';
 import '../../../transfers/presentation/pages/transfer_market_page.dart';
@@ -335,6 +338,7 @@ class HomeContent extends ConsumerWidget {
     WidgetRef ref,
     GameTime currentGameTime,
   ) async {
+    bool loadingClosed = false;
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -351,11 +355,6 @@ class HomeContent extends ConsumerWidget {
       final currentWeek = currentGameTime.week;
       final currentSeason = currentGameTime.season;
 
-      print('[Simulation] Season=$currentSeason, Week=$currentWeek');
-      print(
-        '[Simulation] isTransferWindow=${TransferEngine.isTransferWindow(currentWeek)}',
-      );
-
       // --- TRANSFER WINDOW LOGIC ---
       // 1. If inside transfer window AND no needs exist, generate them
       if (TransferEngine.isTransferWindow(currentWeek)) {
@@ -363,10 +362,8 @@ class HomeContent extends ConsumerWidget {
             .read(appDatabaseProvider)
             .select(ref.read(appDatabaseProvider).transferNeeds)
             .get();
-        print('[Simulation] Existing needs count: ${existingNeeds.length}');
 
         if (existingNeeds.isEmpty) {
-          print('[Simulation] Generating transfer needs...');
           await transferEngine.generateAllClubNeeds();
         }
 
@@ -383,6 +380,13 @@ class HomeContent extends ConsumerWidget {
       // --- MATCH SIMULATION ---
       await simulationService.simulateWeek(currentSeason, currentWeek);
       await ref.read(gameDateProvider.notifier).advanceWeek();
+      final updatedGameTime = ref.read(gameDateProvider);
+      final relationshipReview =
+          TransferEngine.isTransferWindowStarting(updatedGameTime.week)
+          ? await ref
+                .read(relationshipRuleServiceProvider)
+                .evaluateTransferWindowStart()
+          : null;
 
       // Invalidate Providers
       ref.invalidate(standingsProvider);
@@ -404,6 +408,44 @@ class HomeContent extends ConsumerWidget {
 
       // Refresh User Agent to update weekly offers limit if needed (though it uses SP directly)
       ref.invalidate(userAgentProvider);
+
+      final decisionService = ref.read(weeklyDecisionServiceProvider);
+      final decision = await decisionService.maybeGenerateDecision(
+        updatedGameTime.season,
+        updatedGameTime.week,
+      );
+
+      if (context.mounted) {
+        Navigator.pop(context);
+        loadingClosed = true;
+      }
+
+      if (context.mounted && decision != null) {
+        final applied = await showDialog<bool>(
+          context: context,
+          barrierDismissible: false,
+          builder: (dialogContext) => WeeklyDecisionDialog(decision: decision),
+        );
+        if (applied == true) {
+          ref.invalidate(userAgentProvider);
+          ref.invalidate(filteredPlayersProvider);
+          ref.invalidate(playersByClubProvider);
+          ref.invalidate(playersByAgentProvider(1));
+        }
+      }
+
+      if (context.mounted &&
+          relationshipReview != null &&
+          relationshipReview.hasEvents) {
+        ref.invalidate(userAgentProvider);
+        ref.invalidate(filteredPlayersProvider);
+        ref.invalidate(playersByClubProvider);
+        ref.invalidate(playersByAgentProvider(1));
+        await _showRelationshipReviewDialog(
+          context,
+          relationshipReview.messages,
+        );
+      }
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(
@@ -411,8 +453,55 @@ class HomeContent extends ConsumerWidget {
         ).showSnackBar(SnackBar(content: Text('Error: $e')));
       }
     } finally {
-      if (context.mounted) Navigator.pop(context);
+      if (context.mounted && !loadingClosed) {
+        Navigator.pop(context);
+      }
     }
+  }
+
+  Future<void> _showRelationshipReviewDialog(
+    BuildContext context,
+    List<String> messages,
+  ) {
+    return showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: const Color(0xFF1E1E1E),
+        title: const Text(
+          'Transfer Window Review',
+          style: TextStyle(color: Colors.white),
+        ),
+        content: SizedBox(
+          width: 360,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: messages
+                  .map(
+                    (message) => Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: Text(
+                        '• $message',
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          height: 1.35,
+                        ),
+                      ),
+                    ),
+                  )
+                  .toList(),
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -884,7 +973,7 @@ class _TickerWidgetState extends ConsumerState<_TickerWidget>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 60), // Biraz hızlandırdım
+      duration: const Duration(seconds: 200),
     )..repeat();
   }
 
@@ -901,7 +990,7 @@ class _TickerWidgetState extends ConsumerState<_TickerWidget>
     return tickerAsync.when(
       data: (matches) {
         String displayText = matches.isEmpty
-            ? "PRE-SEASON • PREPARE YOUR TEAM • TRANSFER WINDOW OPEN • "
+            ? "TRANSFER WINDOW OPEN • PREPARE YOUR TEAM • SCOUTING ACTIVE • "
             : matches.join("   •   ") + "   •   ";
 
         if (_text != displayText) _text = displayText;
